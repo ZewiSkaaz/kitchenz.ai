@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const UBER_API_BASE = "https://api.uber.com/v1";
-const UBER_AUTH_BASE = "https://login.uber.com/oauth/v2";
+const UBER_API_BASE = "https://test-api.uber.com/v1";
+const UBER_AUTH_BASE = "https://sandbox-login.uber.com/oauth/v2";
 
 export class UberService {
   private clientId: string;
