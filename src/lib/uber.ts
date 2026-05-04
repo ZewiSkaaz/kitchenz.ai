@@ -14,9 +14,6 @@ export class UberService {
     this.redirectUri = process.env.UBER_REDIRECT_URI || "https://kitchenz-ai.onrender.com/api/auth/uber/callback";
   }
 
-  /**
-   * Obtient un access_token via Client Credentials (pas de redirection OAuth nécessaire)
-   */
   async getClientCredentialsToken(scopes: string) {
     const formData = new FormData();
     formData.append('client_id', this.clientId);
@@ -33,51 +30,122 @@ export class UberService {
   }
 
   /**
-   * Convertit un menu Kitchenz.ai au format Uber Eats Menu API v2
+   * Moteur de formatage expert conforme à l'API Menu v2 d'Uber Eats
    */
   formatMenuForUber(brand: any, menuItems: any[]) {
-    // Uber Eats Menu Structure: Menus -> Categories -> Items
-    const categories = Array.from(new Set(menuItems.map((i: any) => i.category)));
-    
-    const uberItems = menuItems.map((item: any) => ({
-      id: `item_${item.id || Math.random().toString(36).substr(2, 9)}`,
-      title: { translations: { fr: item.title } },
-      description: { translations: { fr: item.description_seo || "" } },
-      image_url: item.image_url || null,
-      price_info: {
-        price: Math.round(item.selling_price * 100), // Uber expects cents
-        currency_code: "EUR"
-      }
-    }));
+    const uberItems: any[] = [];
+    const uberModifierGroups: any[] = [];
+    const uberDisplayOptions: any[] = [];
 
-    const uberCategories = categories.map(cat => ({
-      id: `cat_${cat.toString().toLowerCase().replace(/\s+/g, '_')}`,
-      title: { translations: { fr: cat } },
+    // 1. Traitement des articles et de leurs modificateurs
+    menuItems.forEach((item: any) => {
+      const itemModifierGroupIds: string[] = [];
+
+      // Traitement des groupes d'options (ex: Cuissons, Suppléments)
+      if (item.options && Array.isArray(item.options)) {
+        item.options.forEach((group: any, gIdx: number) => {
+          const groupId = `mg_${item.id}_${gIdx}`;
+          
+          const modifierInfos = group.modifiers.map((mod: any, mIdx: number) => {
+            const modId = `mod_${item.id}_${gIdx}_${mIdx}`;
+            
+            // Un modificateur est techniquement un ITEM dans l'API Uber
+            uberItems.push({
+              id: modId,
+              title: { translations: { fr: mod.name } },
+              price_info: {
+                price: Math.round(mod.price * 100),
+                currency_code: "EUR"
+              }
+            });
+
+            return {
+              id: modId,
+              type: "ITEM"
+            };
+          });
+
+          uberModifierGroups.push({
+            id: groupId,
+            title: { translations: { fr: group.name } },
+            quantity_info: {
+              min_permitted: group.min || 0,
+              max_permitted: group.max || 1
+            },
+            modifier_entities: modifierInfos
+          });
+
+          itemModifierGroupIds.push(groupId);
+        });
+      }
+
+      // L'article principal
+      uberItems.push({
+        id: `item_${item.id}`,
+        title: { translations: { fr: item.title } },
+        description: { translations: { fr: item.description || "" } },
+        image_url: item.image_url || null,
+        price_info: {
+          price: Math.round(item.selling_price * 100),
+          currency_code: "EUR"
+        },
+        tax_info: {
+          tax_rate: item.vat_rate || 10
+        },
+        modifier_group_ids: itemModifierGroupIds.length > 0 ? itemModifierGroupIds : undefined
+      });
+    });
+
+    // 2. Structuration des catégories
+    const categories = Array.from(new Set(menuItems.map((i: any) => i.category)));
+    const uberCategories = categories.map(catName => ({
+      id: `cat_${catName.toString().toLowerCase().replace(/\s+/g, '_')}`,
+      title: { translations: { fr: catName } },
       entities: menuItems
-        .filter(i => i.category === cat)
+        .filter(i => i.category === catName)
         .map(i => ({
-          id: `item_${i.id || ""}`,
+          id: `item_${i.id}`,
           type: "ITEM"
         }))
     }));
+
+    // 3. Mapping des horaires d'ouverture (Open Hours)
+    const dayMap: Record<number, string> = {
+      0: "MONDAY", 1: "TUESDAY", 2: "WEDNESDAY", 3: "THURSDAY",
+      4: "FRIDAY", 5: "SATURDAY", 6: "SUNDAY"
+    };
+
+    const serviceAvailability = (brand.business_hours || []).map((h: any) => ({
+      day_of_week: dayMap[h.day] || "MONDAY",
+      time_periods: [{
+        start_time: h.startTime || "08:00",
+        end_time: h.endTime || "22:00"
+      }]
+    }));
+
+    // Si pas d'horaires, on met un fallback 24/7 (sécurité)
+    const finalAvailability = serviceAvailability.length > 0 ? serviceAvailability : [
+      { day_of_week: "MONDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
+      { day_of_week: "TUESDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
+      { day_of_week: "WEDNESDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
+      { day_of_week: "THURSDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
+      { day_of_week: "FRIDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
+      { day_of_week: "SATURDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
+      { day_of_week: "SUNDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] }
+    ];
 
     return {
       menus: [
         {
           id: "main_menu",
-          title: { translations: { fr: "Menu Principal" } },
-          service_availability: [
-            {
-              day_of_week: "MONDAY",
-              time_periods: [{ start_time: "00:00", end_time: "23:59" }]
-            }
-            // ... apply for all days
-          ],
+          title: { translations: { fr: "Menu Kitchenz" } },
+          service_availability: finalAvailability,
           category_ids: uberCategories.map(c => c.id)
         }
       ],
       categories: uberCategories,
-      items: uberItems
+      items: uberItems,
+      modifier_groups: uberModifierGroups
     };
   }
 
@@ -92,13 +160,6 @@ export class UberService {
         }
       }
     );
-    return response.data;
-  }
-
-  async getStores(accessToken: string) {
-    const response = await axios.get(`${UBER_API_BASE}/eats/stores`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
     return response.data;
   }
 }

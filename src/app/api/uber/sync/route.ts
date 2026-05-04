@@ -13,17 +13,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "brandId is required" }, { status: 400 });
     }
 
-    // 1. Get access token from cookie or generate fresh one via client credentials
-    const cookieStore = cookies();
-    let accessToken = cookieStore.get("uber_access_token")?.value;
+    // 1. Auth via Client Credentials (Standard pour Server-to-Server)
+    const tokenData = await uberService.getClientCredentialsToken(SCOPES);
+    const accessToken = tokenData.access_token;
 
     if (!accessToken) {
-      // Re-generate token via client credentials
-      const tokenData = await uberService.getClientCredentialsToken(SCOPES);
-      accessToken = tokenData.access_token;
+      return NextResponse.json({ error: "Could not obtain Uber access token" }, { status: 401 });
     }
 
-    // 2. Get Brand and Menu Items from Supabase
+    // 2. Get Brand (avec Store ID) et Menu Items
     const { data: brand, error: brandError } = await supabase
       .from("brands")
       .select("*, menu_items(*)")
@@ -34,31 +32,40 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Brand not found" }, { status: 404 });
     }
 
-    // 3. Format menu for Uber
+    // 3. Format menu expert (Modificateurs, Horaires, TVA)
     const menuData = uberService.formatMenuForUber(brand, brand.menu_items);
 
-    // 4. In sandbox, we use a test store ID
-    // In production, this would come from the user's Uber store
-    const storeId = "sandbox_store_" + brandId.substring(0, 8);
+    // 4. Ciblage du Store
+    // On utilise l'ID réel s'il existe, sinon on reste en sandbox démo
+    const storeId = brand.uber_store_id || "sandbox_store_" + brandId.substring(0, 8);
     
-    // Log the menu data that would be sent (sandbox test)
-    console.log("Menu ready for Uber:", JSON.stringify(menuData, null, 2));
-    console.log("Would upload to store:", storeId);
-    console.log("Access token obtained:", accessToken ? "YES" : "NO");
+    console.log(`🚀 Synchronisation réelle vers Uber (${storeId})...`);
 
-    // Return success with the formatted data (sandbox mode)
-    return NextResponse.json({ 
-      success: true, 
-      message: "Menu formaté et prêt pour Uber Eats (mode Sandbox)",
-      items_count: brand.menu_items?.length || 0,
-      store_id: storeId,
-      token_obtained: !!accessToken
-    });
+    // 5. Appel API réel (PUT /menus)
+    try {
+      const uberResponse = await uberService.uploadMenu(storeId, accessToken, menuData);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: "Menu synchronisé avec succès sur Uber Eats !",
+        uber_status: "PUBLISHED",
+        details: uberResponse
+      });
+    } catch (uberError: any) {
+      const errorDetail = uberError.response?.data || uberError.message;
+      console.error("🔥 Uber API Error:", JSON.stringify(errorDetail, null, 2));
+      
+      return NextResponse.json({ 
+        success: false,
+        error: "Erreur Uber API : " + (errorDetail.message || "Erreur inconnue"),
+        debug: errorDetail
+      }, { status: 400 });
+    }
 
   } catch (error: any) {
-    console.error("Uber Sync Error:", error.response?.data || error.message);
+    console.error("Critical Sync Error:", error.message);
     return NextResponse.json({ 
-      error: error.response?.data?.message || error.message 
+      error: error.message 
     }, { status: 500 });
   }
 }
