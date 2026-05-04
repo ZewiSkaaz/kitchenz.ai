@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Camera, Trash2, Plus, TrendingUp, Save, X, Image as ImageIcon, 
   Info, AlertCircle, CheckCircle2, Download, ChevronRight, Tag,
   Settings2, Eye, EyeOff, ShieldAlert, BadgeCheck, UtensilsCrossed, Clock, Calendar,
-  ChevronDown, ChevronUp, Smartphone, Layout, ChefHat, ShieldCheck
+  ChevronDown, ChevronUp, Smartphone, Layout, ChefHat, ShieldCheck, Loader2
 } from "lucide-react";
 
 interface BrandEditorProps {
@@ -22,11 +22,21 @@ const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dima
 export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, uberConnected }: BrandEditorProps) {
   const [brand, setBrand] = useState(initialBrand);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState<string | null>(null); // Target ID or 'logo'/'banner'
   const [activeTab, setActiveTab] = useState<'identity' | 'menu' | 'ops'>('identity');
   const [editingItemIdx, setEditingItemIdx] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadTarget, setUploadTarget] = useState<'logo' | 'banner' | { type: 'item', index: number } | null>(null);
+
+  // Auto-hide toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const handleUploadClick = (target: any) => {
     setUploadTarget(target);
@@ -36,7 +46,13 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !uploadTarget) return;
-    if (file.size > 5 * 1024 * 1024) { alert("Max 5MB"); return; }
+    if (file.size > 5 * 1024 * 1024) { 
+      setToast({ message: "L'image est trop lourde (Max 5MB)", type: 'error' });
+      return; 
+    }
+
+    const targetKey = typeof uploadTarget === 'string' ? uploadTarget : `item-${uploadTarget.index}`;
+    setUploading(targetKey);
 
     try {
       const fileName = `${brand.id}/${Date.now()}.${file.name.split('.').pop()}`;
@@ -51,7 +67,20 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
         newItems[uploadTarget.index].image_url = publicUrl;
         setBrand({ ...brand, menu_items: newItems });
       }
-    } catch (error: any) { alert(error.message); }
+      setToast({ message: "Image mise à jour !", type: 'success' });
+    } catch (error: any) { 
+      setToast({ message: error.message, type: 'error' });
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  const validateMenu = () => {
+    for (const item of brand.menu_items) {
+      if (!item.title || item.title.trim() === "") return `Le produit "${item.title || 'sans nom'}" doit avoir un titre.`;
+      if (isNaN(item.selling_price) || item.selling_price < 0) return `Le prix du produit "${item.title}" est invalide.`;
+    }
+    return null;
   };
 
   const saveIdentity = async () => {
@@ -62,14 +91,26 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
       logo_url: brand.logo_url, background_url: brand.background_url,
       business_hours: brand.business_hours
     }).eq("id", brand.id);
-    if (!error) { onRefresh(); alert("✅ Identité & Opérations sauvegardées !"); }
+    
+    if (error) setToast({ message: "Erreur lors de la sauvegarde", type: 'error' });
+    else {
+      onRefresh();
+      setToast({ message: "Identité sauvegardée avec succès !", type: 'success' });
+    }
     setSaving(false);
   };
 
   const saveMenu = async () => {
+    const errorMsg = validateMenu();
+    if (errorMsg) {
+      setToast({ message: errorMsg, type: 'error' });
+      return;
+    }
+
     setSaving(true);
     const { error } = await supabase.from("menu_items").upsert(brand.menu_items);
-    if (!error) alert("✅ Menu synchronisé !");
+    if (error) setToast({ message: "Erreur de synchronisation base de données", type: 'error' });
+    else setToast({ message: "Menu synchronisé en local !", type: 'success' });
     setSaving(false);
   };
 
@@ -80,6 +121,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
     setBrand({ ...brand, business_hours: newHours });
   };
 
+  const sanitizePrice = (val: string) => {
+    const cleaned = val.replace(',', '.');
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -87,6 +134,19 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
       onClick={onClose}
     >
       <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+
+      {/* Premium Notification (Toast) */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div 
+            initial={{ y: -100, opacity: 0 }} animate={{ y: 20, opacity: 1 }} exit={{ y: -100, opacity: 0 }}
+            className={`fixed top-10 left-1/2 -translate-x-1/2 z-[300] px-8 py-4 rounded-[30px] shadow-2xl flex items-center gap-4 border-2 ${toast.type === 'success' ? 'bg-white border-[#06C167] text-[#06C167]' : 'bg-white border-red-500 text-red-500'}`}
+          >
+            {toast.type === 'success' ? <CheckCircle2 className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
+            <span className="font-black uppercase text-[11px] tracking-widest">{toast.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <motion.div 
         initial={{ scale: 0.9, y: 40, rotateX: 10 }} animate={{ scale: 1, y: 0, rotateX: 0 }}
@@ -102,7 +162,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
               </div>
               <div>
                 <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Kitchenz Studio</h3>
-                <span className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">Audit Pro V2.1</span>
+                <span className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">Audit Pro V2.2</span>
               </div>
             </div>
             <div className="h-10 w-px bg-slate-100" />
@@ -134,7 +194,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
               <div className="max-w-5xl mx-auto space-y-16 pb-32">
                 <div className="relative group rounded-[50px] overflow-hidden shadow-2xl border-4 border-white">
                   <div className="h-[450px] w-full bg-slate-100">
-                    <img src={brand.background_url} className="w-full h-full object-cover" />
+                    <img src={brand.background_url} className={`w-full h-full object-cover ${uploading === 'banner' ? 'opacity-30' : ''}`} />
+                    {uploading === 'banner' && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Loader2 className="w-12 h-12 text-[#06C167] animate-spin" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
                       <button onClick={() => handleUploadClick('banner')} className="bg-white px-10 py-4 rounded-3xl font-black uppercase text-xs tracking-widest flex items-center gap-3 shadow-2xl hover:scale-110 transition-all">
                         <Camera className="w-5 h-5" /> Changer la Bannière
@@ -143,7 +208,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                   </div>
                   <div className="absolute -bottom-16 left-16 group/logo">
                     <div className="w-48 h-48 rounded-[45px] border-[12px] border-white shadow-2xl overflow-hidden bg-white relative">
-                      <img src={brand.logo_url} className="w-full h-full object-cover" />
+                      <img src={brand.logo_url} className={`w-full h-full object-cover ${uploading === 'logo' ? 'opacity-30' : ''}`} />
+                      {uploading === 'logo' && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Loader2 className="w-8 h-8 text-[#06C167] animate-spin" />
+                        </div>
+                      )}
                       <button onClick={() => handleUploadClick('logo')} className="absolute inset-0 bg-black/50 opacity-0 group-hover/logo:opacity-100 transition-all flex items-center justify-center text-white backdrop-blur-sm">
                         <Camera className="w-8 h-8" />
                       </button>
@@ -172,7 +242,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                       <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="min-h-[280px] text-lg leading-relaxed italic" />
                     </div>
                     <button onClick={saveIdentity} disabled={saving} className="btn-v3-primary w-full py-8 text-lg">
-                      {saving ? 'Enregistrement...' : 'Valider l\'Identité'} <BadgeCheck className="ml-4 w-6 h-6" />
+                      {saving ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Valider l\'Identité'} <BadgeCheck className="ml-4 w-6 h-6" />
                     </button>
                   </div>
                 </div>
@@ -207,7 +277,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                        <div className="flex gap-14 relative z-10">
                           <div className="w-64 space-y-6 shrink-0">
                              <div className="w-full h-64 rounded-[45px] overflow-hidden bg-slate-100 relative group/img cursor-pointer border-4 border-slate-50 shadow-inner">
-                                <img src={item.image_url} className="w-full h-full object-cover" />
+                                <img src={item.image_url} className={`w-full h-full object-cover ${uploading === `item-${idx}` ? 'opacity-30' : ''}`} />
+                                {uploading === `item-${idx}` && (
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <Loader2 className="w-12 h-12 text-[#06C167] animate-spin" />
+                                  </div>
+                                )}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center text-white backdrop-blur-sm">
                                    <Camera className="w-10 h-10" />
                                 </div>
@@ -259,9 +334,16 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                    </div>
                                 </div>
                                 <div className="bg-slate-900 p-8 rounded-[35px] text-white flex items-center gap-4 shadow-2xl">
-                                   <input type="number" value={item.selling_price} onChange={e => {
-                                      const newItems = [...brand.menu_items]; newItems[idx].selling_price = parseFloat(e.target.value); setBrand({...brand, menu_items: newItems});
-                                   }} className="w-24 text-right bg-transparent font-black text-4xl outline-none text-[#06C167]" />
+                                   <input 
+                                      type="text" 
+                                      value={item.selling_price} 
+                                      onChange={e => {
+                                        const newItems = [...brand.menu_items]; 
+                                        newItems[idx].selling_price = sanitizePrice(e.target.value); 
+                                        setBrand({...brand, menu_items: newItems});
+                                      }} 
+                                      className="w-24 text-right bg-transparent font-black text-4xl outline-none text-[#06C167]" 
+                                   />
                                    <span className="text-3xl font-black text-[#06C167]">€</span>
                                 </div>
                              </div>
@@ -383,9 +465,16 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                                         }} className="flex-1 text-sm font-black bg-transparent outline-none focus:text-indigo-600" />
                                                         <div className="flex items-center gap-2 text-[#06C167] font-black bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
                                                            <span className="text-xs">+</span>
-                                                           <input type="number" value={mod.price} onChange={e => {
-                                                              const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].modifiers[mIdx].price = parseFloat(e.target.value); setBrand({...brand, menu_items: newItems});
-                                                           }} className="w-14 text-right outline-none text-sm bg-transparent" />
+                                                           <input 
+                                                              type="text" 
+                                                              value={mod.price} 
+                                                              onChange={e => {
+                                                                const newItems = [...brand.menu_items]; 
+                                                                newItems[idx].options[gIdx].modifiers[mIdx].price = sanitizePrice(e.target.value); 
+                                                                setBrand({...brand, menu_items: newItems});
+                                                              }} 
+                                                              className="w-14 text-right outline-none text-sm bg-transparent" 
+                                                           />
                                                            <span className="text-xs">€</span>
                                                         </div>
                                                         <button onClick={() => {
@@ -428,7 +517,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                     </div>
                     <div className="flex gap-6">
                       <button onClick={saveMenu} disabled={saving} className="bg-white text-slate-900 font-black uppercase tracking-widest px-12 py-5 rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center gap-4 shadow-2xl">
-                         {saving ? 'En cours...' : 'Sauver en Local'} <Save className="w-6 h-6" />
+                         {saving ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Sauver en Local'} <Save className="w-6 h-6" />
                       </button>
                       {uberConnected && (
                         <button 
@@ -437,8 +526,8 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                             const res = await fetch("/api/uber/sync", { method: "POST", body: JSON.stringify({ brandId: brand.id }) });
                             const data = await res.json();
                             setSaving(false);
-                            if (data.success) alert("🚀 Menu deployé sur Uber Eats avec succès !");
-                            else alert("⚠️ Echec Uber Eats : " + data.error);
+                            if (data.success) setToast({ message: "🚀 Menu déployé sur Uber Eats !", type: 'success' });
+                            else setToast({ message: "⚠️ Échec Uber : " + data.error, type: 'error' });
                           }}
                           className="bg-[#06C167] text-white font-black uppercase tracking-widest px-12 py-5 rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center gap-4 shadow-2xl shadow-[#06C167]/30"
                         >
@@ -497,7 +586,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                    </div>
 
                    <button onClick={saveIdentity} disabled={saving} className="btn-v3-primary w-full py-10 text-xl rounded-[40px] shadow-3xl shadow-slate-200">
-                      Enregistrer les Paramètres Ops <ShieldCheck className="ml-4 w-8 h-8" />
+                      {saving ? <Loader2 className="w-8 h-8 animate-spin" /> : 'Enregistrer les Paramètres Ops'} <ShieldCheck className="ml-4 w-8 h-8" />
                    </button>
                 </div>
               </div>
