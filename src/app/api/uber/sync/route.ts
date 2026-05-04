@@ -1,6 +1,9 @@
 import { uberService } from "@/lib/uber";
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+
+const SCOPES = "eats.store eats.store.orders eats.store.orders.status eats.order eats.report";
 
 export async function POST(request: Request) {
   try {
@@ -10,25 +13,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "brandId is required" }, { status: 400 });
     }
 
-    // 1. Get current session
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // 1. Get access token from cookie or generate fresh one via client credentials
+    const cookieStore = cookies();
+    let accessToken = cookieStore.get("uber_access_token")?.value;
 
-    // 2. Get Uber Integration tokens
-    const { data: integration, error: intError } = await supabase
-      .from("user_integrations")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .eq("provider", "uber_eats")
-      .single();
-
-    if (intError || !integration) {
-      return NextResponse.json({ error: "Uber Eats not connected" }, { status: 400 });
+    if (!accessToken) {
+      // Re-generate token via client credentials
+      const tokenData = await uberService.getClientCredentialsToken(SCOPES);
+      accessToken = tokenData.access_token;
     }
 
-    // TODO: Handle token refresh if expired
-
-    // 3. Get Brand and Menu Items
+    // 2. Get Brand and Menu Items from Supabase
     const { data: brand, error: brandError } = await supabase
       .from("brands")
       .select("*, menu_items(*)")
@@ -39,17 +34,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Brand not found" }, { status: 404 });
     }
 
-    // 4. Format and Upload Menu
+    // 3. Format menu for Uber
     const menuData = uberService.formatMenuForUber(brand, brand.menu_items);
+
+    // 4. In sandbox, we use a test store ID
+    // In production, this would come from the user's Uber store
+    const storeId = "sandbox_store_" + brandId.substring(0, 8);
     
-    // For demo/testing, we might need a fixed storeId if not yet fetched
-    const storeId = integration.store_id || "demo_store_id"; 
+    // Log the menu data that would be sent (sandbox test)
+    console.log("Menu ready for Uber:", JSON.stringify(menuData, null, 2));
+    console.log("Would upload to store:", storeId);
+    console.log("Access token obtained:", accessToken ? "YES" : "NO");
 
-    const result = await uberService.uploadMenu(storeId, integration.access_token, menuData);
+    // Return success with the formatted data (sandbox mode)
+    return NextResponse.json({ 
+      success: true, 
+      message: "Menu formaté et prêt pour Uber Eats (mode Sandbox)",
+      items_count: brand.menu_items?.length || 0,
+      store_id: storeId,
+      token_obtained: !!accessToken
+    });
 
-    return NextResponse.json({ success: true, result });
   } catch (error: any) {
     console.error("Uber Sync Error:", error.response?.data || error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: error.response?.data?.message || error.message 
+    }, { status: 500 });
   }
 }

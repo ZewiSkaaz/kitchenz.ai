@@ -14,33 +14,21 @@ export class UberService {
     this.redirectUri = process.env.UBER_REDIRECT_URI || "https://kitchenz-ai.onrender.com/api/auth/uber/callback";
   }
 
-  getAuthUrl() {
-    const scopes = "eats.store eats.menu eats.order";
-    return `${UBER_AUTH_BASE}/authorize?client_id=${this.clientId}&response_type=code&redirect_uri=${encodeURIComponent(this.redirectUri)}&scope=${encodeURIComponent(scopes)}`;
-  }
+  /**
+   * Obtient un access_token via Client Credentials (pas de redirection OAuth nécessaire)
+   */
+  async getClientCredentialsToken(scopes: string) {
+    const params = new URLSearchParams();
+    params.append('client_id', this.clientId);
+    params.append('client_secret', this.clientSecret);
+    params.append('grant_type', 'client_credentials');
+    params.append('scope', scopes);
 
-  async getAccessToken(code: string) {
-    const response = await axios.post(`${UBER_AUTH_BASE}/token`, null, {
-      params: {
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        grant_type: "authorization_code",
-        redirect_uri: this.redirectUri,
-        code,
-      },
-    });
-    return response.data;
-  }
-
-  async refreshToken(refreshToken: string) {
-    const response = await axios.post(`${UBER_AUTH_BASE}/token`, null, {
-      params: {
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        grant_type: "refresh_token",
-        refresh_token: refreshToken,
-      },
-    });
+    const response = await axios.post(
+      `${UBER_AUTH_BASE}/token`,
+      params,
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
     return response.data;
   }
 
