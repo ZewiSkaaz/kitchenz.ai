@@ -22,6 +22,12 @@ export default function LoginPage() {
     setLoading(false);
   };
 
+  const checkLoggedIn = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) router.push("/dashboard");
+  };
+  checkLoggedIn();
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6 pt-32 pb-20">
       <div className="absolute top-0 left-0 w-full h-full bg-[#06C167]/5 -z-10" />

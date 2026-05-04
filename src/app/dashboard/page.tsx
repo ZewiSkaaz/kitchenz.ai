@@ -47,7 +47,11 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
-          <div>
+          <div className="flex-1">
+            <div className="flex items-center gap-4 mb-4">
+               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#06C167] bg-[#06C167]/10 px-4 py-1.5 rounded-full border border-[#06C167]/10">Dashboard Pro</span>
+               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            </div>
             <h1 className="text-6xl font-black text-slate-900 tracking-tighter mb-4">Mes Empires.</h1>
             <p className="text-slate-500 text-xl font-medium">Gérez vos marques virtuelles et suivez vos performances.</p>
           </div>

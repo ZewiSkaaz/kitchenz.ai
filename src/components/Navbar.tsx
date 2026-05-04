@@ -2,18 +2,41 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { ChefHat, Menu, X, ArrowRight, User } from "lucide-react";
+import { ChefHat, Menu, X, ArrowRight, User, LogOut, LayoutGrid } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const [user, setUser] = useState<any>(null);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    // Auth check
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      subscription.unsubscribe();
+    };
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 px-6 ${scrolled ? "py-4" : "py-8"}`}>
@@ -38,12 +61,28 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-4">
-          <Link href="/login" className={`font-black text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-all ${scrolled ? "text-slate-600 hover:text-[#06C167]" : "text-slate-600 hover:text-[#06C167]"}`}>
-            Connexion
-          </Link>
-          <Link href="/audit" className="bg-[#06C167] text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-[#06C167]/20 flex items-center gap-2">
-            Essai Gratuit <ArrowRight className="w-4 h-4" />
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-4">
+               <Link href="/dashboard" className="flex items-center gap-3 bg-slate-50 border border-slate-100 px-5 py-2.5 rounded-xl hover:bg-slate-100 transition-all">
+                  <div className="w-8 h-8 rounded-full bg-[#06C167]/10 flex items-center justify-center">
+                    <User className="w-4 h-4 text-[#06C167]" />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-widest text-slate-900">Mon Espace</span>
+               </Link>
+               <button onClick={handleLogout} className="p-3 text-slate-400 hover:text-red-500 transition-all" title="Déconnexion">
+                  <LogOut className="w-5 h-5" />
+               </button>
+            </div>
+          ) : (
+            <>
+              <Link href="/login" className={`font-black text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-all ${scrolled ? "text-slate-600 hover:text-[#06C167]" : "text-slate-600 hover:text-[#06C167]"}`}>
+                Connexion
+              </Link>
+              <Link href="/audit" className="bg-[#06C167] text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-[#06C167]/20 flex items-center gap-2">
+                Essai Gratuit <ArrowRight className="w-4 h-4" />
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -66,8 +105,19 @@ export default function Navbar() {
             <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Blog</Link>
             <Link href="/wiki" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Wiki</Link>
             <div className="h-px bg-slate-100 my-2" />
-            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="bg-slate-50 text-slate-900 p-6 rounded-2xl font-black text-center">Connexion</Link>
-            <Link href="/audit" onClick={() => setMobileMenuOpen(false)} className="bg-[#06C167] text-white p-6 rounded-2xl font-black text-center">Lancer l'Audit</Link>
+            {user ? (
+               <>
+                 <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="bg-slate-900 text-white p-6 rounded-2xl font-black text-center flex items-center justify-center gap-3">
+                   <LayoutGrid className="w-5 h-5" /> Mon Dashboard
+                 </Link>
+                 <button onClick={handleLogout} className="text-red-500 font-black uppercase tracking-widest text-sm py-4">Déconnexion</button>
+               </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="bg-slate-50 text-slate-900 p-6 rounded-2xl font-black text-center">Connexion</Link>
+                <Link href="/audit" onClick={() => setMobileMenuOpen(false)} className="bg-[#06C167] text-white p-6 rounded-2xl font-black text-center">Essai Gratuit</Link>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

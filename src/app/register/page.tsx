@@ -34,6 +34,12 @@ export default function RegisterPage() {
     setLoading(false);
   };
 
+  const checkLoggedIn = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) router.push("/dashboard");
+  };
+  checkLoggedIn();
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 relative overflow-hidden pt-32 pb-20">
        {/* Decor */}
