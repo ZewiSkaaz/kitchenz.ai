@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 248, 250, 252; /* Slate 50 */
+  
+  --uber-green: #06C167;
+  --uber-black: #000000;
+  --uber-gray: #F3F4F6;
+  --uber-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@layer base {
+  body {
+    color: #0F172A; /* Slate 900 */
+    background: #FFFFFF;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white border border-slate-100 rounded-[30px] shadow-sm hover:shadow-xl transition-all duration-500;
+  }
+  
+  .btn-primary {
+    @apply bg-[#06C167] hover:bg-[#05a357] text-white px-8 py-4 rounded-2xl font-black transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-[#06C167]/20;
+    transition-timing-function: var(--uber-ease);
+  }
+
+  .btn-secondary {
+    @apply bg-slate-50 hover:bg-slate-100 text-slate-900 px-8 py-4 rounded-2xl font-black transition-all duration-300 flex items-center justify-center gap-2 border border-slate-200;
+    transition-timing-function: var(--uber-ease);
+  }
+
+  .input-premium {
+    @apply bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 focus:bg-white focus:border-[#06C167] focus:ring-1 focus:ring-[#06C167] transition-all text-slate-900 placeholder-slate-400 outline-none;
+  }
+
+  .text-gradient {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-[#06C167] to-emerald-500;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #F8FAFC;
+}
+::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #06C167;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}

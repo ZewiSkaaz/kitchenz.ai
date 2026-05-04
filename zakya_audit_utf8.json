@@ -1,0 +1,182 @@
+﻿Ôùç injected env (5) from .env.local // tip: Ôùê encrypted .env [www.dotenvx.com]
+{
+  "brand": {
+    "id": "20ede543-4847-4b4e-b455-df209fd727c1",
+    "created_at": "2026-05-04T09:01:11.945132+00:00",
+    "name": "Zakya",
+    "tagline": "D├®gustez l'authenticit├® urbaine",
+    "culinary_style": "Cuisine libanaise r├®interpr├®t├®e avec une touche moderne et urbaine.",
+    "storytelling": "Situ├®e en plein c┼ôur de Bordeaux, Zakya transforme les rues de la ville en un v├®ritable petit Beyrouth ├á travers ses saveurs authentiques et son ambiance r├®tro. Inspir├®e par l'├®nergie vibrante de Vice City, cette dark kitchen r├®volutionne le concept de la street food gr├óce ├á ses produits frais et ses techniques de cuisson locales.",
+    "ingredients": [
+      "Veau marin├® aux ├®pices",
+      "├ëpaule de dinde fondante",
+      "Pain pide artisanal au s├®same",
+      "Galettes durum fra├«ches",
+      "Sauce blanche au yaourt grec et ail",
+      "Harissa maison",
+      "Tomates cerises",
+      "Oignons rouges pickles",
+      "Salade iceberg croquante",
+      "Frites de patate douce",
+      "Feta AOP",
+      "Olives Kalamata",
+      "Menthe fra├«che",
+      "Persil plat",
+      "Poivrons grill├®s",
+      "Citron jaune.",
+      "­ƒöÑ NOUVEAU: Paprika doux"
+    ],
+    "equipment": [
+      "Broche ├á kebab verticale",
+      "Couteau ├®lectrique professionnel",
+      "Plancha haute temp├®rature",
+      "Friteuse double bac",
+      "Saladette r├®frig├®r├®e",
+      "Presse ├á pain (toaster)."
+    ],
+    "prep_time_avg": 15,
+    "logo_url": "https://yzoavohpsrlbkqqxcwxj.supabase.co/storage/v1/object/public/brands/zakya_logo_1777885270690.png",
+    "background_url": "https://yzoavohpsrlbkqqxcwxj.supabase.co/storage/v1/object/public/brands/zakya_bg_1777885270690.png"
+  },
+  "items": [
+    {
+      "id": "20d8d082-b908-4853-95c7-41532c35d9b1",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "Veau Marin├® aux ├ëpices avec Galettes Durum et Harissa Maison",
+      "description_seo": "D├®gustez notre veau marin├® aux ├®pices envelopp├® dans des galettes durum l├®g├¿res, rehauss├® par la chaleur de notre harissa maison.",
+      "ingredients": [
+        "Veau marin├® aux ├®pices",
+        "Galettes durum fra├«ches",
+        "Harissa maison",
+        "Oignons rouges pickles",
+        "Menthe fra├«che",
+        "Persil plat",
+        "Citron jaune"
+      ],
+      "material_cost": 5,
+      "net_margin_target": 0.25,
+      "selling_price": 8.75,
+      "category": "Plat Principal"
+    },
+    {
+      "id": "38344402-2773-4134-9e6d-bbf6128d6cac",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "├ëpaule de Dinde Fondante au Pain Pide et Sauce Blanche",
+      "description_seo": "Savourez l'onctuosit├® de l'├®paule de dinde fondante servie sur un pain pide artisanal au s├®same avec une sauce blanche au yaourt grec.",
+      "ingredients": [
+        "├ëpaule de dinde fondante",
+        "Pain pide artisanal au s├®same",
+        "Sauce blanche au yaourt grec et ail",
+        "Salade iceberg croquante",
+        "Tomates cerises",
+        "Olives Kalamata",
+        "Poivrons grill├®s"
+      ],
+      "material_cost": 6.5,
+      "net_margin_target": 0.22,
+      "selling_price": 11.2,
+      "category": "Plat Principal"
+    },
+    {
+      "id": "880f0afc-5bcf-4d01-a9b8-e720499a1bc1",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "Frites de Patate Douce ├ëpic├®es",
+      "description_seo": "Craquez pour nos frites de patate douce ├®pic├®es, accompagnement parfait pour toute occasion.",
+      "ingredients": [
+        "Frites de patate douce",
+        "Menthe fra├«che",
+        "Citron jaune",
+        "Paprika doux"
+      ],
+      "material_cost": 2,
+      "net_margin_target": 0.3,
+      "selling_price": 3.83,
+      "category": "Accompagnement"
+    },
+    {
+      "id": "fa170d90-78f2-4c77-bc8a-81bcb328d8b3",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "Salade de Feta et Tomates Cerises aux Olives",
+      "description_seo": "Une salade fra├«che et croustillante, m├®lange de feta AOP, tomates cerises ├®clatantes et olives Kalamata savoureuses.",
+      "ingredients": [
+        "Feta AOP",
+        "Tomates cerises",
+        "Olives Kalamata",
+        "Salade iceberg croquante",
+        "Oignons rouges pickles",
+        "Persil plat"
+      ],
+      "material_cost": 3,
+      "net_margin_target": 0.3,
+      "selling_price": 5.5,
+      "category": "Accompagnement"
+    },
+    {
+      "id": "7a5d9f99-58ff-44cb-9567-c233817b8316",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "Menu Veau Marin├® aux ├ëpices",
+      "description_seo": "Savourez notre veau marin├® aux ├®pices, accompagn├® de frites de patate douce ├®pic├®es et d'une boisson de votre choix.",
+      "ingredients": [
+        "Veau Marin├® aux ├ëpices",
+        "Frites de Patate Douce ├ëpic├®es",
+        "Boisson au choix"
+      ],
+      "material_cost": 8.5,
+      "net_margin_target": 5,
+      "selling_price": 22.5,
+      "category": "Menu Combo"
+    },
+    {
+      "id": "e03f7321-46ff-42e6-b86c-b6b9222161e5",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "Menu ├ëpaule de Dinde Fondante",
+      "description_seo": "D├®gustez notre ├®paule de dinde fondante avec du pain pide, accompagn├®e d'une salade de feta et tomates cerises et d'une boisson.",
+      "ingredients": [
+        "├ëpaule de Dinde Fondante",
+        "Salade de Feta et Tomates Cerises aux Olives",
+        "Boisson au choix"
+      ],
+      "material_cost": 9,
+      "net_margin_target": 6,
+      "selling_price": 25,
+      "category": "Menu Combo"
+    },
+    {
+      "id": "8b704868-941f-477c-ba7d-800a99777add",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "Menu Veau Marin├® aux ├ëpices Deluxe",
+      "description_seo": "Un vrai d├®lice avec notre veau marin├®, frites ├®pic├®es et une s├®lection de dessert au choix.",
+      "ingredients": [
+        "Veau Marin├® aux ├ëpices",
+        "Frites de Patate Douce ├ëpic├®es",
+        "Dessert au choix"
+      ],
+      "material_cost": 9,
+      "net_margin_target": 5.5,
+      "selling_price": 24.17,
+      "category": "Menu Combo"
+    },
+    {
+      "id": "89d2b770-3324-42e8-badc-5cb48bd036e0",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "1 achet├® = 1 offert sur un side",
+      "description_seo": "Pour chaque plat principal achet├®, profitez d'un accompagnement gratuit de votre choix.",
+      "ingredients": [],
+      "material_cost": 0.5,
+      "net_margin_target": 5,
+      "selling_price": 9.17,
+      "category": "Offre Sp├®ciale"
+    },
+    {
+      "id": "ebaca5ae-a30a-4ce1-8c3b-d03e4e28bb61",
+      "brand_id": "20ede543-4847-4b4e-b455-df209fd727c1",
+      "title": "50% sur la boisson avec chaque plat",
+      "description_seo": "Avec chaque plat principal achet├®, obtenez votre premi├¿re boisson ├á moiti├® prix !",
+      "ingredients": [],
+      "material_cost": 0.25,
+      "net_margin_target": 4,
+      "selling_price": 7.08,
+      "category": "Offre Sp├®ciale"
+    }
+  ]
+}

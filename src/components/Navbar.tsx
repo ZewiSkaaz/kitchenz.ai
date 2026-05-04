@@ -1,0 +1,84 @@
+"use client";
+
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { ChefHat, Menu, X, ArrowRight, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 px-6 ${scrolled ? "py-4" : "py-8"}`}>
+      <div className={`max-w-7xl mx-auto px-6 py-4 rounded-[24px] flex items-center justify-between transition-all duration-500 ${scrolled ? "bg-white/80 backdrop-blur-xl shadow-lg border border-slate-100" : "bg-transparent"}`}>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="p-2 bg-[#06C167] rounded-xl group-hover:rotate-12 transition-transform">
+            <ChefHat className="w-6 h-6 text-white" />
+          </div>
+          <span className={`text-xl font-black tracking-tighter transition-colors ${scrolled ? "text-slate-900" : "text-slate-900"}`}>
+            kitchenz<span className="text-[#06C167]">.ai</span>
+          </span>
+        </Link>
+
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-10">
+          <NavLink href="/audit" label="Audit IA" scrolled={scrolled} />
+          <NavLink href="/dashboard" label="Dashboard" scrolled={scrolled} />
+          <NavLink href="/blog" label="Blog" scrolled={scrolled} />
+          <NavLink href="/wiki" label="Docs" scrolled={scrolled} />
+        </div>
+
+        {/* Actions */}
+        <div className="hidden md:flex items-center gap-4">
+          <Link href="/login" className={`font-black text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-all ${scrolled ? "text-slate-600 hover:text-[#06C167]" : "text-slate-600 hover:text-[#06C167]"}`}>
+            Connexion
+          </Link>
+          <Link href="/audit" className="bg-[#06C167] text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-[#06C167]/20 flex items-center gap-2">
+            Essai Gratuit <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Mobile Toggle */}
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-slate-900">
+          {mobileMenuOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-full left-6 right-6 mt-4 bg-white rounded-[32px] p-8 shadow-2xl border border-slate-100 md:hidden flex flex-col gap-6"
+          >
+            <Link href="/audit" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Audit IA</Link>
+            <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Dashboard</Link>
+            <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Blog</Link>
+            <Link href="/wiki" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Wiki</Link>
+            <div className="h-px bg-slate-100 my-2" />
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="bg-slate-50 text-slate-900 p-6 rounded-2xl font-black text-center">Connexion</Link>
+            <Link href="/audit" onClick={() => setMobileMenuOpen(false)} className="bg-[#06C167] text-white p-6 rounded-2xl font-black text-center">Lancer l'Audit</Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+}
+
+function NavLink({ href, label, scrolled }: { href: string; label: string; scrolled: boolean }) {
+  return (
+    <Link href={href} className={`text-sm font-black uppercase tracking-widest transition-all hover:text-[#06C167] ${scrolled ? "text-slate-600" : "text-slate-600"}`}>
+      {label}
+    </Link>
+  );
+}
