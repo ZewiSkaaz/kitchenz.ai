@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChefHat, Calendar, LayoutGrid, ListFilter, Trash2, ExternalLink, Utensils, BookOpen, Plus, Download, TrendingUp, Zap, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import BrandEditor from "@/components/BrandEditor";
 
 export default function DashboardPage() {
   const [brands, setBrands] = useState<any[]>([]);
@@ -137,73 +138,6 @@ export default function DashboardPage() {
 
       <AnimatePresence>
         {selectedBrand && (
-           <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-6"
-            onClick={() => setSelectedBrand(null)}
-           >
-              <motion.div 
-                initial={{ scale: 0.9, y: 30 }}
-                animate={{ scale: 1, y: 0 }}
-                className="bg-white w-full max-w-5xl max-h-[90vh] rounded-[50px] overflow-hidden flex flex-col shadow-2xl border border-slate-100"
-                onClick={e => e.stopPropagation()}
-              >
-                <div className="h-64 relative bg-slate-900 group">
-                  <img src={selectedBrand.background_url} className="w-full h-full object-cover opacity-60" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
-                  <button onClick={() => setSelectedBrand(null)} className="absolute top-8 right-8 p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 z-20">✕</button>
-                  <div className="absolute top-8 left-8 flex gap-4 z-20">
-                    <button 
-                      onClick={() => {
-                        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(selectedBrand, null, 2));
-                        const downloadAnchorNode = document.createElement('a');
-                        downloadAnchorNode.setAttribute("href", dataStr);
-                        downloadAnchorNode.setAttribute("download", `kitchenz_${selectedBrand.name.toLowerCase().replace(/\s+/g, '_')}.json`);
-                        document.body.appendChild(downloadAnchorNode);
-                        downloadAnchorNode.click();
-                        downloadAnchorNode.remove();
-                      }}
-                      className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-6 py-2.5 rounded-2xl text-white font-black uppercase text-[10px] tracking-widest hover:bg-white/40 border border-white/20 transition-all"
-                    >
-                      <Download className="w-4 h-4" /> Exporter JSON
-                    </button>
-                  </div>
-                  <div className="absolute bottom-0 left-12 flex items-end gap-8 translate-y-1/2">
-                     <img src={selectedBrand.logo_url} className="w-32 h-32 rounded-3xl border-8 border-white shadow-2xl bg-white object-cover" />
-                  </div>
-                </div>
-
-                <div className="p-12 pt-24 overflow-y-auto custom-scrollbar bg-white">
-                   <div className="grid md:grid-cols-2 gap-16">
-                      <div className="space-y-8">
-                        <div className="grid grid-cols-2 gap-6">
-                          <div>
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Nom de la Marque</label>
-                            <input 
-                              value={selectedBrand.name} 
-                              onChange={(e) => setSelectedBrand({...selectedBrand, name: e.target.value})}
-                              className="text-4xl font-black text-slate-900 tracking-tighter w-full bg-transparent border-b-2 border-transparent focus:border-[#06C167] outline-none transition-all pb-2"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Style Culinaire</label>
-                            <input 
-                              value={selectedBrand.culinary_style} 
-                              onChange={(e) => setSelectedBrand({...selectedBrand, culinary_style: e.target.value})}
-                              className="text-[#06C167] font-black uppercase tracking-widest text-sm w-full bg-transparent border-b border-transparent focus:border-[#06C167] outline-none transition-all pb-1"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Tagline (Accroche)</label>
-                          <input 
-                            value={selectedBrand.tagline} 
-                            onChange={(e) => setSelectedBrand({...selectedBrand, tagline: e.target.value})}
-                            className="text-slate-500 font-medium italic w-full bg-transparent border-b border-transparent focus:border-[#06C167] outline-none transition-all pb-1"
-                          />
                         </div>
 
                         <div className="grid grid-cols-2 gap-6">
