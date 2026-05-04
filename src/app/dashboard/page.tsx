@@ -73,7 +73,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-40 pb-20 px-6">
+    <div className="min-h-screen bg-slate-50 pt-24 md:pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
@@ -82,8 +82,8 @@ export default function DashboardPage() {
                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#06C167] bg-[#06C167]/10 px-4 py-1.5 rounded-full border border-[#06C167]/10">Dashboard Pro</span>
                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
             </div>
-            <h1 className="text-6xl font-black text-slate-900 tracking-tighter mb-4">Mes Empires.</h1>
-            <p className="text-slate-500 text-xl font-medium">Gérez vos marques virtuelles et suivez vos performances.</p>
+            <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter mb-4">Mes Empires.</h1>
+            <p className="text-slate-500 text-lg md:text-xl font-medium">Gérez vos marques virtuelles et suivez vos performances.</p>
           </div>
           <Link href="/audit" className="btn-primary text-lg px-8 py-4 shadow-xl shadow-[#06C167]/20">
             Nouvel Audit <Plus className="w-6 h-6" />
@@ -153,13 +153,13 @@ export default function DashboardPage() {
 
 function StatCard({ title, value, trend, icon }: { title: string, value: string, trend: string, icon: React.ReactNode }) {
   return (
-    <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/40">
-      <div className="flex justify-between items-start mb-8">
-        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">{icon}</div>
-        <span className="text-xs font-black text-[#06C167] bg-[#06C167]/5 px-3 py-1 rounded-full uppercase tracking-widest border border-[#06C167]/10">{trend}</span>
+    <div className="bg-white p-6 md:p-10 rounded-[30px] md:rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/40">
+      <div className="flex justify-between items-start mb-6 md:mb-8">
+        <div className="p-3 md:p-4 bg-slate-50 rounded-2xl border border-slate-100">{icon}</div>
+        <span className="text-[10px] font-black text-[#06C167] bg-[#06C167]/5 px-3 py-1 rounded-full uppercase tracking-widest border border-[#06C167]/10">{trend}</span>
       </div>
-      <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">{title}</p>
-      <h3 className="text-5xl font-black text-slate-900 tracking-tighter">{value}</h3>
+      <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 md:mb-2">{title}</p>
+      <h3 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">{value}</h3>
     </div>
   );
 }

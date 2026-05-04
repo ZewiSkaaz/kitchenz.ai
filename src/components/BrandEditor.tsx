@@ -150,38 +150,38 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
 
       <motion.div 
         initial={{ scale: 0.9, y: 40, rotateX: 10 }} animate={{ scale: 1, y: 0, rotateX: 0 }}
-        className="bg-[#fcfcfc] w-full max-w-[1600px] h-full max-h-[92vh] rounded-[60px] overflow-hidden flex flex-col shadow-[0_40px_120px_-20px_rgba(0,0,0,0.5)] border border-white/20 relative"
+        className="bg-[#fcfcfc] w-full max-w-[1600px] h-full md:max-h-[92vh] rounded-none md:rounded-[60px] overflow-hidden flex flex-col shadow-[0_40px_120px_-20px_rgba(0,0,0,0.5)] border border-white/20 relative"
         onClick={e => e.stopPropagation()}
       >
         {/* Top Control Bar */}
-        <div className="flex items-center justify-between px-12 py-8 bg-white border-b border-slate-100 z-[60]">
-          <div className="flex items-center gap-10">
+        <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-12 py-6 md:py-8 bg-white border-b border-slate-100 z-[60] gap-6">
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10 w-full md:w-auto">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-black rounded-2xl flex items-center justify-center text-white shadow-xl">
-                <ChefHat className="w-7 h-7" />
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-2xl flex items-center justify-center text-white shadow-xl">
+                <ChefHat className="w-6 h-6 md:w-7 md:h-7" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Kitchenz Studio</h3>
-                <span className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">Audit Pro V2.2</span>
+                <h3 className="text-lg md:text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Studio</h3>
+                <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">V2.2 Hardened</span>
               </div>
             </div>
-            <div className="h-10 w-px bg-slate-100" />
-            <div className="flex bg-slate-50 p-1.5 rounded-[22px] border border-slate-100">
-               <button onClick={() => setActiveTab('identity')} className={`px-8 py-3 rounded-[18px] text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'identity' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}>Identité</button>
-               <button onClick={() => setActiveTab('menu')} className={`px-8 py-3 rounded-[18px] text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'menu' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}>Menu Expert</button>
-               <button onClick={() => setActiveTab('ops')} className={`px-8 py-3 rounded-[18px] text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'ops' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}>Operations</button>
+            <div className="hidden md:block h-10 w-px bg-slate-100" />
+            <div className="flex bg-slate-50 p-1 rounded-[22px] border border-slate-100 overflow-x-auto w-full md:w-auto no-scrollbar">
+               <button onClick={() => setActiveTab('identity')} className={`flex-1 md:flex-none px-4 md:px-8 py-3 rounded-[18px] text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'identity' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400'}`}>Identité</button>
+               <button onClick={() => setActiveTab('menu')} className={`flex-1 md:flex-none px-4 md:px-8 py-3 rounded-[18px] text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'menu' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400'}`}>Menu</button>
+               <button onClick={() => setActiveTab('ops')} className={`flex-1 md:flex-none px-4 md:px-8 py-3 rounded-[18px] text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'ops' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400'}`}>Ops</button>
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
             <button 
               onClick={() => setShowPreview(!showPreview)}
-              className={`flex items-center gap-3 px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${showPreview ? 'bg-indigo-600 text-white shadow-indigo-200 shadow-xl' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+              className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 md:py-4 rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all ${showPreview ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400'}`}
             >
               {showPreview ? <Layout className="w-5 h-5" /> : <Smartphone className="w-5 h-5" />}
-              {showPreview ? 'Vue Studio' : 'Preview Uber'}
+              <span className="hidden sm:inline">{showPreview ? 'Studio' : 'Uber Preview'}</span>
             </button>
-            <button onClick={onClose} className="p-4 bg-slate-50 rounded-2xl text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all">
+            <button onClick={onClose} className="p-3 md:p-4 bg-slate-50 rounded-2xl text-slate-300 hover:text-red-500">
                <X className="w-6 h-6" />
             </button>
           </div>
@@ -506,18 +506,18 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                 </div>
 
                 {/* Floating Bottom Bar */}
-                <div className="fixed bottom-12 left-1/2 -translate-x-1/2 w-full max-w-5xl px-12 z-[100]">
-                  <div className="bg-slate-900/90 backdrop-blur-3xl p-8 rounded-[50px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border-4 border-white/10 flex gap-10 items-center">
-                    <div className="flex-1 space-y-1">
-                      <p className="text-white/50 text-[10px] font-black uppercase tracking-[0.3em]">Status de Synchronisation</p>
-                      <div className="flex items-center gap-3">
-                         <div className="w-3 h-3 bg-[#06C167] rounded-full animate-pulse shadow-[0_0_20px_#06C167]" />
-                         <span className="text-white font-black text-sm tracking-tight uppercase">Base de données synchronisée</span>
+                <div className="fixed bottom-6 md:bottom-12 left-0 md:left-1/2 md:-translate-x-1/2 w-full md:max-w-5xl px-4 md:px-12 z-[100]">
+                  <div className="bg-slate-900/90 backdrop-blur-3xl p-6 md:p-8 rounded-[30px] md:rounded-[50px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border-4 border-white/10 flex flex-col md:flex-row gap-6 md:gap-10 items-center">
+                    <div className="flex-1 space-y-1 text-center md:text-left">
+                      <p className="text-white/50 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">Status</p>
+                      <div className="flex items-center justify-center md:justify-start gap-3">
+                         <div className="w-2 h-2 md:w-3 md:h-3 bg-[#06C167] rounded-full animate-pulse shadow-[0_0_20px_#06C167]" />
+                         <span className="text-white font-black text-xs md:text-sm tracking-tight uppercase">Données locales prêtes</span>
                       </div>
                     </div>
-                    <div className="flex gap-6">
-                      <button onClick={saveMenu} disabled={saving} className="bg-white text-slate-900 font-black uppercase tracking-widest px-12 py-5 rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center gap-4 shadow-2xl">
-                         {saving ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Sauver en Local'} <Save className="w-6 h-6" />
+                    <div className="flex gap-4 md:gap-6 w-full md:w-auto">
+                      <button onClick={saveMenu} disabled={saving} className="flex-1 md:flex-none bg-white text-slate-900 font-black uppercase tracking-widest px-6 md:px-12 py-4 md:py-5 rounded-[20px] md:rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 md:gap-4 shadow-2xl text-[10px] md:text-xs">
+                         {saving ? <Loader2 className="w-4 h-4 md:w-6 md:h-6 animate-spin" /> : 'Sauver'} <Save className="w-4 h-4 md:w-6 md:h-6" />
                       </button>
                       {uberConnected && (
                         <button 
@@ -526,12 +526,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                             const res = await fetch("/api/uber/sync", { method: "POST", body: JSON.stringify({ brandId: brand.id }) });
                             const data = await res.json();
                             setSaving(false);
-                            if (data.success) setToast({ message: "🚀 Menu déployé sur Uber Eats !", type: 'success' });
-                            else setToast({ message: "⚠️ Échec Uber : " + data.error, type: 'error' });
+                            if (data.success) setToast({ message: "🚀 Menu publié !", type: 'success' });
+                            else setToast({ message: "⚠️ Erreur Uber", type: 'error' });
                           }}
-                          className="bg-[#06C167] text-white font-black uppercase tracking-widest px-12 py-5 rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center gap-4 shadow-2xl shadow-[#06C167]/30"
+                          className="flex-1 md:flex-none bg-[#06C167] text-white font-black uppercase tracking-widest px-6 md:px-12 py-4 md:py-5 rounded-[20px] md:rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 md:gap-4 shadow-2xl shadow-[#06C167]/30 text-[10px] md:text-xs"
                         >
-                           🚀 Publier Uber <TrendingUp className="w-6 h-6" />
+                           🚀 Publier <TrendingUp className="w-4 h-4 md:w-6 md:h-6" />
                         </button>
                       )}
                     </div>
