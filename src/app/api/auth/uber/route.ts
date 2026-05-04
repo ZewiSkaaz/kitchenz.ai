@@ -1,4 +1,5 @@
 import { uberService } from "@/lib/uber";
+import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
 const SCOPES = "eats.store eats.store.status.write eats.order eats.report";
@@ -6,6 +7,20 @@ const SCOPES = "eats.store eats.store.status.write eats.order eats.report";
 export async function GET() {
   try {
     const tokens = await uberService.getClientCredentialsToken(SCOPES);
+    
+    // Attempt to save in Supabase if user is logged in
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      await supabase.from("user_integrations").upsert({
+        user_id: session.user.id,
+        provider: "uber",
+        access_token: tokens.access_token,
+        expires_at: new RegExp(/^\d+$/).test(tokens.expires_in) 
+          ? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+          : new Date(Date.now() + 2592000 * 1000).toISOString()
+      });
+    }
+
     // Store in a cookie or return token info for the dashboard
     const response = NextResponse.redirect("https://kitchenz-ai.onrender.com/dashboard?success=uber_connected");
     response.cookies.set("uber_access_token", tokens.access_token, {
