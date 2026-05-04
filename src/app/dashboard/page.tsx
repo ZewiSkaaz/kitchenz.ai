@@ -11,6 +11,7 @@ export default function DashboardPage() {
   const [brands, setBrands] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState<any | null>(null);
+  const [uberConnected, setUberConnected] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,10 +21,21 @@ export default function DashboardPage() {
         router.push("/login");
       } else {
         fetchBrands();
+        checkUberConnection(session.user.id);
       }
     };
     checkUser();
   }, []);
+
+  const checkUberConnection = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_integrations")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("provider", "uber_eats")
+      .single();
+    setUberConnected(!!data);
+  };
 
   const fetchBrands = async () => {
     setLoading(true);
@@ -61,10 +73,23 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-20">
           <StatCard title="Commandes" value="1,240" trend="+12%" icon={<TrendingUp className="text-[#06C167]" />} />
           <StatCard title="Chiffre d'Affaires" value="18,450€" trend="+8%" icon={<Zap className="text-yellow-500" />} />
           <StatCard title="Crédits IA" value="84 / 100" trend="Reset J-12" icon={<ChefHat className="text-indigo-500" />} />
+          <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-center items-center text-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" className="h-6 mb-6" />
+            {uberConnected ? (
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-[10px] font-black uppercase text-[#06C167] bg-[#06C167]/10 px-4 py-1.5 rounded-full">Connecté</span>
+                <p className="text-[10px] text-slate-400 font-bold uppercase mt-2">Prêt pour synchro</p>
+              </div>
+            ) : (
+              <Link href="/api/auth/uber" className="text-[10px] font-black uppercase text-white bg-slate-900 px-6 py-3 rounded-2xl hover:bg-black transition-all">
+                Connecter
+              </Link>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -125,6 +150,23 @@ export default function DashboardPage() {
                         <p className="text-[#06C167] font-black uppercase tracking-widest text-sm mb-8">{selectedBrand.culinary_style}</p>
                         <h3 className="text-xs font-black mb-4 uppercase tracking-widest text-slate-400">Storytelling</h3>
                         <p className="text-slate-600 text-lg italic leading-relaxed mb-8">"{selectedBrand.storytelling}"</p>
+                        
+                        {uberConnected && (
+                          <button 
+                            onClick={async () => {
+                              const res = await fetch("/api/uber/sync", {
+                                method: "POST",
+                                body: JSON.stringify({ brandId: selectedBrand.id })
+                              });
+                              const data = await res.json();
+                              if (data.success) alert("🚀 Menu synchronisé sur Uber Eats !");
+                              else alert("Erreur : " + data.error);
+                            }}
+                            className="w-full bg-[#06C167] text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-lg shadow-[#06C167]/20 flex items-center justify-center gap-3 hover:scale-105 transition-all"
+                          >
+                            <TrendingUp className="w-5 h-5" /> Publier sur Uber Eats
+                          </button>
+                        )}
                       </div>
                       <div>
                         <h3 className="text-xs font-black mb-6 uppercase tracking-widest text-slate-400">Menu Stratégique</h3>

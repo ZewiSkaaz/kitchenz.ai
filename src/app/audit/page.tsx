@@ -20,10 +20,22 @@ export default function AuditPage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push("/login");
+      } else {
+        checkUberConnection(session.user.id);
       }
     };
     checkUser();
   }, []);
+
+  const checkUberConnection = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_integrations")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("provider", "uber_eats")
+      .single();
+    setUberConnected(!!data);
+  };
   
   // Data State
   const [brandName, setBrandName] = useState("");
@@ -59,6 +71,7 @@ export default function AuditPage() {
   const [staff, setStaff] = useState(2500);
   const [dailyOrders, setDailyOrders] = useState(20);
   const [selectedCategory, setSelectedCategory] = useState<string>("Tous");
+  const [uberConnected, setUberConnected] = useState(false);
 
   // Calculs dynamiques du simulateur
   const menuItems = fullMenu?.menu_items || [];
@@ -1176,6 +1189,26 @@ export default function AuditPage() {
                 <button onClick={exportForUberEats} className="btn-secondary text-lg px-10 py-5 bg-white border-slate-200 group">
                   <Download className="w-6 h-6 text-[#06C167] group-hover:scale-110 transition-transform" /> Export JSON
                 </button>
+                {uberConnected && saved && (
+                   <button 
+                    onClick={async () => {
+                      // Fetch brand ID from supabase search by name or pass it from saveToSupabase
+                      const { data } = await supabase.from("brands").select("id").eq("name", fullMenu.brand_identity.name).single();
+                      if (!data) return alert("Sauvegardez d'abord le concept !");
+                      
+                      const res = await fetch("/api/uber/sync", {
+                        method: "POST",
+                        body: JSON.stringify({ brandId: data.id })
+                      });
+                      const syncData = await res.json();
+                      if (syncData.success) alert("🚀 Menu synchronisé sur Uber Eats !");
+                      else alert("Erreur : " + syncData.error);
+                    }}
+                    className="btn-primary text-lg px-10 py-5 bg-[#06C167] shadow-[#06C167]/20"
+                   >
+                     🚀 Publier sur Uber Eats
+                   </button>
+                )}
                 <button onClick={saveToSupabase} disabled={saving || saved} className={`btn-primary text-lg px-12 py-5 shadow-2xl ${saved ? 'bg-[#06C167] shadow-[#06C167]/20' : 'bg-slate-900 shadow-slate-900/20'}`}>
                   {saving ? <Loader2 className="w-6 h-6 animate-spin" /> : saved ? <Check className="w-6 h-6" /> : <ShieldCheck className="w-6 h-6" />}
                   {saved ? "Concept Sauvegardé" : "Enregistrer dans mon Dashboard"}
