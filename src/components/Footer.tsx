@@ -46,9 +46,9 @@ export default function Footer() {
           <div>
             <h4 className="text-slate-900 font-black uppercase text-xs tracking-widest mb-8">Légal</h4>
             <ul className="space-y-4 text-slate-500 font-bold">
-              <li><Link href="#" className="hover:text-[#06C167] transition-colors">Confidentialité</Link></li>
-              <li><Link href="#" className="hover:text-[#06C167] transition-colors">CGV</Link></li>
-              <li><Link href="#" className="hover:text-[#06C167] transition-colors">Mentions</Link></li>
+              <li><Link href="/privacy" className="hover:text-[#06C167] transition-colors">Confidentialité</Link></li>
+              <li><Link href="/terms" className="hover:text-[#06C167] transition-colors">CGV / Conditions</Link></li>
+              <li><a href="mailto:hello@kitchenz.ai" className="hover:text-[#06C167] transition-colors">Contact</a></li>
             </ul>
           </div>
         </div>

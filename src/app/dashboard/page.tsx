@@ -73,58 +73,52 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-24 md:pt-40 pb-20 px-4 md:px-6">
+    <div className="min-h-screen bg-[#F6F6F6] pt-20 md:pt-28 pb-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
-          <div className="flex-1">
-            <div className="flex items-center gap-4 mb-4">
-               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#06C167] bg-[#06C167]/10 px-4 py-1.5 rounded-full border border-[#06C167]/10">Dashboard Pro</span>
-               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter mb-4">Mes Empires.</h1>
-            <p className="text-slate-500 text-lg md:text-xl font-medium">Gérez vos marques virtuelles et suivez vos performances.</p>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-black tracking-tight mb-1">Aperçu de l'établissement</h1>
+            <p className="text-gray-500 text-sm">Gérez vos marques et suivez vos performances en temps réel.</p>
           </div>
-          <Link href="/audit" className="btn-primary text-lg px-8 py-4 shadow-xl shadow-[#06C167]/20">
-            Nouvel Audit <Plus className="w-6 h-6" />
+          <Link href="/audit" className="bg-[#06C167] text-white text-sm font-bold px-6 py-3 rounded-md hover:bg-[#05a357] transition-all flex items-center gap-2">
+            Nouvel Audit <Plus className="w-4 h-4" />
           </Link>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-20">
-          <StatCard title="Commandes" value="1,240" trend="+12%" icon={<TrendingUp className="text-[#06C167]" />} />
-          <StatCard title="Chiffre d'Affaires" value="18,450€" trend="+8%" icon={<Zap className="text-yellow-500" />} />
-          <StatCard title="Crédits IA" value="84 / 100" trend="Reset J-12" icon={<ChefHat className="text-indigo-500" />} />
-          <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-center items-center text-center">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" className="h-6 mb-6" />
-            {uberConnected ? (
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-[10px] font-black uppercase text-[#06C167] bg-[#06C167]/10 px-4 py-1.5 rounded-full">Connecté</span>
-                <p className="text-[10px] text-slate-400 font-bold uppercase mt-2">Prêt pour synchro</p>
-              </div>
-            ) : (
-              <Link href="/api/auth/uber" className="text-[10px] font-black uppercase text-white bg-slate-900 px-6 py-3 rounded-2xl hover:bg-black transition-all">
-                Connecter
-              </Link>
-            )}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <StatCard title="Ventes" value="1,240" trend="+12%" icon={<TrendingUp className="text-[#06C167] w-4 h-4" />} />
+          <StatCard title="Chiffre d'Affaires" value="18,450.00 €" trend="+8%" icon={<Zap className="text-yellow-500 w-4 h-4" />} />
+          <StatCard title="Performance" value="98%" trend="+2%" icon={<ChefHat className="text-indigo-500 w-4 h-4" />} />
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-[11px] font-bold uppercase tracking-wider mb-1">Uber Eats</p>
+              {uberConnected ? (
+                <span className="text-[11px] font-bold text-[#06C167] bg-[#06C167]/5 px-2 py-1 rounded">Actif</span>
+              ) : (
+                <Link href="/api/auth/uber" className="text-[11px] font-bold text-blue-600 hover:underline">Connecter</Link>
+              )}
+            </div>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" className="h-4" />
           </div>
         </div>
 
         {loading ? (
-          <div className="grid md:grid-cols-3 gap-8">
-            {[1, 2, 3].map(i => <div key={i} className="h-[400px] bg-white rounded-[40px] animate-pulse border border-slate-100" />)}
+          <div className="grid md:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => <div key={i} className="h-48 bg-white rounded-lg animate-pulse border border-gray-200" />)}
           </div>
         ) : brands.length === 0 ? (
-          <div className="bg-white p-20 text-center rounded-[50px] border border-slate-100 shadow-xl shadow-slate-200/50">
-            <LayoutGrid className="w-20 h-20 text-slate-100 mx-auto mb-8" />
-            <h2 className="text-3xl font-black text-slate-900 mb-4">Aucune marque active</h2>
-            <p className="text-slate-500 mb-10 max-w-sm mx-auto font-medium">Lancez votre premier audit IA pour créer une marque rentable sur Uber Eats.</p>
+          <div className="bg-white p-20 text-center rounded-lg border border-gray-200 shadow-sm">
+            <LayoutGrid className="w-12 h-12 text-gray-200 mx-auto mb-6" />
+            <h2 className="text-xl font-bold text-black mb-2">Aucune marque active</h2>
+            <p className="text-gray-500 mb-8 max-w-sm mx-auto text-sm font-medium">Lancez votre premier audit IA pour créer une marque rentable sur Uber Eats.</p>
             <Link href="/audit" className="btn-primary inline-flex">
               Créer ma première marque
             </Link>
           </div>
         ) : (
-          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {brands.map((brand) => (
               <BrandCard 
                 key={brand.id} 
@@ -153,48 +147,49 @@ export default function DashboardPage() {
 
 function StatCard({ title, value, trend, icon }: { title: string, value: string, trend: string, icon: React.ReactNode }) {
   return (
-    <div className="bg-white p-6 md:p-10 rounded-[30px] md:rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/40">
-      <div className="flex justify-between items-start mb-6 md:mb-8">
-        <div className="p-3 md:p-4 bg-slate-50 rounded-2xl border border-slate-100">{icon}</div>
-        <span className="text-[10px] font-black text-[#06C167] bg-[#06C167]/5 px-3 py-1 rounded-full uppercase tracking-widest border border-[#06C167]/10">{trend}</span>
+    <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-gray-500 text-[11px] font-bold uppercase tracking-wider">{title}</p>
+        <div className="p-1.5 bg-gray-50 rounded-md border border-gray-100">{icon}</div>
       </div>
-      <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 md:mb-2">{title}</p>
-      <h3 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">{value}</h3>
+      <div className="flex items-baseline gap-2">
+        <h3 className="text-2xl font-bold text-black tracking-tight">{value}</h3>
+        <span className="text-[10px] font-bold text-[#06C167]">{trend}</span>
+      </div>
     </div>
   );
 }
 
 function BrandCard({ brand, onDelete, onClick }: { brand: any, onDelete: () => void, onClick: () => void }) {
   return (
-    <motion.div 
-      whileHover={{ y: -10 }}
-      className="bg-white overflow-hidden group cursor-pointer border border-slate-100 rounded-[45px] shadow-lg shadow-slate-200/50 hover:shadow-2xl transition-all duration-500"
+    <div 
+      className="bg-white group cursor-pointer border border-gray-200 rounded-lg overflow-hidden hover:border-[#06C167] transition-all"
       onClick={onClick}
     >
-      <div className="h-56 relative bg-slate-100">
-        <img src={brand.background_url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-        <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-transparent" />
+      <div className="h-40 relative bg-gray-100">
+        <img src={brand.background_url} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all" />
         <button 
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="absolute top-6 right-6 p-3 bg-white/20 backdrop-blur-md text-white rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500"
+          className="absolute top-3 right-3 p-2 bg-white/90 text-gray-400 rounded-md hover:text-red-500 shadow-sm"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-3.5 h-3.5" />
         </button>
-        <div className="absolute -bottom-8 left-10">
-           <img src={brand.logo_url} className="w-20 h-20 rounded-3xl border-4 border-white shadow-2xl bg-white object-cover" />
+      </div>
+      <div className="p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <img src={brand.logo_url} className="w-10 h-10 rounded-md border border-gray-100 bg-white object-cover" />
+          <div>
+            <h3 className="text-sm font-bold text-black group-hover:text-[#06C167] transition-colors">{brand.name}</h3>
+            <p className="text-[10px] text-gray-500 font-medium uppercase tracking-tight">{brand.culinary_style}</p>
+          </div>
+        </div>
+        <p className="text-gray-500 text-xs line-clamp-1 mb-4">"{brand.tagline}"</p>
+        <div className="flex justify-between items-center pt-4 border-t border-gray-50">
+           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><Utensils className="w-3 h-3" /> {brand.menu_items?.length || 0} Articles</span>
+           <span className="text-[10px] font-bold text-[#06C167] uppercase tracking-widest">Gérer</span>
         </div>
       </div>
-      <div className="pt-14 p-10">
-        <h3 className="text-2xl font-black text-slate-900 mb-1 group-hover:text-[#06C167] transition-colors tracking-tight">{brand.name}</h3>
-        <p className="text-[#06C167] text-[10px] font-black uppercase tracking-widest mb-6">{brand.culinary_style}</p>
-        <p className="text-slate-400 text-sm italic font-medium line-clamp-2 mb-8 leading-relaxed">"{brand.tagline}"</p>
-        <div className="flex justify-between items-center pt-8 border-t border-slate-50">
-           <div className="flex gap-4">
-              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-2"><Utensils className="w-3 h-3" /> {brand.menu_items?.length || 0} Articles</span>
-           </div>
-           <span className="bg-slate-50 text-slate-900 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl border border-slate-100">Détails</span>
-        </div>
-      </div>
-    </motion.div>
+    </div>
   );
 }

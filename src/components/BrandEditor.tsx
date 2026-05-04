@@ -130,7 +130,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[200] bg-slate-900/70 backdrop-blur-3xl flex items-center justify-center p-4 md:p-8 overflow-hidden"
+      className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-0 md:p-8 overflow-hidden"
       onClick={onClose}
     >
       <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
@@ -149,158 +149,134 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
       </AnimatePresence>
 
       <motion.div 
-        initial={{ scale: 0.9, y: 40, rotateX: 10 }} animate={{ scale: 1, y: 0, rotateX: 0 }}
-        className="bg-[#fcfcfc] w-full max-w-[1600px] h-full md:max-h-[92vh] rounded-none md:rounded-[60px] overflow-hidden flex flex-col shadow-[0_40px_120px_-20px_rgba(0,0,0,0.5)] border border-white/20 relative"
+        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+        className="bg-white w-full max-w-[1400px] h-full md:h-[90vh] rounded-none md:rounded-lg overflow-hidden flex flex-col shadow-2xl relative"
         onClick={e => e.stopPropagation()}
       >
         {/* Top Control Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-12 py-6 md:py-8 bg-white border-b border-slate-100 z-[60] gap-6">
-          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10 w-full md:w-auto">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-2xl flex items-center justify-center text-white shadow-xl">
-                <ChefHat className="w-6 h-6 md:w-7 md:h-7" />
+        <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 z-[60]">
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white">
+                <ChefHat className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="text-lg md:text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Studio</h3>
-                <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">V2.2 Hardened</span>
-              </div>
+              <h3 className="text-sm font-bold text-black uppercase tracking-tight">Gestionnaire de menu</h3>
             </div>
-            <div className="hidden md:block h-10 w-px bg-slate-100" />
-            <div className="flex bg-slate-50 p-1 rounded-[22px] border border-slate-100 overflow-x-auto w-full md:w-auto no-scrollbar">
-               <button onClick={() => setActiveTab('identity')} className={`flex-1 md:flex-none px-4 md:px-8 py-3 rounded-[18px] text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'identity' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400'}`}>Identité</button>
-               <button onClick={() => setActiveTab('menu')} className={`flex-1 md:flex-none px-4 md:px-8 py-3 rounded-[18px] text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'menu' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400'}`}>Menu</button>
-               <button onClick={() => setActiveTab('ops')} className={`flex-1 md:flex-none px-4 md:px-8 py-3 rounded-[18px] text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'ops' ? 'bg-white shadow-lg text-slate-900' : 'text-slate-400'}`}>Ops</button>
+            <div className="h-6 w-px bg-gray-200" />
+            <div className="flex gap-1">
+               <button onClick={() => setActiveTab('identity')} className={`px-4 py-2 rounded text-xs font-bold transition-all ${activeTab === 'identity' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Identité</button>
+               <button onClick={() => setActiveTab('menu')} className={`px-4 py-2 rounded text-xs font-bold transition-all ${activeTab === 'menu' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Articles</button>
+               <button onClick={() => setActiveTab('ops')} className={`px-4 py-2 rounded text-xs font-bold transition-all ${activeTab === 'ops' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Paramètres</button>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => setShowPreview(!showPreview)}
-              className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 md:py-4 rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all ${showPreview ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400'}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded text-xs font-bold transition-all ${showPreview ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}
             >
-              {showPreview ? <Layout className="w-5 h-5" /> : <Smartphone className="w-5 h-5" />}
-              <span className="hidden sm:inline">{showPreview ? 'Studio' : 'Uber Preview'}</span>
+              {showPreview ? <Layout className="w-4 h-4" /> : <Smartphone className="w-4 h-4" />}
+              {showPreview ? 'Éditeur' : 'Aperçu Uber'}
             </button>
-            <button onClick={onClose} className="p-3 md:p-4 bg-slate-50 rounded-2xl text-slate-300 hover:text-red-500">
-               <X className="w-6 h-6" />
+            <button onClick={onClose} className="p-2 text-gray-400 hover:text-black">
+               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         <div className="flex-1 flex overflow-hidden">
           {/* Main Content Area */}
-          <div className={`flex-1 overflow-y-auto custom-scrollbar p-12 transition-all duration-700 ${showPreview ? 'opacity-40 pointer-events-none scale-95 blur-sm' : 'opacity-100'}`}>
+          <div className={`flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 transition-all ${showPreview ? 'opacity-40 blur-sm pointer-events-none' : ''}`}>
             {activeTab === 'identity' ? (
               <div className="max-w-5xl mx-auto space-y-16 pb-32">
-                <div className="relative group rounded-[50px] overflow-hidden shadow-2xl border-4 border-white">
-                  <div className="h-[450px] w-full bg-slate-100">
+                <div className="relative group rounded-lg overflow-hidden border border-gray-200">
+                  <div className="h-64 w-full bg-gray-100">
                     <img src={brand.background_url} className={`w-full h-full object-cover ${uploading === 'banner' ? 'opacity-30' : ''}`} />
-                    {uploading === 'banner' && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Loader2 className="w-12 h-12 text-[#06C167] animate-spin" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
-                      <button onClick={() => handleUploadClick('banner')} className="bg-white px-10 py-4 rounded-3xl font-black uppercase text-xs tracking-widest flex items-center gap-3 shadow-2xl hover:scale-110 transition-all">
-                        <Camera className="w-5 h-5" /> Changer la Bannière
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                      <button onClick={() => handleUploadClick('banner')} className="bg-white px-6 py-2 rounded font-bold text-xs shadow-lg flex items-center gap-2">
+                        <Camera className="w-4 h-4" /> Changer l'image de couverture
                       </button>
                     </div>
                   </div>
-                  <div className="absolute -bottom-16 left-16 group/logo">
-                    <div className="w-48 h-48 rounded-[45px] border-[12px] border-white shadow-2xl overflow-hidden bg-white relative">
+                  <div className="absolute -bottom-8 left-10 group/logo">
+                    <div className="w-24 h-24 rounded-md border-4 border-white shadow-lg overflow-hidden bg-white relative">
                       <img src={brand.logo_url} className={`w-full h-full object-cover ${uploading === 'logo' ? 'opacity-30' : ''}`} />
-                      {uploading === 'logo' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Loader2 className="w-8 h-8 text-[#06C167] animate-spin" />
-                        </div>
-                      )}
-                      <button onClick={() => handleUploadClick('logo')} className="absolute inset-0 bg-black/50 opacity-0 group-hover/logo:opacity-100 transition-all flex items-center justify-center text-white backdrop-blur-sm">
-                        <Camera className="w-8 h-8" />
+                      <button onClick={() => handleUploadClick('logo')} className="absolute inset-0 bg-black/40 opacity-0 group-hover/logo:opacity-100 transition-all flex items-center justify-center text-white">
+                        <Camera className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-24 grid md:grid-cols-2 gap-16">
-                  <div className="space-y-10">
-                    <div className="field-group-v3">
-                      <label>Nom de la Marque</label>
-                      <input value={brand.name} onChange={e => setBrand({...brand, name: e.target.value})} className="text-4xl font-black tracking-tighter" />
+                <div className="pt-16 grid md:grid-cols-2 gap-10">
+                  <div className="space-y-6">
+                    <div className="field-group-uber">
+                      <label>Nom de l'établissement</label>
+                      <input value={brand.name} onChange={e => setBrand({...brand, name: e.target.value})} className="text-xl font-bold" />
                     </div>
-                    <div className="field-group-v3">
-                      <label>Tagline / Accroche</label>
-                      <input value={brand.tagline} onChange={e => setBrand({...brand, tagline: e.target.value})} className="text-xl font-medium text-slate-500 italic" />
+                    <div className="field-group-uber">
+                      <label>Slogan marketing</label>
+                      <input value={brand.tagline} onChange={e => setBrand({...brand, tagline: e.target.value})} className="text-sm text-gray-600" />
                     </div>
-                    <div className="field-group-v3">
-                      <label>Cuisine de Reference</label>
-                      <input value={brand.culinary_style} onChange={e => setBrand({...brand, culinary_style: e.target.value})} className="text-[#06C167] font-black uppercase tracking-widest" />
+                    <div className="field-group-uber">
+                      <label>Catégorie de cuisine</label>
+                      <input value={brand.culinary_style} onChange={e => setBrand({...brand, culinary_style: e.target.value})} className="text-[#06C167] font-bold text-sm" />
                     </div>
                   </div>
-                  <div className="space-y-10">
-                    <div className="field-group-v3">
-                      <label>Storytelling & Vision Agentic</label>
-                      <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="min-h-[280px] text-lg leading-relaxed italic" />
+                  <div className="space-y-6">
+                    <div className="field-group-uber">
+                      <label>Présentation (Storytelling)</label>
+                      <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="min-h-[160px] text-sm leading-relaxed" />
                     </div>
-                    <button onClick={saveIdentity} disabled={saving} className="btn-v3-primary w-full py-8 text-lg">
-                      {saving ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Valider l\'Identité'} <BadgeCheck className="ml-4 w-6 h-6" />
+                    <button onClick={saveIdentity} disabled={saving} className="w-full py-3 bg-black text-white text-sm font-bold rounded-md hover:bg-gray-800 transition-all flex items-center justify-center gap-2">
+                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer les modifications'}
                     </button>
                   </div>
                 </div>
               </div>
             ) : activeTab === 'menu' ? (
               <div className="max-w-6xl mx-auto space-y-12 pb-40">
-                <div className="flex justify-between items-end mb-16">
-                  <div className="space-y-2">
-                    <h2 className="text-6xl font-black text-slate-900 tracking-tighter uppercase">Menu Expert</h2>
-                    <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-xs flex items-center gap-3">
-                      <ShieldCheck className="w-5 h-5 text-[#06C167]" /> Données isolées & sécurisées (RLS Active)
-                    </p>
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h2 className="text-xl font-bold text-black">Articles du menu</h2>
+                    <p className="text-xs text-gray-500 font-medium">Gérez vos plats, prix et disponibilités.</p>
                   </div>
                   <button 
                     onClick={() => {
                       const newItem = {
                         brand_id: brand.id, title: "Nouveau produit", description: "Description...", category: "Plats",
-                        selling_price: 10, vat_rate: 10, is_available: true, options: [], sub_category: "Signature", image_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"
+                        selling_price: 10, vat_rate: 10, is_available: true, options: [], sub_category: "Général", image_url: ""
                       };
                       setBrand({...brand, menu_items: [...(brand.menu_items || []), newItem]});
                     }}
-                    className="btn-v3-success px-12 py-6 rounded-[30px]"
+                    className="bg-[#06C167] text-white text-xs font-bold px-4 py-2 rounded-md flex items-center gap-2"
                   >
-                    <Plus className="w-6 h-6" /> Ajouter un Plat
+                    <Plus className="w-4 h-4" /> Ajouter un article
                   </button>
                 </div>
 
                 <div className="grid gap-8">
                   {brand.menu_items?.map((item: any, idx: number) => (
-                    <div key={idx} className="bg-white p-12 rounded-[55px] border border-slate-100 shadow-[0_15px_50px_-10px_rgba(0,0,0,0.03)] hover:shadow-2xl transition-all duration-700 group/item relative overflow-hidden">
-                       <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 -mr-16 -mt-16 rounded-full group-hover/item:scale-150 transition-all duration-1000 opacity-20" />
-                       <div className="flex gap-14 relative z-10">
-                          <div className="w-64 space-y-6 shrink-0">
-                             <div className="w-full h-64 rounded-[45px] overflow-hidden bg-slate-100 relative group/img cursor-pointer border-4 border-slate-50 shadow-inner">
-                                <img src={item.image_url} className={`w-full h-full object-cover ${uploading === `item-${idx}` ? 'opacity-30' : ''}`} />
-                                {uploading === `item-${idx}` && (
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <Loader2 className="w-12 h-12 text-[#06C167] animate-spin" />
-                                  </div>
-                                )}
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center text-white backdrop-blur-sm">
-                                   <Camera className="w-10 h-10" />
+                    <div key={idx} className="bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all group/item">
+                       <div className="flex gap-6">
+                          <div className="w-24 space-y-3 shrink-0">
+                             <div className="w-24 h-24 rounded-md overflow-hidden bg-gray-100 relative group/img cursor-pointer border border-gray-200">
+                                <img src={item.image_url} className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center text-white">
+                                   <Camera className="w-5 h-5" />
                                 </div>
                                 <button onClick={() => handleUploadClick({ type: 'item', index: idx })} className="absolute inset-0 z-20" />
                              </div>
-                             <div className="flex flex-col gap-3">
-                                <button 
-                                  onClick={() => {
-                                    const newItems = [...brand.menu_items];
-                                    newItems[idx].is_available = !newItems[idx].is_available;
-                                    setBrand({...brand, menu_items: newItems});
-                                  }}
-                                  className={`flex items-center justify-center gap-3 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${item.is_available ? 'bg-green-50 text-[#06C167] border border-green-100' : 'bg-red-50 text-red-500 border border-red-100'}`}
-                                >
-                                  {item.is_available ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-                                  {item.is_available ? 'Actif sur Uber' : 'Epuisé'}
-                                </button>
-                             </div>
+                             <button 
+                                onClick={() => {
+                                  const newItems = [...brand.menu_items];
+                                  newItems[idx].is_available = !newItems[idx].is_available;
+                                  setBrand({...brand, menu_items: newItems});
+                                }}
+                                className={`w-full py-1.5 rounded text-[10px] font-bold uppercase transition-all ${item.is_available ? 'bg-green-50 text-[#06C167]' : 'bg-red-50 text-red-500'}`}
+                             >
+                                {item.is_available ? 'Disponible' : 'Indisponible'}
+                             </button>
                           </div>
 
                           <div className="flex-1 space-y-10">
@@ -324,11 +300,11 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                            onChange={e => {
                                              const newItems = [...brand.menu_items]; newItems[idx].vat_rate = parseFloat(e.target.value); setBrand({...brand, menu_items: newItems});
                                            }}
-                                           className="bg-transparent text-[11px] font-black text-yellow-700 outline-none"
+                                           className="bg-transparent text-[10px] font-bold text-gray-600 outline-none"
                                          >
-                                            <option value={5.5}>5.5% (Taxes reduites)</option>
-                                            <option value={10}>10% (Restauration)</option>
-                                            <option value={20}>20% (Standard)</option>
+                                            <option value={5.5}>5.5%</option>
+                                            <option value={10}>10%</option>
+                                            <option value={20}>20%</option>
                                          </select>
                                       </div>
                                    </div>
@@ -348,23 +324,20 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                 </div>
                              </div>
 
-                             <div className="space-y-4">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Description Marketing</label>
-                                <textarea value={item.description} onChange={e => {
-                                   const newItems = [...brand.menu_items]; newItems[idx].description = e.target.value; setBrand({...brand, menu_items: newItems});
-                                }} className="w-full text-xl text-slate-600 bg-slate-50/50 p-8 rounded-[40px] outline-none border border-slate-100 focus:bg-white focus:shadow-xl transition-all h-36 resize-none italic" />
-                             </div>
+                             <textarea value={item.description} onChange={e => {
+                                const newItems = [...brand.menu_items]; newItems[idx].description = e.target.value; setBrand({...brand, menu_items: newItems});
+                             }} className="w-full text-xs text-gray-500 bg-gray-50 p-3 rounded outline-none border border-transparent focus:border-gray-200 transition-all h-20 resize-none" placeholder="Description de l'article..." />
 
-                             <div className="flex gap-8 items-center border-t border-slate-50 pt-10">
+                             <div className="flex gap-4 items-center pt-4 border-t border-gray-50">
                                 <button 
                                   onClick={() => setEditingItemIdx(editingItemIdx === idx ? null : idx)}
-                                  className="flex items-center gap-4 px-10 py-5 bg-indigo-600 text-white rounded-[25px] text-[12px] font-black uppercase tracking-widest shadow-xl shadow-indigo-200 hover:scale-105 active:scale-95 transition-all"
+                                  className={`flex items-center gap-2 px-4 py-2 rounded text-[10px] font-bold uppercase tracking-wider transition-all ${editingItemIdx === idx ? 'bg-black text-white' : 'bg-gray-100 text-gray-600'}`}
                                 >
-                                  {editingItemIdx === idx ? <ChevronUp className="w-5 h-5" /> : <UtensilsCrossed className="w-5 h-5" />}
-                                  {editingItemIdx === idx ? 'Fermer Config' : 'Options & Modificateurs'}
+                                  {editingItemIdx === idx ? <ChevronUp className="w-4 h-4" /> : <Settings2 className="w-4 h-4" />}
+                                  Options
                                 </button>
                                 
-                                <label className="flex items-center gap-4 cursor-pointer p-5 bg-orange-50 rounded-[25px] border border-orange-100 group/offer">
+                                <label className="flex items-center gap-2 cursor-pointer p-2 bg-orange-50 rounded border border-orange-100">
                                    <input 
                                      type="checkbox"
                                      checked={item.is_special_offer}
@@ -373,28 +346,23 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                         newItems[idx].is_special_offer = e.target.checked;
                                         setBrand({...brand, menu_items: newItems});
                                      }}
-                                     className="w-6 h-6 rounded-lg border-orange-300 text-orange-600 focus:ring-orange-500 transition-all"
+                                     className="w-4 h-4 rounded border-orange-300 text-orange-600"
                                    />
-                                   <span className="text-[12px] font-black uppercase tracking-widest text-orange-700 flex items-center gap-3">
-                                      <Tag className="w-5 h-5" /> Offre Spéciale
-                                   </span>
+                                   <span className="text-[10px] font-bold uppercase tracking-wider text-orange-700">Offre</span>
                                 </label>
                                 
-                                <AnimatePresence>
-                                  {item.is_special_offer && (
-                                    <motion.input 
-                                      initial={{ width: 0, opacity: 0 }} animate={{ width: 'auto', opacity: 1 }} exit={{ width: 0, opacity: 0 }}
-                                      value={item.special_offer_text || ''}
-                                      onChange={e => {
-                                        const newItems = [...brand.menu_items];
-                                        newItems[idx].special_offer_text = e.target.value;
-                                        setBrand({...brand, menu_items: newItems});
-                                      }}
-                                      className="flex-1 text-[12px] font-black text-orange-900 bg-white px-8 py-5 rounded-[25px] outline-none border-2 border-orange-200 shadow-sm"
-                                      placeholder="Ex: 1 acheté = 1 offert"
-                                    />
-                                  )}
-                                </AnimatePresence>
+                                {item.is_special_offer && (
+                                  <input 
+                                    value={item.special_offer_text || ''}
+                                    onChange={e => {
+                                      const newItems = [...brand.menu_items];
+                                      newItems[idx].special_offer_text = e.target.value;
+                                      setBrand({...brand, menu_items: newItems});
+                                    }}
+                                    className="flex-1 text-[10px] font-bold text-orange-900 bg-white px-3 py-2 rounded border border-orange-200 outline-none"
+                                    placeholder="Ex: 1 acheté = 1 offert"
+                                  />
+                                )}
 
                                 <div className="flex-1" />
                                 <button 
@@ -403,99 +371,92 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                       const newItems = [...brand.menu_items]; newItems.splice(idx, 1); setBrand({...brand, menu_items: newItems});
                                     }
                                   }}
-                                  className="p-5 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                  className="p-2 text-gray-300 hover:text-red-500"
                                 >
-                                  <Trash2 className="w-7 h-7" />
+                                  <Trash2 className="w-4 h-4" />
                                 </button>
                              </div>
 
                              <AnimatePresence>
                                 {editingItemIdx === idx && (
                                    <motion.div 
-                                     initial={{ height: 0, opacity: 0, y: -20 }} animate={{ height: 'auto', opacity: 1, y: 0 }} exit={{ height: 0, opacity: 0, y: -20 }}
-                                     className="overflow-hidden bg-slate-50/80 p-12 rounded-[50px] border border-slate-100 space-y-10"
-                                   >
-                                      <div className="flex justify-between items-center border-b border-slate-200 pb-8">
-                                         <h4 className="text-sm font-black uppercase text-indigo-900 tracking-[0.3em] flex items-center gap-4">
-                                            <ShieldAlert className="w-6 h-6" /> Architecture de Choix
-                                         </h4>
-                                         <button 
-                                           onClick={() => {
-                                             const newItems = [...brand.menu_items];
-                                             const newGroup = { name: "Choisissez votre cuisson", min: 1, max: 1, modifiers: [{ name: "Saignant", price: 0 }] };
-                                             newItems[idx].options = [...(newItems[idx].options || []), newGroup];
-                                             setBrand({...brand, menu_items: newItems});
-                                           }}
-                                           className="btn-v3-primary px-8 py-4 text-[11px]"
-                                         >
-                                            + Nouveau Groupe
-                                         </button>
-                                      </div>
-
-                                      <div className="grid gap-10">
-                                         {(item.options || []).map((group: any, gIdx: number) => (
-                                            <div key={gIdx} className="bg-white p-10 rounded-[45px] border border-slate-200 shadow-sm relative">
-                                               <div className="flex justify-between items-center mb-10 pb-6 border-b border-slate-100">
-                                                  <div className="flex items-center gap-10">
-                                                     <input value={group.name} onChange={e => {
-                                                        const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].name = e.target.value; setBrand({...brand, menu_items: newItems});
-                                                     }} className="bg-transparent font-black text-2xl text-slate-900 outline-none focus:text-indigo-600 w-96" />
-                                                     <div className="flex items-center gap-6 text-[11px] font-black text-slate-400 bg-slate-50 px-8 py-3 rounded-2xl border border-slate-100">
-                                                        CONTRAINTES : 
-                                                        <div className="flex items-center gap-4 text-indigo-600">
-                                                          MIN <input type="number" value={group.min} onChange={e => {
-                                                            const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].min = parseInt(e.target.value); setBrand({...brand, menu_items: newItems});
-                                                          }} className="w-12 text-center bg-white rounded-lg p-1" />
-                                                          MAX <input type="number" value={group.max} onChange={e => {
-                                                            const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].max = parseInt(e.target.value); setBrand({...brand, menu_items: newItems});
-                                                          }} className="w-12 text-center bg-white rounded-lg p-1" />
-                                                        </div>
-                                                     </div>
-                                                  </div>
-                                                  <button onClick={() => {
-                                                     const newItems = [...brand.menu_items]; newItems[idx].options.splice(gIdx, 1); setBrand({...brand, menu_items: newItems});
-                                                  }} className="p-4 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"><X className="w-6 h-6" /></button>
-                                               </div>
-
-                                               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                  {group.modifiers.map((mod: any, mIdx: number) => (
-                                                     <div key={mIdx} className="flex items-center gap-4 bg-slate-50 p-6 rounded-[30px] border border-slate-100 group/mod hover:bg-white hover:shadow-xl transition-all border-l-8 border-l-slate-200 hover:border-l-indigo-400">
-                                                        <input value={mod.name} onChange={e => {
-                                                           const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].modifiers[mIdx].name = e.target.value; setBrand({...brand, menu_items: newItems});
-                                                        }} className="flex-1 text-sm font-black bg-transparent outline-none focus:text-indigo-600" />
-                                                        <div className="flex items-center gap-2 text-[#06C167] font-black bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
-                                                           <span className="text-xs">+</span>
-                                                           <input 
-                                                              type="text" 
-                                                              value={mod.price} 
-                                                              onChange={e => {
-                                                                const newItems = [...brand.menu_items]; 
-                                                                newItems[idx].options[gIdx].modifiers[mIdx].price = sanitizePrice(e.target.value); 
-                                                                setBrand({...brand, menu_items: newItems});
-                                                              }} 
-                                                              className="w-14 text-right outline-none text-sm bg-transparent" 
-                                                           />
-                                                           <span className="text-xs">€</span>
-                                                        </div>
-                                                        <button onClick={() => {
-                                                           const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].modifiers.splice(mIdx, 1); setBrand({...brand, menu_items: newItems});
-                                                        }} className="p-2 text-slate-200 group-hover/mod:text-red-400 transition-all"><Trash2 className="w-5 h-5" /></button>
-                                                     </div>
-                                                  ))}
-                                                  <button 
-                                                    onClick={() => {
-                                                      const newItems = [...brand.menu_items];
-                                                      newItems[idx].options[gIdx].modifiers.push({ name: "Option supp", price: 0 });
-                                                      setBrand({...brand, menu_items: newItems});
-                                                    }}
-                                                    className="p-6 border-4 border-dashed border-slate-100 rounded-[30px] text-[12px] font-black text-slate-300 hover:border-indigo-400 hover:text-indigo-600 transition-all flex items-center justify-center gap-4"
-                                                  >
-                                                     <Plus className="w-6 h-6" /> Nouveau Choix
-                                                  </button>
-                                               </div>
-                                            </div>
-                                         ))}
-                                      </div>
+                                      initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                                      className="overflow-hidden bg-gray-50 p-6 rounded-md border border-gray-100 mt-4 space-y-6"
+                                    >
+                                       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+                                          <h4 className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Groupes d'options</h4>
+                                          <button 
+                                            onClick={() => {
+                                              const newItems = [...brand.menu_items];
+                                              const newGroup = { name: "Options", min: 0, max: 1, modifiers: [{ name: "Standard", price: 0 }] };
+                                              newItems[idx].options = [...(newItems[idx].options || []), newGroup];
+                                              setBrand({...brand, menu_items: newItems});
+                                            }}
+                                            className="text-[10px] font-bold text-blue-600 hover:underline"
+                                          >
+                                             + Ajouter un groupe
+                                          </button>
+                                       </div>
+                                       <div className="grid gap-6">
+                                          {(item.options || []).map((group: any, gIdx: number) => (
+                                             <div key={gIdx} className="bg-white p-4 rounded border border-gray-200 shadow-sm">
+                                                <div className="flex justify-between items-center mb-6">
+                                                   <div className="flex items-center gap-4">
+                                                      <input value={group.name} onChange={e => {
+                                                         const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].name = e.target.value; setBrand({...brand, menu_items: newItems});
+                                                      }} className="font-bold text-sm text-black outline-none w-48" />
+                                                      <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                                                        Min: <input type="number" value={group.min} onChange={e => {
+                                                          const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].min = parseInt(e.target.value); setBrand({...brand, menu_items: newItems});
+                                                        }} className="w-8 bg-gray-50 border border-gray-100 p-1" />
+                                                        Max: <input type="number" value={group.max} onChange={e => {
+                                                          const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].max = parseInt(e.target.value); setBrand({...brand, menu_items: newItems});
+                                                        }} className="w-8 bg-gray-50 border border-gray-100 p-1" />
+                                                      </div>
+                                                   </div>
+                                                   <button onClick={() => {
+                                                      const newItems = [...brand.menu_items]; newItems[idx].options.splice(gIdx, 1); setBrand({...brand, menu_items: newItems});
+                                                   }} className="text-gray-300 hover:text-red-500"><X className="w-4 h-4" /></button>
+                                                </div>
+                                                <div className="grid md:grid-cols-2 gap-4">
+                                                   {group.modifiers.map((mod: any, mIdx: number) => (
+                                                      <div key={mIdx} className="flex items-center gap-3 bg-gray-50 p-3 rounded border border-gray-100">
+                                                         <input value={mod.name} onChange={e => {
+                                                            const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].modifiers[mIdx].name = e.target.value; setBrand({...brand, menu_items: newItems});
+                                                         }} className="flex-1 text-[11px] font-bold bg-transparent outline-none" />
+                                                         <div className="flex items-center gap-1 text-[#06C167] font-bold">
+                                                            <span className="text-[10px]">+</span>
+                                                            <input 
+                                                               type="text" 
+                                                               value={mod.price} 
+                                                               onChange={e => {
+                                                                 const newItems = [...brand.menu_items]; 
+                                                                 newItems[idx].options[gIdx].modifiers[mIdx].price = sanitizePrice(e.target.value); 
+                                                                 setBrand({...brand, menu_items: newItems});
+                                                               }} 
+                                                               className="w-10 text-right outline-none text-[11px] bg-transparent" 
+                                                            />
+                                                            <span className="text-[10px]">€</span>
+                                                         </div>
+                                                         <button onClick={() => {
+                                                            const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].modifiers.splice(mIdx, 1); setBrand({...brand, menu_items: newItems});
+                                                         }} className="text-gray-300 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                                                      </div>
+                                                   ))}
+                                                   <button 
+                                                     onClick={() => {
+                                                       const newItems = [...brand.menu_items];
+                                                       newItems[idx].options[gIdx].modifiers.push({ name: "Option", price: 0 });
+                                                       setBrand({...brand, menu_items: newItems});
+                                                     }}
+                                                     className="p-3 border border-dashed border-gray-300 rounded text-[10px] font-bold text-gray-400 hover:border-black hover:text-black transition-all"
+                                                   >
+                                                      + Ajouter un choix
+                                                   </button>
+                                                </div>
+                                             </div>
+                                          ))}
+                                       </div>
                                    </motion.div>
                                 )}
                              </AnimatePresence>
@@ -506,18 +467,15 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                 </div>
 
                 {/* Floating Bottom Bar */}
-                <div className="fixed bottom-6 md:bottom-12 left-0 md:left-1/2 md:-translate-x-1/2 w-full md:max-w-5xl px-4 md:px-12 z-[100]">
-                  <div className="bg-slate-900/90 backdrop-blur-3xl p-6 md:p-8 rounded-[30px] md:rounded-[50px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border-4 border-white/10 flex flex-col md:flex-row gap-6 md:gap-10 items-center">
-                    <div className="flex-1 space-y-1 text-center md:text-left">
-                      <p className="text-white/50 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">Status</p>
-                      <div className="flex items-center justify-center md:justify-start gap-3">
-                         <div className="w-2 h-2 md:w-3 md:h-3 bg-[#06C167] rounded-full animate-pulse shadow-[0_0_20px_#06C167]" />
-                         <span className="text-white font-black text-xs md:text-sm tracking-tight uppercase">Données locales prêtes</span>
-                      </div>
+                <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-[100] flex justify-center">
+                  <div className="w-full max-w-4xl flex items-center justify-between gap-6">
+                    <div className="flex items-center gap-3">
+                       <div className="w-2 h-2 bg-[#06C167] rounded-full" />
+                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Modifications prêtes</span>
                     </div>
-                    <div className="flex gap-4 md:gap-6 w-full md:w-auto">
-                      <button onClick={saveMenu} disabled={saving} className="flex-1 md:flex-none bg-white text-slate-900 font-black uppercase tracking-widest px-6 md:px-12 py-4 md:py-5 rounded-[20px] md:rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 md:gap-4 shadow-2xl text-[10px] md:text-xs">
-                         {saving ? <Loader2 className="w-4 h-4 md:w-6 md:h-6 animate-spin" /> : 'Sauver'} <Save className="w-4 h-4 md:w-6 md:h-6" />
+                    <div className="flex gap-3">
+                      <button onClick={saveMenu} disabled={saving} className="bg-black text-white text-[11px] font-bold px-8 py-2.5 rounded hover:bg-gray-800 transition-all flex items-center gap-2">
+                         {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-4 h-4" />} Sauvegarder
                       </button>
                       {uberConnected && (
                         <button 
@@ -526,12 +484,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                             const res = await fetch("/api/uber/sync", { method: "POST", body: JSON.stringify({ brandId: brand.id }) });
                             const data = await res.json();
                             setSaving(false);
-                            if (data.success) setToast({ message: "🚀 Menu publié !", type: 'success' });
+                            if (data.success) setToast({ message: "🚀 Publié !", type: 'success' });
                             else setToast({ message: "⚠️ Erreur Uber", type: 'error' });
                           }}
-                          className="flex-1 md:flex-none bg-[#06C167] text-white font-black uppercase tracking-widest px-6 md:px-12 py-4 md:py-5 rounded-[20px] md:rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 md:gap-4 shadow-2xl shadow-[#06C167]/30 text-[10px] md:text-xs"
+                          className="bg-[#06C167] text-white text-[11px] font-bold px-8 py-2.5 rounded hover:bg-[#05a357] transition-all flex items-center gap-2"
                         >
-                           🚀 Publier <TrendingUp className="w-4 h-4 md:w-6 md:h-6" />
+                           Publier sur Uber Eats
                         </button>
                       )}
                     </div>
@@ -680,17 +638,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
       </motion.div>
 
       <style jsx>{`
-        .nav-tab-v3 { @apply text-[11px] font-black uppercase tracking-[0.2em] px-8 py-3 rounded-2xl transition-all; }
-        .nav-tab-v3.active { @apply bg-white shadow-xl text-slate-900; }
-        .field-group-v3 { @apply space-y-4 bg-white p-10 rounded-[45px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-500; }
-        .field-group-v3 label { @apply text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 block; }
-        .field-group-v3 input, .field-group-v3 textarea { @apply w-full bg-transparent outline-none border-none; }
-        .btn-v3-primary { @apply bg-slate-900 text-white font-black uppercase tracking-[0.3em] py-6 rounded-[30px] hover:bg-black active:scale-95 transition-all flex items-center justify-center shadow-2xl; }
-        .btn-v3-success { @apply bg-[#06C167] text-white font-black uppercase tracking-widest py-5 rounded-[25px] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4 shadow-xl shadow-[#06C167]/30; }
-        .custom-scrollbar::-webkit-scrollbar { width: 10px; }
+        .field-group-uber { @apply space-y-2; }
+        .field-group-uber label { @apply text-[10px] font-bold uppercase tracking-wider text-gray-500 block; }
+        .field-group-uber input, .field-group-uber textarea { @apply w-full bg-white border border-gray-200 rounded px-4 py-2 outline-none focus:border-black transition-all; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; border: 4px solid transparent; background-clip: content-box; }
-        @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E2E2; border-radius: 10px; }
       `}</style>
     </motion.div>
   );

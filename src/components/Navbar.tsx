@@ -39,20 +39,20 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 px-6 ${scrolled ? "py-4" : "py-8"}`}>
-      <div className={`max-w-7xl mx-auto px-6 py-4 rounded-[24px] flex items-center justify-between transition-all duration-500 ${scrolled ? "bg-white/80 backdrop-blur-xl shadow-lg border border-slate-100" : "bg-transparent"}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-8 ${scrolled ? "py-4" : "py-6"}`}>
+      <div className={`max-w-7xl mx-auto px-5 py-2.5 rounded-xl flex items-center justify-between transition-all duration-300 ${scrolled ? "bg-white shadow-sm border border-slate-100" : "bg-transparent"}`}>
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="p-2 bg-[#06C167] rounded-xl group-hover:rotate-12 transition-transform">
-            <ChefHat className="w-6 h-6 text-white" />
+          <div className="p-1.5 bg-[#06C167] rounded-lg group-hover:rotate-12 transition-transform">
+            <ChefHat className="w-5 h-5 text-white" />
           </div>
-          <span className={`text-xl font-black tracking-tighter transition-colors ${scrolled ? "text-slate-900" : "text-slate-900"}`}>
+          <span className={`text-lg font-bold tracking-tight transition-colors ${scrolled ? "text-slate-900" : "text-slate-900"}`}>
             kitchenz<span className="text-[#06C167]">.ai</span>
           </span>
         </Link>
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden md:flex items-center gap-8">
           <NavLink href="/audit" label="Audit IA" scrolled={scrolled} />
           <NavLink href="/dashboard" label="Dashboard" scrolled={scrolled} />
           <NavLink href="/blog" label="Blog" scrolled={scrolled} />
@@ -78,8 +78,8 @@ export default function Navbar() {
               <Link href="/login" className={`font-black text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-all ${scrolled ? "text-slate-600 hover:text-[#06C167]" : "text-slate-600 hover:text-[#06C167]"}`}>
                 Connexion
               </Link>
-              <Link href="/audit" className="bg-[#06C167] text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-[#06C167]/20 flex items-center gap-2">
-                Essai Gratuit <ArrowRight className="w-4 h-4" />
+              <Link href="/audit" className="bg-[#06C167] text-white px-5 py-2 rounded-md font-bold text-xs uppercase tracking-wider hover:bg-[#05a357] transition-all flex items-center gap-2">
+                Essai Gratuit <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </>
           )}
@@ -95,10 +95,10 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-6 right-6 mt-4 bg-white rounded-[32px] p-8 shadow-2xl border border-slate-100 md:hidden flex flex-col gap-6"
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-full left-4 right-4 mt-2 bg-white rounded-lg p-6 shadow-xl border border-gray-100 md:hidden flex flex-col gap-4"
           >
             <Link href="/audit" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Audit IA</Link>
             <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Dashboard</Link>
