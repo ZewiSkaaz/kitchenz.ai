@@ -108,7 +108,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
     }
 
     setSaving(true);
-    const menuToSave = brand.menu_items?.map(item => ({
+    const menuToSave = brand.menu_items?.map((item: any) => ({
       ...item,
       brand_id: brand.id
     }));
@@ -219,25 +219,24 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                 </div>
 
                 <div className="pt-8 grid md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <div className="field-group-uber">
-                      <label>Nom de l'établissement</label>
-                      <input value={brand.name} onChange={e => setBrand({...brand, name: e.target.value})} className="text-lg font-bold" />
+                  <div className="space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Nom de l&apos;établissement</label>
+                      <input value={brand.name} onChange={e => setBrand({...brand, name: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-base font-bold outline-none focus:border-[#06C167] focus:bg-white transition-all" />
                     </div>
-                    <div className="field-group-uber">
-                      <label>Slogan marketing</label>
-                      <input value={brand.tagline} onChange={e => setBrand({...brand, tagline: e.target.value})} className="text-sm text-gray-500 font-medium" />
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Slogan marketing</label>
+                      <input value={brand.tagline} onChange={e => setBrand({...brand, tagline: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-700 text-sm font-medium outline-none focus:border-[#06C167] focus:bg-white transition-all" />
                     </div>
-                    <div className="field-group-uber">
-                      <label>Catégorie de cuisine</label>
-                      <input value={brand.culinary_style} onChange={e => setBrand({...brand, culinary_style: e.target.value})} className="text-[#06C167] font-bold text-sm" />
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Catégorie de cuisine</label>
+                      <input value={brand.culinary_style} onChange={e => setBrand({...brand, culinary_style: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-[#06C167] text-sm font-bold outline-none focus:border-[#06C167] focus:bg-white transition-all" />
                     </div>
                   </div>
-                  <div className="space-y-4">
-                    <div className="field-group-uber">
-                      <label>Présentation (Storytelling)</label>
-                      <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="min-h-[140px] text-sm leading-relaxed" />
-                    </div>
+                  <div className="space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Présentation (Storytelling)</label>
+                      <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-700 text-sm leading-relaxed outline-none focus:border-[#06C167] focus:bg-white transition-all min-h-[160px] resize-none" />
                     </div>
                   </div>
                 </div>
@@ -292,7 +291,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                 <div className="flex-1 space-y-6">
                                    <input value={item.title} onChange={e => {
                                       const newItems = [...brand.menu_items]; newItems[idx].title = e.target.value; setBrand({...brand, menu_items: newItems});
-                                   }} className="text-2xl font-bold text-black bg-transparent outline-none focus:text-[#06C167] w-full tracking-tight" />
+                                   }} className="text-xl font-bold text-gray-900 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#06C167] focus:bg-white w-full transition-all" />
                                    
                                    <div className="flex flex-wrap gap-4">
                                       <input value={item.category} onChange={e => {
@@ -523,8 +522,9 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                       ))}
                    </div>
 
-                   <button onClick={saveIdentity} disabled={saving} className="btn-v3-primary w-full py-10 text-xl rounded-[40px] shadow-3xl shadow-slate-200">
-                      {saving ? <Loader2 className="w-8 h-8 animate-spin" /> : 'Enregistrer les Paramètres Ops'} <ShieldCheck className="ml-4 w-8 h-8" />
+                   <button onClick={saveIdentity} disabled={saving} className="w-full py-4 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-black transition-all flex items-center justify-center gap-3 disabled:opacity-50">
+                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                      Enregistrer les Paramètres
                    </button>
                 </div>
               </div>
@@ -650,12 +650,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
         </div>
       </motion.div>
 
-      <style jsx>{`
-        .field-group-uber { @apply space-y-2; }
-        .field-group-uber label { @apply text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block; }
-        .field-group-uber input, .field-group-uber textarea { 
-          @apply w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 outline-none focus:bg-white focus:border-[#06C167] transition-all text-slate-900 font-medium; 
-        }
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E2E2; border-radius: 10px; }

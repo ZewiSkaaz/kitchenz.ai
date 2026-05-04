@@ -1,21 +1,33 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
+import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => req.cookies.getAll(),
+        setAll: (cookies: any) => {
+          cookies.forEach(({ name, value, options }: any) => {
+            res.cookies.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
 
-  // Protéger les routes sensibles (Pages et API)
-  const isAuthPage = req.nextUrl.pathname.startsWith('/login');
+  const { data: { session } } = await supabase.auth.getSession();
+
   const isApiRoute = req.nextUrl.pathname.startsWith('/api');
-  const isPublicApi = req.nextUrl.pathname.startsWith('/api/auth'); // Exclure le callback auth
+  const isPublicApi = req.nextUrl.pathname.startsWith('/api/auth') || 
+                      req.nextUrl.pathname.startsWith('/api/billing/webhook');
+  const isDashboard = req.nextUrl.pathname.startsWith('/dashboard');
 
-  if (!session && (req.nextUrl.pathname.startsWith('/dashboard') || (isApiRoute && !isPublicApi))) {
+  if (!session && (isDashboard || (isApiRoute && !isPublicApi))) {
     if (isApiRoute) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       parameters: { width: width || 1024, height: height || 1024 },
     });
 
-    const buffer = Buffer.from(await blob.arrayBuffer());
+    const buffer = Buffer.from(await (blob as any).arrayBuffer());
     const base64 = buffer.toString("base64");
 
     return NextResponse.json({ 

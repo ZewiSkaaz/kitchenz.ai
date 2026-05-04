@@ -19,7 +19,20 @@ export async function GET(request: Request) {
   }
 
   try {
-    const tokens = await uberService.getAccessToken(code);
+    // Exchange code for tokens manually
+    const params = new URLSearchParams({
+      client_id: process.env.UBER_CLIENT_ID!,
+      client_secret: process.env.UBER_CLIENT_SECRET!,
+      grant_type: 'authorization_code',
+      redirect_uri: process.env.UBER_REDIRECT_URI || 'https://kitchenz-ai.onrender.com/api/auth/uber/callback',
+      code,
+    });
+    const tokenRes = await fetch('https://sandbox-login.uber.com/oauth/v2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
+    });
+    const tokens = await tokenRes.json();
     
     // Get current user
     const { data: { session } } = await supabase.auth.getSession();
