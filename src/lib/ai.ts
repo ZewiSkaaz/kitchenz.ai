@@ -377,14 +377,32 @@ export async function generateMenuAssembly(
 }
 
 export async function analyzeInventoryImage(base64Image: string) {
-  const prompt = `Analyse cette image d'inventaire. Extrais les ingrédients visibles sous forme de liste JSON { name, qty }.`;
+  const prompt = `
+    Agis en tant qu'Expert Logistique Dark Kitchen.
+    Analyse cette image de stock/frigo/réserve.
+    
+    MISSIONS :
+    1. Identifie TOUS les ingrédients alimentaires visibles.
+    2. Estime les quantités et les unités (ex: "kg", "pièces", "bouteilles").
+    3. Ignore les éléments non alimentaires (emballages vides, étagères, outils) sauf s'ils sont critiques.
+    
+    FORMAT DE SORTIE (JSON STRICT) :
+    {
+      "items": [
+        { "name": "Tomates", "qty": "2kg", "category": "Légumes" },
+        { "name": "Steaks hachés", "qty": "10 pièces", "category": "Viandes" }
+      ],
+      "analysis_quality": "High/Medium/Low"
+    }
+  `;
   const openai = getOpenAI();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }]}],
     response_format: { type: "json_object" }
   });
-  return JSON.parse(response.choices[0].message.content || "{}").items || [];
+  const data = JSON.parse(response.choices[0].message.content || "{}");
+  return data.items || [];
 }
 
 /**
