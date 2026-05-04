@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: kitchenz-ai
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: UBER_EATS_CLIENT_ID
+        sync: false
+      - key: UBER_EATS_CLIENT_SECRET
+        sync: false
