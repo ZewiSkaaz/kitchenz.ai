@@ -16,13 +16,13 @@ export default function AuditPage() {
   const router = useRouter();
 
   useEffect(() => {
-    /* const checkUser = async () => {
+    const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push("/login");
       }
     };
-    checkUser(); */
+    checkUser();
   }, []);
   
   // Data State
@@ -58,6 +58,7 @@ export default function AuditPage() {
   const [rent, setRent] = useState(1200);
   const [staff, setStaff] = useState(2500);
   const [dailyOrders, setDailyOrders] = useState(20);
+  const [selectedCategory, setSelectedCategory] = useState<string>("Tous");
 
   // Calculs dynamiques du simulateur
   const menuItems = fullMenu?.menu_items || [];
@@ -859,6 +860,27 @@ export default function AuditPage() {
                       )}
                     </div>
                     <div>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Ingrédients exploités</span>
+                      <div className="flex flex-wrap gap-1">
+                        {isEditing ? (
+                          <input 
+                            type="text"
+                            className="bg-gray-100 text-black px-2 py-1 rounded-md text-[10px] font-bold border border-gray-200 w-full"
+                            value={fullMenu.inventory_analysis.detected_ingredients.join(", ")}
+                            onChange={(e) => {
+                              const newData = {...fullMenu};
+                              newData.inventory_analysis.detected_ingredients = e.target.value.split(",").map(s => s.trim());
+                              setFullMenu(newData);
+                            }}
+                          />
+                        ) : (
+                          fullMenu.inventory_analysis.detected_ingredients.map((ing: string, i: number) => (
+                            <span key={i} className="bg-gray-100 text-black px-2 py-1 rounded-md text-[10px] font-bold border border-gray-200">{ing}</span>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                    <div>
                       <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Matériel requis</span>
                       <div className="flex flex-wrap gap-1">
                         {isEditing ? (
@@ -883,9 +905,29 @@ export default function AuditPage() {
                 </div>
               </div>
 
-              <h3 className="text-3xl font-black mt-12 mb-8 text-black tracking-tight">Menu Stratégique</h3>
+              <h3 className="text-3xl font-black mt-12 mb-4 text-black tracking-tight">Menu Stratégique</h3>
+              
+              {/* Category Filter */}
+              <div className="flex flex-wrap gap-4 mb-10 overflow-x-auto pb-4 custom-scrollbar">
+                {["Tous", "Plat Principal", "Accompagnement", "Menu Combo", "Boisson", "Dessert"].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] border-2 transition-all ${
+                      selectedCategory === cat 
+                      ? 'bg-slate-900 border-slate-900 text-white shadow-xl' 
+                      : 'bg-white border-slate-100 text-slate-400 hover:border-[#06C167] hover:text-[#06C167]'
+                    }`}
+                  >
+                    {cat === "Tous" ? "Tout voir" : cat}
+                  </button>
+                ))}
+              </div>
+
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {fullMenu.menu_items.map((item: any, i: number) => (
+                {fullMenu.menu_items
+                  .filter((item: any) => selectedCategory === "Tous" || item.category === selectedCategory)
+                  .map((item: any, i: number) => (
                   <motion.div 
                     key={i} 
                     initial={{ opacity: 0, y: 20 }} 
@@ -1174,17 +1216,50 @@ export default function AuditPage() {
                   <div>
                     <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Ingrédients requis</h3>
                     <div className="flex flex-wrap gap-3">
-                      {selectedItemForRecipe.ingredients?.map((ing: string, i: number) => (
-                        <span key={i} className="bg-slate-50 px-5 py-2 rounded-xl text-sm font-bold text-slate-600 border border-slate-100">{ing}</span>
-                      ))}
+                      {isEditing ? (
+                        <input 
+                          type="text"
+                          className="bg-slate-50 px-5 py-3 rounded-xl text-sm font-bold text-slate-900 border border-slate-100 w-full outline-none focus:border-[#06C167]"
+                          value={selectedItemForRecipe.ingredients?.join(", ")}
+                          onChange={(e) => {
+                             const updatedItem = {...selectedItemForRecipe, ingredients: e.target.value.split(",").map(s => s.trim())};
+                             setSelectedItemForRecipe(updatedItem);
+                             // Update in main menu too
+                             const newData = {...fullMenu};
+                             const idx = newData.menu_items.findIndex((m: any) => m.title === selectedItemForRecipe.title);
+                             if (idx !== -1) newData.menu_items[idx].ingredients = updatedItem.ingredients;
+                             setFullMenu(newData);
+                          }}
+                        />
+                      ) : (
+                        selectedItemForRecipe.ingredients?.map((ing: string, i: number) => (
+                          <span key={i} className="bg-slate-50 px-5 py-2 rounded-xl text-sm font-bold text-slate-600 border border-slate-100">{ing}</span>
+                        ))
+                      )}
                     </div>
                   </div>
 
                   <div>
                     <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Instructions de préparation</h3>
-                    <div className="bg-slate-50 p-8 rounded-[32px] border border-slate-100 italic text-slate-600 font-medium leading-relaxed whitespace-pre-line text-lg shadow-inner">
-                      {selectedItemForRecipe.prep_instructions}
-                    </div>
+                    {isEditing ? (
+                      <textarea 
+                        className="bg-slate-50 p-8 rounded-[32px] border border-slate-100 italic text-slate-900 font-medium leading-relaxed w-full h-48 outline-none focus:border-[#06C167] text-lg shadow-inner"
+                        value={selectedItemForRecipe.prep_instructions}
+                        onChange={(e) => {
+                           const updatedItem = {...selectedItemForRecipe, prep_instructions: e.target.value};
+                           setSelectedItemForRecipe(updatedItem);
+                           // Update in main menu too
+                           const newData = {...fullMenu};
+                           const idx = newData.menu_items.findIndex((m: any) => m.title === selectedItemForRecipe.title);
+                           if (idx !== -1) newData.menu_items[idx].prep_instructions = updatedItem.prep_instructions;
+                           setFullMenu(newData);
+                        }}
+                      />
+                    ) : (
+                      <div className="bg-slate-50 p-8 rounded-[32px] border border-slate-100 italic text-slate-600 font-medium leading-relaxed whitespace-pre-line text-lg shadow-inner">
+                        {selectedItemForRecipe.prep_instructions}
+                      </div>
+                    )}
                   </div>
 
                   <div className="pt-10 border-t border-slate-100 flex justify-between items-center">

@@ -14,7 +14,15 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetchBrands();
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
+      } else {
+        fetchBrands();
+      }
+    };
+    checkUser();
   }, []);
 
   const fetchBrands = async () => {
