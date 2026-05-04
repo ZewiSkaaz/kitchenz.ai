@@ -22,10 +22,26 @@ export default function DashboardPage() {
       } else {
         fetchBrands();
         checkUberConnection(session.user.id);
+        handleUrlParams();
       }
     };
     checkUser();
   }, []);
+
+  const handleUrlParams = () => {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    if (error === "invalid_scope") {
+      alert("Erreur Uber : Vous devez sélectionner et activer les permissions (Scopes) dans l'onglet 'Setup' de votre Dashboard Uber Developer.");
+      router.replace("/dashboard");
+    } else if (error) {
+      alert("Erreur de connexion Uber : " + error);
+      router.replace("/dashboard");
+    } else if (params.get("success")) {
+      alert("✅ Compte Uber Eats connecté avec succès !");
+      router.replace("/dashboard");
+    }
+  };
 
   const checkUberConnection = async (userId: string) => {
     const { data } = await supabase
