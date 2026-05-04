@@ -18,16 +18,16 @@ export class UberService {
    * Obtient un access_token via Client Credentials (pas de redirection OAuth nécessaire)
    */
   async getClientCredentialsToken(scopes: string) {
-    const params = new URLSearchParams();
-    params.append('client_id', this.clientId);
-    params.append('client_secret', this.clientSecret);
-    params.append('grant_type', 'client_credentials');
-    params.append('scope', scopes);
+    const formData = new FormData();
+    formData.append('client_id', this.clientId);
+    formData.append('client_secret', this.clientSecret);
+    formData.append('grant_type', 'client_credentials');
+    formData.append('scope', scopes);
 
     const response = await axios.post(
       `${UBER_AUTH_BASE}/token`,
-      params,
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
     );
     return response.data;
   }
