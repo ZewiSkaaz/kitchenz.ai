@@ -12,6 +12,8 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: HUGGINGFACE_TOKEN
+        sync: false
       - key: UBER_EATS_CLIENT_ID
         sync: false
       - key: UBER_EATS_CLIENT_SECRET
