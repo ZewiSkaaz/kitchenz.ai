@@ -1,7 +1,7 @@
 import { uberService } from "@/lib/uber";
 import { NextResponse } from "next/server";
 
-const SCOPES = "eats.store eats.store.orders eats.store.orders.status eats.order eats.report";
+const SCOPES = "eats.store eats.store.orders.read eats.store.status.write eats.order eats.report eats.store.orders.cancel eats.store.orders.restaurant.delivery.status";
 
 export async function GET() {
   try {
