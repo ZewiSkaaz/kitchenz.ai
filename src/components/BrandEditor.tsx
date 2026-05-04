@@ -238,9 +238,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                       <label>Présentation (Storytelling)</label>
                       <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="min-h-[140px] text-sm leading-relaxed" />
                     </div>
-                    <button onClick={saveIdentity} disabled={saving} className="w-full py-2.5 bg-black text-white text-xs font-bold rounded-md hover:bg-gray-800 transition-all flex items-center justify-center gap-2 uppercase tracking-widest">
-                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
-                    </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -476,35 +474,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                   ))}
                 </div>
 
-                {/* Floating Bottom Bar */}
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-[100] flex justify-center">
-                  <div className="w-full max-w-4xl flex items-center justify-between gap-6">
-                    <div className="flex items-center gap-3">
-                       <div className="w-2 h-2 bg-[#06C167] rounded-full" />
-                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Modifications prêtes</span>
-                    </div>
-                    <div className="flex gap-3">
-                      <button onClick={saveMenu} disabled={saving} className="bg-black text-white text-[11px] font-bold px-8 py-2.5 rounded hover:bg-gray-800 transition-all flex items-center gap-2">
-                         {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-4 h-4" />} Sauvegarder
-                      </button>
-                      {uberConnected && (
-                        <button 
-                          onClick={async () => {
-                            setSaving(true);
-                            const res = await fetch("/api/uber/sync", { method: "POST", body: JSON.stringify({ brandId: brand.id }) });
-                            const data = await res.json();
-                            setSaving(false);
-                            if (data.success) setToast({ message: "🚀 Publié !", type: 'success' });
-                            else setToast({ message: "⚠️ Erreur Uber", type: 'error' });
-                          }}
-                          className="bg-[#06C167] text-white text-[11px] font-bold px-8 py-2.5 rounded hover:bg-[#05a357] transition-all flex items-center gap-2"
-                        >
-                           Publier sur Uber Eats
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                {/* Ancien bouton supprimé car doublon avec la barre globale */}
               </div>
             ) : (
               <div className="max-w-4xl mx-auto space-y-20 pb-40">
@@ -645,15 +615,51 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
             )}
           </AnimatePresence>
         </div>
+
+        {/* Unified Action Bar - FIXED at bottom */}
+        <div className="px-10 py-6 bg-white border-t border-gray-100 flex justify-between items-center z-[70] shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center gap-4 text-gray-400">
+            <span className="text-[10px] font-black uppercase tracking-widest">Modifications en attente</span>
+          </div>
+          <div className="flex items-center gap-4">
+             <button onClick={onClose} className="px-8 py-3 text-xs font-bold text-gray-500 hover:text-black transition-all uppercase tracking-widest">Annuler</button>
+             <button 
+                onClick={activeTab === 'identity' ? saveIdentity : saveMenu} 
+                disabled={saving} 
+                className="btn-primary !px-8 !py-4 shadow-xl shadow-[#06C167]/20 flex items-center gap-3"
+             >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                {activeTab === 'identity' ? 'Sauvegarder' : 'Sauvegarder Menu'}
+             </button>
+             {uberConnected && activeTab === 'menu' && (
+               <button 
+                onClick={async () => {
+                  setSaving(true);
+                  const res = await fetch("/api/uber/sync", { method: "POST", body: JSON.stringify({ brandId: brand.id }) });
+                  const data = await res.json();
+                  setSaving(false);
+                  if (data.success) setToast({ message: "🚀 Publié !", type: 'success' });
+                  else setToast({ message: "⚠️ Erreur Uber", type: 'error' });
+                }}
+                className="bg-[#06C167] text-white text-xs font-bold px-8 py-4 rounded-full hover:bg-[#05a357] transition-all flex items-center gap-2 shadow-xl shadow-[#06C167]/10"
+               >
+                 🚀 Publier sur Uber Eats
+               </button>
+             )}
+          </div>
+        </div>
       </motion.div>
 
       <style jsx>{`
         .field-group-uber { @apply space-y-2; }
-        .field-group-uber label { @apply text-[10px] font-bold uppercase tracking-wider text-gray-500 block; }
-        .field-group-uber input, .field-group-uber textarea { @apply w-full bg-white border border-gray-200 rounded px-4 py-2 outline-none focus:border-black transition-all; }
+        .field-group-uber label { @apply text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block; }
+        .field-group-uber input, .field-group-uber textarea { 
+          @apply w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 outline-none focus:bg-white focus:border-[#06C167] transition-all text-slate-900 font-medium; 
+        }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E2E2; border-radius: 10px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
     </motion.div>
   );
