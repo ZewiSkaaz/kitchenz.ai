@@ -9,9 +9,9 @@ export class UberService {
   private redirectUri: string;
 
   constructor() {
-    this.clientId = process.env.UBER_CLIENT_ID || "";
-    this.clientSecret = process.env.UBER_CLIENT_SECRET || "";
-    this.redirectUri = process.env.UBER_REDIRECT_URI || "";
+    this.clientId = process.env.UBER_CLIENT_ID || "ba9x6wqY0-IW4kjpjmyg4gYl8IhLQkxo";
+    this.clientSecret = process.env.UBER_CLIENT_SECRET || "G5ZpMkqegSDQxURLZKGJCdpauipv9YP-wSgQlyJf";
+    this.redirectUri = process.env.UBER_REDIRECT_URI || "https://kitchenz-ai.onrender.com/api/auth/uber/callback";
   }
 
   getAuthUrl() {
