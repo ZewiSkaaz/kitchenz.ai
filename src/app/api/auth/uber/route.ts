@@ -11,13 +11,12 @@ export async function GET() {
     // Attempt to save in Supabase if user is logged in
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
+      // Use service role if available or anon if permitted by RLS
       await supabase.from("user_integrations").upsert({
         user_id: session.user.id,
         provider: "uber",
         access_token: tokens.access_token,
-        expires_at: new RegExp(/^\d+$/).test(tokens.expires_in) 
-          ? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
-          : new Date(Date.now() + 2592000 * 1000).toISOString()
+        expires_at: new Date(Date.now() + (tokens.expires_in || 2592000) * 1000).toISOString()
       });
     }
 

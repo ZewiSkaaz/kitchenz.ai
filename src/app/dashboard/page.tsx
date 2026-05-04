@@ -37,10 +37,10 @@ export default function DashboardPage() {
     } else if (error) {
       alert("Erreur de connexion Uber : " + error);
       router.replace("/dashboard");
-    } else if (params.get("success")) {
-      alert("✅ Compte Uber Eats connecté avec succès !");
+    } else if (params.get("success") === "uber_connected") {
+      setIsUberConnected(true);
       router.replace("/dashboard");
-    }
+    } else if (params.get("success")) {
   };
 
   const checkUberConnection = async (userId: string) => {
