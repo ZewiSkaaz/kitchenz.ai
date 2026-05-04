@@ -23,25 +23,32 @@ function getHF() {
 // ---------------------------------------------------------------------------
 
 export const PRICING = {
-  UBER_COMMISSION: 0.30,    // 30% commission Uber Eats (ajustable : Deliveroo = 0.25)
+  UBER_COMMISSION: 0.30,    // 30% commission Uber Eats
   TVA_FOOD: 0.10,           // 10% TVA restauration livrée
   TVA_ALCOHOL: 0.20,        // 20% TVA boissons alcoolisées
   PACKAGING_COST: 0.50,     // 0.50€ coût emballage moyen par commande
 };
 
-// Formule de calcul du prix de vente TTC
-// Le restaurateur reçoit : prix_TTC × (1 - commission_uber)
-// Dont il doit reverser la TVA : montant_reçu / (1 + TVA) = HT reçu
-// HT reçu = material_cost + net_margin + packaging
-// Donc : prix_TTC = (material_cost + net_margin + packaging) × (1 + TVA) / (1 - commission)
+/**
+ * Arrondi psychologique pour Uber Eats (.90, .95 ou .00)
+ */
+function roundToPsychologicalPrice(price: number): number {
+  const floor = Math.floor(price);
+  const decimals = price - floor;
+  
+  if (decimals < 0.25) return floor; // 14.20 -> 14.00
+  if (decimals < 0.75) return floor + 0.90; // 14.40 -> 14.90
+  return floor + 1.0; // 14.80 -> 15.00
+}
+
+// Formule de calcul du prix de vente TTC avec Arrondi Psychologique
 export function calculateSellingPrice(
   materialCost: number, 
   netMargin: number, 
   tvaRate: number = PRICING.TVA_FOOD
 ): number {
-  return parseFloat(
-    ((materialCost + netMargin + PRICING.PACKAGING_COST) * (1 + tvaRate) / (1 - PRICING.UBER_COMMISSION)).toFixed(2)
-  );
+  const rawPrice = ((materialCost + netMargin + PRICING.PACKAGING_COST) * (1 + tvaRate) / (1 - PRICING.UBER_COMMISSION));
+  return roundToPsychologicalPrice(rawPrice);
 }
 
 // ---------------------------------------------------------------------------
@@ -167,7 +174,18 @@ const menuAssemblySchema = {
                   name: { type: "string" },
                   min_selection: { type: "number" },
                   max_selection: { type: "number" },
-                  options: { type: "array", items: { type: "string" } }
+                  options: { 
+                    type: "array", 
+                    items: { 
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        price_override: { type: "number" }
+                      },
+                      required: ["name", "price_override"],
+                      additionalProperties: false
+                    } 
+                  }
                 },
                 required: ["name", "min_selection", "max_selection", "options"],
                 additionalProperties: false
@@ -185,9 +203,8 @@ const menuAssemblySchema = {
 };
 
 // ---------------------------------------------------------------------------
-// ZOD SCHEMAS (VALIDATION)
+// ZOD SCHEMAS
 // ---------------------------------------------------------------------------
-
 const BrandCoreZod = z.object({
   name: z.string(),
   tagline: z.string(),
@@ -215,11 +232,16 @@ const MenuItemZod = z.object({
   prep_instructions: z.string()
 });
 
+const ModifierOptionZod = z.object({
+  name: z.string(),
+  price_override: z.number()
+});
+
 const ModifierGroupZod = z.object({
   name: z.string(),
   min_selection: z.number(),
   max_selection: z.number(),
-  options: z.array(z.string())
+  options: z.array(ModifierOptionZod)
 });
 
 const ComboItemZod = MenuItemZod.extend({
@@ -259,11 +281,10 @@ export async function generateBrandCore(
     - Style visuel souhaité : ${visualStyle || "Moderne et appétissant"}
     ${location ? `- Localisation : ${location} (Adapte le storytelling pour cette zone géographique)` : ""}
 
-    ${flexibilityOptions?.allowNewEquipment ? "INFO INVESTISSEMENT : Tu as l'autorisation de suggérer 1 nouveau petit matériel (ex: Friteuse, Blender) si cela permet d'améliorer radicalement le concept et la carte." : "CONTRAINTE STRICTE : N'utilise QUE le matériel listé, tu ne peux rien suggérer d'autre."}
+    ${flexibilityOptions?.allowNewEquipment ? "INFO INVESTISSEMENT : Tu as l'autorisation de suggérer 1 nouveau petit matériel si cela permet d'améliorer radicalement le concept." : "CONTRAINTE STRICTE : N'utilise QUE le matériel listé."}
 
-    Génère un nom percutant (ou utilise le nom imposé), un slogan (tagline), un storytelling court (2 phrases), et le style culinaire.
-    Génère aussi deux prompts précis (en anglais) pour DALL-E 3 afin de créer le logo et la bannière de la boutique Uber Eats.
-    Remplis "suggested_new_equipment" avec les nouveaux matériels que tu as décidé d'ajouter (ou un tableau vide si aucun).
+    Génère un nom percutant, un slogan (tagline), un storytelling court (2 phrases), et le style culinaire.
+    Génère aussi deux prompts précis (en anglais) pour DALL-E 3 afin de créer le logo et la bannière.
   `;
 
   const openai = getOpenAI();
@@ -287,70 +308,35 @@ export async function generateCoreItems(
 ) {
   const prompt = `
     Agis en tant que Chef Exécutif. Pour la marque "${brandCore.name}" (${brandCore.culinary_style}), 
-    crée une carte de Plats Principaux et d'Accompagnements (Sides) en utilisant principalement ces ingrédients : ${ingredients.join(", ")}.
+    crée une carte de Plats Principaux et d'Accompagnements (Sides).
 
-    RÈGLE D'IDENTITÉ DE MARQUE (LA PLUS IMPORTANTE) :
-    - CHAQUE plat principal DOIT correspondre au style culinaire "${brandCore.culinary_style}".
-    - Si le concept est mexicain, TOUS les plats doivent être des tacos, burritos, quesadillas, bowls mexicains, etc.
-    - Si le concept est libanais, TOUS les plats doivent être des kebabs, wraps, mezze, etc.
-    - Tu peux fusionner avec des techniques françaises ou modernes, mais le FORMAT et L'IDENTITÉ du plat doivent rester fidèles au concept.
-    - NE CRÉE JAMAIS un plat de cuisine française classique (ex: "Pavé de saumon au beurre") en l'étiquetant "façon mexicaine". Le plat DOIT être authentiquement lié au concept.
+    RÈGLES SEO UBER EATS (CRITIQUE) :
+    - Titre : Injecte des "Power Words" si pertinent (ex: "L'Original", "Signature", "Fait Maison").
+    - Description SEO : Doit être longue (200+ caractères), appétissante, et inclure des émojis (ex: 🔥, 🥑, 🧀).
+    - Mots-clés : Utilise des termes recherchés (ex: "Gourmet", "Réconfortant", "Croustillant").
 
-    RÈGLES CULINAIRES (CRITIQUE) :
-    - Les recettes DOIVENT être parfaitement logiques, cohérentes et délicieuses.
-    - Ne crée pas d'associations absurdes (ex: pas de confiture dans un burger au poisson).
-    - Tu n'es pas obligé d'utiliser TOUS les ingrédients dans chaque plat, choisis uniquement ceux qui vont bien ensemble.
+    RÈGLES FINANCIÈRES (CRITIQUE) :
+    - Fournis 'material_cost' et 'net_margin_target' (Cible : Marges élevées).
     
-    ${flexibilityOptions?.allowNewIngredients ? "INFO INVESTISSEMENT : Tu es autorisé à ajouter jusqu'à 3 NOUVEAUX ingrédients (qui ne sont pas dans la liste) si et seulement si cela permet d'augmenter significativement la rentabilité ou la qualité perçue des plats. Ajoute-les aux listes d'ingrédients des recettes. Tu DOIS ABSOLUMENT les lister dans le champ 'suggested_new_ingredients'." : "CONTRAINTE STRICTE : N'utilise STRICTEMENT QUE les ingrédients fournis dans la liste. Aucun ajout n'est toléré. Le champ 'suggested_new_ingredients' doit être vide."}
-
-    RÈGLES FINANCIÈRES Uber Eats (CRITIQUE) :
-    - Tu NE DOIS FOURNIR QUE le coût matière (material_cost) et la marge nette cible (net_margin_target).
-    - NE CALCULE PAS et NE FOURNIS PAS le prix de vente (selling_price). C'est le backend qui le calculera avec la formule : (material_cost + net_margin_target) / 0.6.
-    - FOURCHETTES DE PRIX RÉALISTES (prix final client sur Uber Eats) :
-      * Plat Principal : entre 11€ et 16€ → donc net_margin_target entre 3€ et 6€
-      * Accompagnement (Side) : entre 4€ et 7€ → donc net_margin_target entre 1.5€ et 3€
-    - Exemple : Un plat à 4€ de coût matière avec une marge nette de 4.60€ donne un prix de vente de (4 + 4.60) / 0.6 = 14.33€. C'est le bon ordre de grandeur.
-    
-    RÈGLES SEO & ALLERGÈNES (NOUVEAU) :
-    - Indique les 'dietary_tags' pertinents (ex: ["Halal", "Vegan", "Sans Gluten", "Végétarien"]). Un tableau vide si rien de spécial.
-    - Liste tous les 'allergens' majeurs présents (ex: ["Gluten", "Lactose", "Arachides", "Œufs"]). Un tableau vide si aucun.
-    - La 'description_seo' doit être très appétissante.
-    - Rédige des 'prep_instructions' courtes (3 étapes max) pour la fiche technique cuisine.
+    ${flexibilityOptions?.allowNewIngredients ? "AUTORISATION : Ajoute jusqu'à 3 ingrédients rentables hors liste." : "STRICT : Uniquement les ingrédients fournis."}
   `;
 
   const openai = getOpenAI();
   const response = await openai.chat.completions.create({
     model: "gpt-4o-2024-08-06",
     messages: [
-      { role: "system", content: "Tu es un chef cuisinier expert en rentabilité. Réponds EXCLUSIVEMENT en français." },
+      { role: "system", content: "Tu es un chef cuisinier expert en rentabilité et SEO Uber Eats. Réponds EXCLUSIVEMENT en français." },
       { role: "user", content: prompt },
     ],
     response_format: { type: "json_schema", json_schema: coreItemsSchema },
   });
 
-  let rawData;
-  try {
-    rawData = JSON.parse(response.choices[0].message.content || "{}");
-  } catch (e: any) {
-    console.error("Erreur parsing JSON OpenAI:", e);
-    throw new Error(`L'IA a renvoyé un format de menu illisible (JSON corrompu) : ${e.message}`);
-  }
-
-  let validatedData;
-  try {
-    validatedData = CoreItemsZod.parse(rawData);
-  } catch (e: any) {
-    console.error("Erreur validation Zod Menu:", e);
-    throw new Error(`Le menu généré ne respecte pas les critères de qualité (Zod Error) : ${e.message}`);
-  }
+  const rawData = JSON.parse(response.choices[0].message.content || "{}");
+  const validatedData = CoreItemsZod.parse(rawData);
   
-  // Calcul mathématique strict du Selling Price (formule corrigée)
   const applyPricing = (item: any) => {
     if (item.financials) {
-      item.financials.selling_price = calculateSellingPrice(
-        item.financials.material_cost, 
-        item.financials.net_margin_target
-      );
+      item.financials.selling_price = calculateSellingPrice(item.financials.material_cost, item.financials.net_margin_target);
     }
   };
 
@@ -367,45 +353,21 @@ export async function generateMenuAssembly(
   brandCore: any
 ) {
   const prompt = `
-    Agis en tant qu'Expert Marketing Uber Eats.
-    Assemble des "Menus Combos" pour la marque "${brandCore.name}".
+    Agis en tant qu'Expert Marketing Uber Eats. Assemble 3 "Menus Combos".
 
-    NE GÉNÈRE PAS d'offres spéciales ou de promotions. C'est au restaurateur de les créer lui-même.
+    RÈGLE D'UPSELL (MAX RENTABILITÉ) :
+    - Pour CHAQUE combo, crée un groupe de modificateurs nommé "🔥 LES SUPPLÉMENTS GOURMANDS".
+    - Ce groupe doit contenir des options payantes (ex: Double Fromage, Bacon croustillant, Sauce secrète).
+    - 'price_override' doit être le PRIX DE VENTE du supplément (ex: 1.50, 2.00).
 
-    Éléments à assembler :
-    - Plats Principaux disponibles : ${coreItems.main_dishes.map((d: any) => d.title).join(", ")}
-    - Sides disponibles : ${coreItems.generated_sides.map((s: any) => s.title).join(", ")}
-    - Boissons existantes : ${drinks.length ? drinks.join(", ") : "Sodas classiques"}
-    - Desserts existants : ${desserts.length ? desserts.join(", ") : "Brownie, Cookie"}
-
-    Crée 3 Menus Combos (Plat + Side + Boisson).
-    
-    RÈGLES DE NOMMAGE (CRITIQUE) :
-    - Le titre d'un Menu Combo DOIT TOUJOURS prendre le nom de son Plat Principal (ex: "Menu Poulet Crémeux", "Menu Smash Burger"). 
-    - Ne nomme JAMAIS un menu avec le nom d'un dessert ou d'un accompagnement.
-
-    RÈGLES UBER EATS (MODIFIER GROUPS) :
-    - Sur Uber Eats, un combo n'est pas un texte figé. Le client choisit ses options.
-    - Pour CHAQUE combo, tu DOIS créer des 'modifier_groups' (ex: name: "Choisissez votre Boisson", options: ["Coca-Cola", "Sprite"], min_selection: 1, max_selection: 1).
-    - Crée systématiquement un groupe pour l'accompagnement (side) et un groupe pour la boisson ou le dessert.
-
-    RÈGLES FINANCIÈRES COMBOS (CRUCIAL) :
-    - Le coût matière cumulé (material_cost) doit être la somme logique des composants (Plat + Side + ~0.5€ boisson).
-    - La marge nette cible (net_margin_target) doit être entre 3€ et 5€ par menu.
-    - Le prix de vente final sera calculé par la formule (material_cost + net_margin_target) / 0.6.
-    - FOURCHETTE DE PRIX RÉALISTE pour un Menu Combo : entre 15€ et 20€. Donc ajuste tes material_cost et net_margin_target en conséquence.
-    
-    RÈGLES SEO & ALLERGÈNES :
-    - Indique les 'dietary_tags' (ex: ["Halal", "Végétarien"]).
-    - Liste les 'allergens' (ex: ["Gluten", "Lactose"]).
-    - Rédige des 'prep_instructions' (ex: "1. Assembler le plat. 2. Ajouter le side. 3. Emballer.")
+    RÈGLE DE NOMMAGE : Le titre doit être "Menu [Nom du Plat]".
   `;
 
   const openai = getOpenAI();
   const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4o-2024-08-06",
     messages: [
-      { role: "system", content: "Tu es un expert marketing Uber Eats. Réponds EXCLUSIVEMENT en français." },
+      { role: "system", content: "Tu es un expert marketing expert en augmentation du panier moyen. Réponds EXCLUSIVEMENT en français." },
       { role: "user", content: prompt },
     ],
     response_format: { type: "json_schema", json_schema: menuAssemblySchema },
@@ -416,72 +378,23 @@ export async function generateMenuAssembly(
 
   const applyPricing = (item: any) => {
     if (item.financials) {
-      item.financials.selling_price = calculateSellingPrice(
-        item.financials.material_cost, 
-        item.financials.net_margin_target
-      );
+      item.financials.selling_price = calculateSellingPrice(item.financials.material_cost, item.financials.net_margin_target);
     }
   };
 
   if (validatedData.combos) validatedData.combos.forEach(applyPricing);
-
   return validatedData;
 }
 
 export async function analyzeInventoryImage(base64Image: string) {
-  const prompt = `
-    Analyse cette image de stock de cuisine ou d'inventaire.
-    Extrais TOUS les ingrédients visibles et estime leurs quantités si possible.
-    Retourne une liste d'objets { name: string, qty: string }.
-    Si l'image contient du texte (ex: une liste manuscrite), retranscris-la fidèlement.
-  `;
-
+  const prompt = `Analyse cette image d'inventaire. Extrais les ingrédients visibles sous forme de liste JSON { name, qty }.`;
   const openai = getOpenAI();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: prompt },
-          {
-            type: "image_url",
-            image_url: { url: `data:image/jpeg;base64,${base64Image}` }
-          }
-        ],
-      },
-    ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "inventory_extraction",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            items: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  qty: { type: "string" }
-                },
-                required: ["name", "qty"],
-                additionalProperties: false
-              }
-            }
-          },
-          required: ["items"],
-        }
-      }
-    }
+    messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }]}],
+    response_format: { type: "json_object" }
   });
-
-  const rawData = JSON.parse(response.choices[0].message.content || "{}");
-  return z.object({
-    items: z.array(z.object({ name: z.string(), qty: z.string() }))
-  }).parse(rawData).items;
+  return JSON.parse(response.choices[0].message.content || "{}").items || [];
 }
 
 export async function generateMenuItemImage(itemTitle: string, itemDescription: string, culinaryStyle: string, visualStyle: string) {
@@ -490,64 +403,38 @@ export async function generateMenuItemImage(itemTitle: string, itemDescription: 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        prompt: `Gourmet food photography of ${itemTitle}, ${itemDescription}. Professional studio lighting, 8k resolution, macro lens, warm bokeh background. The dish is plated on a dark ceramic plate on a dark wooden table. Style: "${visualStyle}" and "${culinaryStyle}". No text, no words, no letters anywhere in the image. Clean dark moody background with warm orange bokeh lights.`,
+        prompt: `Gourmet food photography of ${itemTitle}, ${itemDescription}. Professional studio lighting, 8k resolution, macro lens. Style: "${visualStyle}" and "${culinaryStyle}". No text.`,
         model: "black-forest-labs/FLUX.1-schnell",
-        width: 1024,
-        height: 1024,
+        width: 1024, height: 1024,
       }),
     });
-    
     const result = await response.json();
-    if (!result.success) throw new Error(result.error);
     return result.dataUrl;
-  } catch (error: any) {
-    console.error(`Erreur photo plat ${itemTitle}:`, error);
-    return null;
-  }
+  } catch (error) { return null; }
 }
 
 export async function generateBrandImages(logoPrompt: string, backgroundPrompt: string, mainDishesContext?: string) {
   try {
-    const bannerPrompt = mainDishesContext 
-      ? `A breathtaking, cinematic wide landscape banner for a high-end restaurant menu featuring these dishes: ${mainDishesContext}. Professional gourmet food photography, 8k resolution, soft studio lighting. Aesthetic: ${backgroundPrompt}`
-      : `A breathtaking, cinematic wide landscape banner for a high-end restaurant menu. Professional gourmet food photography, 8k resolution. Aesthetic: ${backgroundPrompt}`;
-
     const [logoRes, bgRes] = await Promise.all([
       fetch("/api/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: `A professional minimalist vector logo icon for a premium food brand. Flat design, solid black background. ULTRA-HIGH QUALITY TYPOGRAPHY AND SYMBOL. CRITICAL: The brand name text MUST be fully visible and readable. Do NOT place any graphic element overlapping or hiding any letter of the brand name. All text must be clearly separated from the central icon. Aesthetic: ${logoPrompt}`,
+          prompt: `A professional minimalist vector logo. Solid black background. Aesthetic: ${logoPrompt}`,
           model: "black-forest-labs/FLUX.1-schnell",
-          width: 1024,
-          height: 1024,
+          width: 1024, height: 1024,
         }),
       }).then(r => r.json()),
       fetch("/api/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: bannerPrompt,
+          prompt: `Cinematic landscape banner featuring: ${mainDishesContext}. Aesthetic: ${backgroundPrompt}`,
           model: "black-forest-labs/FLUX.1-schnell",
-          width: 1024,
-          height: 768,
+          width: 1024, height: 768,
         }),
       }).then(r => r.json())
     ]);
-
-    if (!logoRes.success || !bgRes.success) {
-      throw new Error("Échec d'une des générations d'image de marque.");
-    }
-
-    return {
-      logoUrl: logoRes.dataUrl,
-      backgroundUrl: bgRes.dataUrl
-    };
-  } catch (error) {
-    console.error("Erreur génération image FLUX (via API):", error);
-    return {
-      logoUrl: null,
-      backgroundUrl: null
-    };
-  }
+    return { logoUrl: logoRes.dataUrl, backgroundUrl: bgRes.dataUrl };
+  } catch (error) { return { logoUrl: null, backgroundUrl: null }; }
 }
