@@ -178,30 +178,59 @@ export default function DashboardPage() {
                 <div className="p-12 pt-24 overflow-y-auto custom-scrollbar bg-white">
                    <div className="grid md:grid-cols-2 gap-16">
                       <div className="space-y-8">
-                        <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Nom de la Marque</label>
-                          <input 
-                            value={selectedBrand.name} 
-                            onChange={(e) => setSelectedBrand({...selectedBrand, name: e.target.value})}
-                            className="text-5xl font-black text-slate-900 tracking-tighter w-full bg-transparent border-b-2 border-transparent focus:border-[#06C167] outline-none transition-all pb-2"
-                          />
+                        <div className="grid grid-cols-2 gap-6">
+                          <div>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Nom de la Marque</label>
+                            <input 
+                              value={selectedBrand.name} 
+                              onChange={(e) => setSelectedBrand({...selectedBrand, name: e.target.value})}
+                              className="text-4xl font-black text-slate-900 tracking-tighter w-full bg-transparent border-b-2 border-transparent focus:border-[#06C167] outline-none transition-all pb-2"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Style Culinaire</label>
+                            <input 
+                              value={selectedBrand.culinary_style} 
+                              onChange={(e) => setSelectedBrand({...selectedBrand, culinary_style: e.target.value})}
+                              className="text-[#06C167] font-black uppercase tracking-widest text-sm w-full bg-transparent border-b border-transparent focus:border-[#06C167] outline-none transition-all pb-1"
+                            />
+                          </div>
                         </div>
 
                         <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Style Culinaire</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Tagline (Accroche)</label>
                           <input 
-                            value={selectedBrand.culinary_style} 
-                            onChange={(e) => setSelectedBrand({...selectedBrand, culinary_style: e.target.value})}
-                            className="text-[#06C167] font-black uppercase tracking-widest text-sm w-full bg-transparent border-b border-transparent focus:border-[#06C167] outline-none transition-all pb-1"
+                            value={selectedBrand.tagline} 
+                            onChange={(e) => setSelectedBrand({...selectedBrand, tagline: e.target.value})}
+                            className="text-slate-500 font-medium italic w-full bg-transparent border-b border-transparent focus:border-[#06C167] outline-none transition-all pb-1"
                           />
                         </div>
 
+                        <div className="grid grid-cols-2 gap-6">
+                          <div>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">URL du Logo</label>
+                            <input 
+                              value={selectedBrand.logo_url} 
+                              onChange={(e) => setSelectedBrand({...selectedBrand, logo_url: e.target.value})}
+                              className="text-[10px] text-slate-400 w-full bg-slate-50 p-3 rounded-xl border border-slate-100 outline-none focus:ring-1 focus:ring-[#06C167]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">URL de la Bannière</label>
+                            <input 
+                              value={selectedBrand.background_url} 
+                              onChange={(e) => setSelectedBrand({...selectedBrand, background_url: e.target.value})}
+                              className="text-[10px] text-slate-400 w-full bg-slate-50 p-3 rounded-xl border border-slate-100 outline-none focus:ring-1 focus:ring-[#06C167]"
+                            />
+                          </div>
+                        </div>
+
                         <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Storytelling / Concept</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Concept & Storytelling</label>
                           <textarea 
                             value={selectedBrand.storytelling} 
                             onChange={(e) => setSelectedBrand({...selectedBrand, storytelling: e.target.value})}
-                            className="text-slate-600 text-lg italic leading-relaxed w-full bg-slate-50 p-6 rounded-3xl outline-none focus:ring-2 focus:ring-[#06C167]/20 border border-slate-100 min-h-[150px] resize-none"
+                            className="text-slate-600 text-base leading-relaxed w-full bg-slate-50 p-6 rounded-3xl outline-none focus:ring-2 focus:ring-[#06C167]/20 border border-slate-100 min-h-[120px] resize-none"
                           />
                         </div>
                         
@@ -211,61 +240,87 @@ export default function DashboardPage() {
                               const { error } = await supabase.from("brands").update({
                                 name: selectedBrand.name,
                                 culinary_style: selectedBrand.culinary_style,
-                                storytelling: selectedBrand.storytelling
+                                tagline: selectedBrand.tagline,
+                                storytelling: selectedBrand.storytelling,
+                                logo_url: selectedBrand.logo_url,
+                                background_url: selectedBrand.background_url
                               }).eq("id", selectedBrand.id);
                               
                               if (!error) {
                                 fetchBrands();
-                                alert("✅ Modifications enregistrées !");
+                                alert("✅ Marque mise à jour avec succès !");
                               } else {
                                 alert("Erreur : " + error.message);
                               }
                             }}
                             className="flex-1 bg-slate-900 text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-slate-900/10 hover:bg-black transition-all"
                           >
-                            Enregistrer
+                            Enregistrer l'Identité
                           </button>
-                          
-                          {uberConnected && (
-                            <button 
-                              onClick={async () => {
-                                const res = await fetch("/api/uber/sync", {
-                                  method: "POST",
-                                  body: JSON.stringify({ brandId: selectedBrand.id })
-                                });
-                                const data = await res.json();
-                                if (data.success) alert("🚀 Menu synchronisé sur Uber Eats !");
-                                else alert("Erreur : " + data.error);
-                              }}
-                              className="flex-1 bg-[#06C167] text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-[#06C167]/20 flex items-center justify-center gap-3 hover:scale-105 transition-all"
-                            >
-                              <TrendingUp className="w-5 h-5" /> Publier Uber Eats
-                            </button>
-                          )}
                         </div>
                       </div>
 
-                      <div>
+                      <div className="flex flex-col">
                         <div className="flex justify-between items-center mb-6">
-                          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Menu & Tarification</h3>
-                          <span className="text-[10px] font-black bg-slate-100 px-3 py-1 rounded-full uppercase text-slate-500 tracking-widest">
-                            {selectedBrand.menu_items?.length} Articles
-                          </span>
+                          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Articles du Menu</h3>
+                          <button 
+                            onClick={() => {
+                              const newItem = {
+                                brand_id: selectedBrand.id,
+                                title: "Nouvel Article",
+                                description: "Description de l'article...",
+                                category: "Plats",
+                                selling_price: 10.00,
+                                image_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"
+                              };
+                              setSelectedBrand({
+                                ...selectedBrand, 
+                                menu_items: [...(selectedBrand.menu_items || []), newItem]
+                              });
+                            }}
+                            className="text-[10px] font-black text-[#06C167] bg-[#06C167]/5 px-4 py-2 rounded-xl border border-[#06C167]/10 hover:bg-[#06C167]/10 transition-all flex items-center gap-2"
+                          >
+                            <Plus className="w-3 h-3" /> Ajouter
+                          </button>
                         </div>
-                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                           {selectedBrand.menu_items?.map((item: any, idx: number) => (
-                            <div key={item.id} className="p-5 bg-slate-50 rounded-2xl flex flex-col gap-2 group hover:bg-slate-100 transition-all border border-slate-100">
-                               <div className="flex justify-between items-start">
-                                  <input 
-                                    value={item.title}
-                                    onChange={(e) => {
-                                      const newItems = [...selectedBrand.menu_items];
-                                      newItems[idx].title = e.target.value;
-                                      setSelectedBrand({...selectedBrand, menu_items: newItems});
-                                    }}
-                                    className="text-slate-900 font-black bg-transparent outline-none focus:text-[#06C167] flex-1"
-                                  />
-                                  <div className="flex items-center gap-1 text-[#06C167] font-black">
+                            <div key={item.id || idx} className="p-6 bg-slate-50 rounded-3xl flex flex-col gap-4 group hover:bg-slate-100 transition-all border border-slate-100 relative">
+                               <button 
+                                 onClick={() => {
+                                   const newItems = [...selectedBrand.menu_items];
+                                   newItems.splice(idx, 1);
+                                   setSelectedBrand({...selectedBrand, menu_items: newItems});
+                                 }}
+                                 className="absolute top-4 right-4 p-2 text-slate-300 hover:text-red-500 transition-colors"
+                               >
+                                 <Trash2 className="w-4 h-4" />
+                               </button>
+
+                               <div className="flex justify-between items-start gap-4">
+                                  <div className="flex-1">
+                                    <input 
+                                      value={item.title}
+                                      placeholder="Titre de l'article"
+                                      onChange={(e) => {
+                                        const newItems = [...selectedBrand.menu_items];
+                                        newItems[idx].title = e.target.value;
+                                        setSelectedBrand({...selectedBrand, menu_items: newItems});
+                                      }}
+                                      className="text-slate-900 font-black bg-transparent outline-none focus:text-[#06C167] w-full"
+                                    />
+                                    <input 
+                                      value={item.category}
+                                      placeholder="Catégorie (ex: Burger, Boisson)"
+                                      onChange={(e) => {
+                                        const newItems = [...selectedBrand.menu_items];
+                                        newItems[idx].category = e.target.value;
+                                        setSelectedBrand({...selectedBrand, menu_items: newItems});
+                                      }}
+                                      className="text-[10px] text-slate-400 uppercase tracking-widest font-black bg-transparent outline-none focus:text-slate-600 block mt-1"
+                                    />
+                                  </div>
+                                  <div className="flex items-center gap-1 text-[#06C167] font-black bg-white px-4 py-2 rounded-xl shadow-sm">
                                     <input 
                                       type="number"
                                       value={item.selling_price}
@@ -279,29 +334,50 @@ export default function DashboardPage() {
                                     <span>€</span>
                                   </div>
                                </div>
-                               <input 
-                                 value={item.category}
+                               
+                               <textarea 
+                                 value={item.description}
+                                 placeholder="Description Uber Eats..."
                                  onChange={(e) => {
                                    const newItems = [...selectedBrand.menu_items];
-                                   newItems[idx].category = e.target.value;
+                                   newItems[idx].description = e.target.value;
                                    setSelectedBrand({...selectedBrand, menu_items: newItems});
                                  }}
-                                 className="text-[10px] text-slate-400 uppercase tracking-widest font-black bg-transparent outline-none focus:text-slate-600"
+                                 className="text-xs text-slate-500 bg-white/50 p-4 rounded-xl outline-none focus:ring-1 focus:ring-[#06C167]/20 border border-slate-100 resize-none h-20"
                                />
                             </div>
                           ))}
                         </div>
                         
-                        <button 
-                          onClick={async () => {
-                            const { error } = await supabase.from("menu_items").upsert(selectedBrand.menu_items);
-                            if (!error) alert("✅ Menu mis à jour !");
-                            else alert("Erreur menu: " + error.message);
-                          }}
-                          className="w-full mt-6 border-2 border-slate-100 text-slate-400 font-black uppercase tracking-widest py-3 rounded-2xl hover:border-slate-300 hover:text-slate-600 transition-all text-xs"
-                        >
-                          Sauvegarder le Menu
-                        </button>
+                        <div className="grid grid-cols-2 gap-4 mt-6">
+                          <button 
+                            onClick={async () => {
+                              const { error } = await supabase.from("menu_items").upsert(selectedBrand.menu_items);
+                              if (!error) alert("✅ Menu enregistré avec succès !");
+                              else alert("Erreur menu: " + error.message);
+                            }}
+                            className="bg-slate-100 text-slate-600 font-black uppercase tracking-widest py-4 rounded-2xl hover:bg-slate-200 transition-all text-xs"
+                          >
+                            Sauvegarder le Menu
+                          </button>
+
+                          {uberConnected && (
+                            <button 
+                              onClick={async () => {
+                                const res = await fetch("/api/uber/sync", {
+                                  method: "POST",
+                                  body: JSON.stringify({ brandId: selectedBrand.id })
+                                });
+                                const data = await res.json();
+                                if (data.success) alert("🚀 Menu synchronisé sur Uber Eats !");
+                                else alert("Erreur : " + data.error);
+                              }}
+                              className="bg-[#06C167] text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-[#06C167]/20 flex items-center justify-center gap-3 hover:scale-105 transition-all"
+                            >
+                              <TrendingUp className="w-5 h-5" /> Synchro Uber
+                            </button>
+                          )}
+                        </div>
                       </div>
                    </div>
                 </div>
