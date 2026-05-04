@@ -5,9 +5,17 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
+  const errorParam = searchParams.get("error");
+  const errorDesc = searchParams.get("error_description");
+  
+  const baseUrl = "https://kitchenz-ai.onrender.com";
+
+  if (errorParam) {
+    return NextResponse.redirect(new URL(`/dashboard?error=${errorParam}&desc=${encodeURIComponent(errorDesc || '')}`, baseUrl));
+  }
 
   if (!code) {
-    return NextResponse.redirect(new URL("/dashboard?error=no_code", request.url));
+    return NextResponse.redirect(new URL("/dashboard?error=no_code", baseUrl));
   }
 
   try {
@@ -17,7 +25,7 @@ export async function GET(request: Request) {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
-      return NextResponse.redirect(new URL("/login?error=no_session", request.url));
+      return NextResponse.redirect(new URL("/login?error=no_session", baseUrl));
     }
 
     // Store tokens in user_integrations
@@ -33,12 +41,12 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("Supabase error:", error);
-      return NextResponse.redirect(new URL("/dashboard?error=db_error", request.url));
+      return NextResponse.redirect(new URL("/dashboard?error=db_error", baseUrl));
     }
 
-    return NextResponse.redirect(new URL("/dashboard?success=uber_connected", request.url));
+    return NextResponse.redirect(new URL("/dashboard?success=uber_connected", baseUrl));
   } catch (error: any) {
     console.error("Uber Auth Error:", error.response?.data || error.message);
-    return NextResponse.redirect(new URL("/dashboard?error=auth_failed", request.url));
+    return NextResponse.redirect(new URL("/dashboard?error=auth_failed", baseUrl));
   }
 }
