@@ -19,29 +19,24 @@ function getHF() {
 }
 
 // ---------------------------------------------------------------------------
-// PRICING CONSTANTS (Paramétrables)
+// PRICING CONSTANTS
 // ---------------------------------------------------------------------------
 
 export const PRICING = {
-  UBER_COMMISSION: 0.30,    // 30% commission Uber Eats
-  TVA_FOOD: 0.10,           // 10% TVA restauration livrée
-  TVA_ALCOHOL: 0.20,        // 20% TVA boissons alcoolisées
-  PACKAGING_COST: 0.50,     // 0.50€ coût emballage moyen par commande
+  UBER_COMMISSION: 0.30,
+  TVA_FOOD: 0.10,
+  TVA_ALCOHOL: 0.20,
+  PACKAGING_COST: 0.50,
 };
 
-/**
- * Arrondi psychologique pour Uber Eats (.90, .95 ou .00)
- */
 function roundToPsychologicalPrice(price: number): number {
   const floor = Math.floor(price);
   const decimals = price - floor;
-  
-  if (decimals < 0.25) return floor; // 14.20 -> 14.00
-  if (decimals < 0.75) return floor + 0.90; // 14.40 -> 14.90
-  return floor + 1.0; // 14.80 -> 15.00
+  if (decimals < 0.25) return floor;
+  if (decimals < 0.75) return floor + 0.90;
+  return floor + 1.0;
 }
 
-// Formule de calcul du prix de vente TTC avec Arrondi Psychologique
 export function calculateSellingPrice(
   materialCost: number, 
   netMargin: number, 
@@ -316,7 +311,7 @@ export async function generateCoreItems(
     - Mots-clés : Utilise des termes recherchés (ex: "Gourmet", "Réconfortant", "Croustillant").
 
     RÈGLES FINANCIÈRES (CRITIQUE) :
-    - Fournis 'material_cost' et 'net_margin_target' (Cible : Marges élevées).
+    - Fournis 'material_cost' et 'net_margin_target'.
     
     ${flexibilityOptions?.allowNewIngredients ? "AUTORISATION : Ajoute jusqu'à 3 ingrédients rentables hors liste." : "STRICT : Uniquement les ingrédients fournis."}
   `;
@@ -354,12 +349,7 @@ export async function generateMenuAssembly(
 ) {
   const prompt = `
     Agis en tant qu'Expert Marketing Uber Eats. Assemble 3 "Menus Combos".
-
-    RÈGLE D'UPSELL (MAX RENTABILITÉ) :
-    - Pour CHAQUE combo, crée un groupe de modificateurs nommé "🔥 LES SUPPLÉMENTS GOURMANDS".
-    - Ce groupe doit contenir des options payantes (ex: Double Fromage, Bacon croustillant, Sauce secrète).
-    - 'price_override' doit être le PRIX DE VENTE du supplément (ex: 1.50, 2.00).
-
+    RÈGLE D'UPSELL : Pour CHAQUE combo, crée un groupe de modificateurs nommé "🔥 LES SUPPLÉMENTS GOURMANDS" avec des prix payants.
     RÈGLE DE NOMMAGE : Le titre doit être "Menu [Nom du Plat]".
   `;
 
@@ -397,13 +387,28 @@ export async function analyzeInventoryImage(base64Image: string) {
   return JSON.parse(response.choices[0].message.content || "{}").items || [];
 }
 
+/**
+ * GÉNÉRATION PHOTO HARDENED (Audit #2)
+ * Unifie l'arrière-plan et maximise l'appétence culinaire.
+ */
 export async function generateMenuItemImage(itemTitle: string, itemDescription: string, culinaryStyle: string, visualStyle: string) {
   try {
+    // Audit Fix: Background Locking
+    // On force un arrière-plan cohérent (dark slate ou light marble selon le style visuel)
+    const bgSurface = visualStyle.toLowerCase().includes("clair") || visualStyle.toLowerCase().includes("minimal") 
+      ? "on a clean white marble kitchen counter" 
+      : "on a dark slate textured ceramic plate, rustic wooden table";
+
     const response = await fetch("/api/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        prompt: `Gourmet food photography of ${itemTitle}, ${itemDescription}. Professional studio lighting, 8k resolution, macro lens. Style: "${visualStyle}" and "${culinaryStyle}". No text.`,
+        prompt: `ULTRA-PHOTOREALISTIC gourmet food photography of ${itemTitle}. ${itemDescription}. 
+        Close-up shot, macro lens, professional studio softbox lighting, 8k resolution. 
+        Texture: glistening sauce, steam rising, crispy edges, moisture.
+        Background: ${bgSurface}. Warm orange bokeh in the distance.
+        Aesthetic: "${visualStyle}" combined with "${culinaryStyle}".
+        CRITICAL: No text, no napkins with logos, no utensils with text. Centered composition.`,
         model: "black-forest-labs/FLUX.1-schnell",
         width: 1024, height: 1024,
       }),
@@ -420,7 +425,7 @@ export async function generateBrandImages(logoPrompt: string, backgroundPrompt: 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: `A professional minimalist vector logo. Solid black background. Aesthetic: ${logoPrompt}`,
+          prompt: `A professional minimalist vector logo. Solid black background. ULTRA-CLEAN TYPOGRAPHY. Aesthetic: ${logoPrompt}`,
           model: "black-forest-labs/FLUX.1-schnell",
           width: 1024, height: 1024,
         }),
@@ -429,9 +434,10 @@ export async function generateBrandImages(logoPrompt: string, backgroundPrompt: 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: `Cinematic landscape banner featuring: ${mainDishesContext}. Aesthetic: ${backgroundPrompt}`,
+          // Audit Fix: Format 16:9 pour Uber Eats Banner
+          prompt: `Cinematic wide landscape banner for a high-end restaurant featuring: ${mainDishesContext}. Professional food photography, 8k, extreme detail. Aesthetic: ${backgroundPrompt}. No text.`,
           model: "black-forest-labs/FLUX.1-schnell",
-          width: 1024, height: 768,
+          width: 1280, height: 720,
         }),
       }).then(r => r.json())
     ]);
