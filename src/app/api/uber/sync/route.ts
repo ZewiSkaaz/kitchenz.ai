@@ -1,7 +1,7 @@
 import { uberService } from "@/lib/uber";
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { Brand } from "@/types";
 
 const SCOPES = "eats.store eats.store.status.write eats.order eats.report";
 
@@ -32,8 +32,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Brand not found" }, { status: 404 });
     }
 
+    const typedBrand = brand as Brand;
+
     // 3. Format menu expert (Modificateurs, Horaires, TVA)
-    const menuData = uberService.formatMenuForUber(brand, brand.menu_items);
+    const menuData = uberService.formatMenuForUber(typedBrand, typedBrand.menu_items || []);
 
     // 4. Ciblage du Store
     // On utilise l'ID réel s'il existe, sinon on reste en sandbox démo

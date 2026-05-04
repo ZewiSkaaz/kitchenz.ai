@@ -76,6 +76,35 @@ export default function AuditPage() {
   const [analyzingInventory, setAnalyzingInventory] = useState(false);
   const inventoryInputRef = useRef<HTMLInputElement>(null);
 
+  // Persistence logic (Master Audit #4)
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("kitchenz_audit_draft");
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft);
+        setBrandName(draft.brandName || "");
+        setConcept(draft.concept || "");
+        setVisualStyle(draft.visualStyle || "");
+        setLocation(draft.location || "");
+        setIngredients(draft.ingredients || []);
+        setDrinks(draft.drinks || []);
+        setDesserts(draft.desserts || []);
+        setEquipment(draft.equipment || []);
+        setAllowNewIngredients(draft.allowNewIngredients || false);
+        setAllowNewEquipment(draft.allowNewEquipment || false);
+      } catch (e) { console.error("Could not load draft", e); }
+    }
+  }, []);
+
+  useEffect(() => {
+    const draft = { brandName, concept, visualStyle, location, ingredients, drinks, desserts, equipment, allowNewIngredients, allowNewEquipment };
+    localStorage.setItem("kitchenz_audit_draft", JSON.stringify(draft));
+  }, [brandName, concept, visualStyle, location, ingredients, drinks, desserts, equipment, allowNewIngredients, allowNewEquipment]);
+
+  const clearDraft = () => {
+    localStorage.removeItem("kitchenz_audit_draft");
+  };
+
   // Calculs dynamiques du simulateur
   const menuItems = fullMenu?.menu_items || [];
   const mainDishes = menuItems.filter((i: any) => i.category === "Plat Principal");
@@ -151,20 +180,33 @@ export default function AuditPage() {
       const coreItems = await generateCoreItems(ingredients, brandCore, flexibilityOptions);
 
       setLoadingStep("Génération des Photos de TOUS les produits...");
-      // On génère les photos pour TOUS les plats (Principaux et Sides) pour une cohérence totale
       const allDishesWithPhotos = await Promise.all(
         [...coreItems.main_dishes, ...coreItems.generated_sides].map(async (item: any) => {
-          const imageUrl = await generateMenuItemImage(item.title, item.description_seo, brandCore.culinary_style, visualStyle);
-          return { ...item, imageUrl };
+          try {
+            const imageUrl = await generateMenuItemImage(item.title, item.description_seo, brandCore.culinary_style, visualStyle);
+            return { ...item, imageUrl };
+          } catch (e) {
+            console.warn(`Génération photo échouée pour ${item.title}, utilisation fallback.`);
+            return { ...item, imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" };
+          }
         })
       );
 
       const allMainDishes = allDishesWithPhotos.filter(i => i.category === "Plat Principal");
       const allSides = allDishesWithPhotos.filter(i => i.category === "Accompagnement");
 
-      setLoadingStep("Création du Logo & de la Bannière Contextuelle...");
-      const dishesContext = allMainDishes.map((d: any) => d.title).join(", ");
-      const brandImages = await generateBrandImages(brandCore.logo_prompt, brandCore.background_prompt, dishesContext);
+      setLoadingStep("Création du Logo & de la Bannière...");
+      let brandImages = { logoUrl: "", backgroundUrl: "" };
+      try {
+        const dishesContext = allMainDishes.map((d: any) => d.title).join(", ");
+        brandImages = await generateBrandImages(brandCore.logo_prompt, brandCore.background_prompt, dishesContext);
+      } catch (e) {
+        console.error("Erreur images marque:", e);
+        brandImages = { 
+          logoUrl: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=200", 
+          backgroundUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1200" 
+        };
+      }
 
       setLoadingStep("Assemblage des Menus Combos...");
       const menuAssembly = await generateMenuAssembly(coreItems, drinks, desserts, brandCore);
@@ -232,6 +274,7 @@ export default function AuditPage() {
         ]
       });
 
+      clearDraft(); // On nettoie le brouillon une fois terminé
       setStep("result");
     } catch (error: any) {
       console.error(error);
@@ -306,10 +349,13 @@ export default function AuditPage() {
       if (menuError) throw menuError;
 
       setSaved(true);
-      alert("Marque sauvegardée avec succès avec des images permanentes !");
+      // Redirection automatique vers le Dashboard après un court délai
+      setTimeout(() => {
+        router.push("/dashboard?newBrand=" + brandData.id);
+      }, 2000);
     } catch (error) {
       console.error("Erreur de sauvegarde:", error);
-      alert("Erreur lors de la sauvegarde.");
+      // Ici on pourrait utiliser un toast premium au lieu d'alert
     } finally {
       setSaving(false);
     }

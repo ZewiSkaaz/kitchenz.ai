@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChefHat, Calendar, LayoutGrid, ListFilter, Trash2, ExternalLink, Utensils, BookOpen, Plus, Download, TrendingUp, Zap, LogOut } from "lucide-react";
@@ -147,7 +148,11 @@ export default function DashboardPage() {
 
 function StatCard({ title, value, trend, icon }: { title: string, value: string, trend: string, icon: React.ReactNode }) {
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+    >
       <div className="flex justify-between items-center mb-4">
         <p className="text-gray-500 text-[11px] font-bold uppercase tracking-wider">{title}</p>
         <div className="p-1.5 bg-gray-50 rounded-md border border-gray-100">{icon}</div>
@@ -156,29 +161,46 @@ function StatCard({ title, value, trend, icon }: { title: string, value: string,
         <h3 className="text-2xl font-bold text-black tracking-tight">{value}</h3>
         <span className="text-[10px] font-bold text-[#06C167]">{trend}</span>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function BrandCard({ brand, onDelete, onClick }: { brand: any, onDelete: () => void, onClick: () => void }) {
   return (
-    <div 
+    <motion.div 
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ y: -4 }}
       className="bg-white group cursor-pointer border border-gray-200 rounded-lg overflow-hidden hover:border-[#06C167] transition-all"
       onClick={onClick}
     >
-      <div className="h-40 relative bg-gray-100">
-        <img src={brand.background_url} className="w-full h-full object-cover" />
+      <div className="h-40 relative bg-gray-100 overflow-hidden">
+        <Image 
+          src={brand.background_url} 
+          alt={brand.name}
+          fill
+          className="object-cover" 
+        />
         <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all" />
         <button 
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="absolute top-3 right-3 p-2 bg-white/90 text-gray-400 rounded-md hover:text-red-500 shadow-sm"
+          className="absolute top-3 right-3 p-2 bg-white/90 text-gray-400 rounded-md hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
       <div className="p-5">
         <div className="flex items-center gap-3 mb-3">
-          <img src={brand.logo_url} className="w-10 h-10 rounded-md border border-gray-100 bg-white object-cover" />
+          <div className="w-10 h-10 rounded-md border border-gray-100 bg-white relative overflow-hidden">
+            <Image 
+              src={brand.logo_url} 
+              alt="Logo"
+              width={40}
+              height={40}
+              className="object-cover" 
+            />
+          </div>
           <div>
             <h3 className="text-sm font-bold text-black group-hover:text-[#06C167] transition-colors">{brand.name}</h3>
             <p className="text-[10px] text-gray-500 font-medium uppercase tracking-tight">{brand.culinary_style}</p>
@@ -190,6 +212,6 @@ function BrandCard({ brand, onDelete, onClick }: { brand: any, onDelete: () => v
            <span className="text-[10px] font-bold text-[#06C167] uppercase tracking-widest">Gérer</span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

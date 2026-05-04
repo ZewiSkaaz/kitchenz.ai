@@ -55,8 +55,19 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-8">
           <NavLink href="/audit" label="Audit IA" scrolled={scrolled} />
           <NavLink href="/dashboard" label="Dashboard" scrolled={scrolled} />
-          <NavLink href="/blog" label="Blog" scrolled={scrolled} />
-          <NavLink href="/wiki" label="Docs" scrolled={scrolled} />
+          
+          {/* Language Selector (Master Audit #8) */}
+          <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-md border border-gray-100">
+            {['FR', 'EN', 'ES'].map((lang) => (
+              <button 
+                key={lang}
+                className="text-[10px] font-bold text-gray-400 hover:text-black transition-colors"
+                onClick={() => alert(`Changement vers ${lang} (Configuration en cours...)`)}
+              >
+                {lang}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Actions */}
@@ -78,7 +89,7 @@ export default function Navbar() {
               <Link href="/login" className={`font-black text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-all ${scrolled ? "text-slate-600 hover:text-[#06C167]" : "text-slate-600 hover:text-[#06C167]"}`}>
                 Connexion
               </Link>
-              <Link href="/audit" className="bg-[#06C167] text-white px-5 py-2 rounded-md font-bold text-xs uppercase tracking-wider hover:bg-[#05a357] transition-all flex items-center gap-2">
+              <Link href="/audit" className="btn-primary !py-2 !text-xs uppercase tracking-widest">
                 Essai Gratuit <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </>

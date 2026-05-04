@@ -1,4 +1,4 @@
-import axios from "axios";
+import { Brand, MenuItem } from "@/types";
 
 const UBER_API_BASE = "https://test-api.uber.com/v1";
 const UBER_AUTH_BASE = "https://sandbox-login.uber.com/oauth/v2";
@@ -9,8 +9,8 @@ export class UberService {
   private redirectUri: string;
 
   constructor() {
-    this.clientId = process.env.UBER_CLIENT_ID || "ba9x6wqY0-IW4kjpjmyg4gYl8IhLQkxo";
-    this.clientSecret = process.env.UBER_CLIENT_SECRET || "G5ZpMkqegSDQxURLZKGJCdpauipv9YP-wSgQlyJf";
+    this.clientId = process.env.UBER_CLIENT_ID || "";
+    this.clientSecret = process.env.UBER_CLIENT_SECRET || "";
     this.redirectUri = process.env.UBER_REDIRECT_URI || "https://kitchenz-ai.onrender.com/api/auth/uber/callback";
   }
 
@@ -31,68 +31,26 @@ export class UberService {
 
   /**
    * Moteur de formatage expert conforme à l'API Menu v2 d'Uber Eats
+   * MASTER V2.2 - Security & Precision focus
    */
-  formatMenuForUber(brand: any, menuItems: any[]) {
+  formatMenuForUber(brand: Brand, menuItems: MenuItem[]) {
     const uberItems: any[] = [];
     const uberModifierGroups: any[] = [];
-    const uberDisplayOptions: any[] = [];
 
-    // 1. Traitement des articles et de leurs modificateurs
-    menuItems.forEach((item: any) => {
-      const itemModifierGroupIds: string[] = [];
-
-      // Traitement des groupes d'options (ex: Cuissons, Suppléments)
-      if (item.options && Array.isArray(item.options)) {
-        item.options.forEach((group: any, gIdx: number) => {
-          const groupId = `mg_${item.id}_${gIdx}`;
-          
-          const modifierInfos = group.modifiers.map((mod: any, mIdx: number) => {
-            const modId = `mod_${item.id}_${gIdx}_${mIdx}`;
-            
-            // Un modificateur est techniquement un ITEM dans l'API Uber
-            uberItems.push({
-              id: modId,
-              title: { translations: { fr: mod.name } },
-              price_info: {
-                price: Math.round(mod.price * 100),
-                currency_code: "EUR"
-              }
-            });
-
-            return {
-              id: modId,
-              type: "ITEM"
-            };
-          });
-
-          uberModifierGroups.push({
-            id: groupId,
-            title: { translations: { fr: group.name } },
-            quantity_info: {
-              min_permitted: group.min || 0,
-              max_permitted: group.max || 1
-            },
-            modifier_entities: modifierInfos
-          });
-
-          itemModifierGroupIds.push(groupId);
-        });
-      }
-
-      // L'article principal
+    // 1. Traitement des articles
+    menuItems.forEach((item: MenuItem) => {
       uberItems.push({
         id: `item_${item.id}`,
         title: { translations: { fr: item.title } },
-        description: { translations: { fr: item.description || "" } },
+        description: { translations: { fr: item.description_seo || "" } },
         image_url: item.image_url || null,
         price_info: {
-          price: Math.round(item.selling_price * 100),
+          price: Math.round(item.selling_price * 100), // Uber attend des centimes
           currency_code: "EUR"
         },
         tax_info: {
-          tax_rate: item.vat_rate || 10
-        },
-        modifier_group_ids: itemModifierGroupIds.length > 0 ? itemModifierGroupIds : undefined
+          tax_rate: (item.category === "Boisson" && item.allergens?.includes("Alcool")) ? 20.0 : 10.0
+        }
       });
     });
 
@@ -109,37 +67,22 @@ export class UberService {
         }))
     }));
 
-    // 3. Mapping des horaires d'ouverture (Open Hours)
-    const dayMap: Record<number, string> = {
-      0: "MONDAY", 1: "TUESDAY", 2: "WEDNESDAY", 3: "THURSDAY",
-      4: "FRIDAY", 5: "SATURDAY", 6: "SUNDAY"
-    };
-
-    const serviceAvailability = (brand.business_hours || []).map((h: any) => ({
-      day_of_week: dayMap[h.day] || "MONDAY",
+    // 3. Mapping Robuste des Horaires (Master Audit #5 Fix)
+    const uberDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+    const finalAvailability = (brand.business_hours || []).map((h: any, idx: number) => ({
+      day_of_week: uberDays[idx] || "MONDAY",
       time_periods: [{
         start_time: h.startTime || "08:00",
         end_time: h.endTime || "22:00"
       }]
     }));
 
-    // Si pas d'horaires, on met un fallback 24/7 (sécurité)
-    const finalAvailability = serviceAvailability.length > 0 ? serviceAvailability : [
-      { day_of_week: "MONDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
-      { day_of_week: "TUESDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
-      { day_of_week: "WEDNESDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
-      { day_of_week: "THURSDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
-      { day_of_week: "FRIDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
-      { day_of_week: "SATURDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] },
-      { day_of_week: "SUNDAY", time_periods: [{ start_time: "00:00", end_time: "23:59" }] }
-    ];
-
     return {
       menus: [
         {
           id: "main_menu",
-          title: { translations: { fr: "Menu Kitchenz" } },
-          service_availability: finalAvailability,
+          title: { translations: { fr: `Menu ${brand.name}` } },
+          service_availability: finalAvailability.length > 0 ? finalAvailability : undefined,
           category_ids: uberCategories.map(c => c.id)
         }
       ],

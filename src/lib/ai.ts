@@ -18,22 +18,39 @@ function getHF() {
   return new HfInference(process.env.NEXT_PUBLIC_HUGGINGFACE_TOKEN || process.env.HUGGINGFACE_TOKEN || "");
 }
 
+/**
+ * Fonction d'aide pour retenter les appels API en cas d'échec
+ * MASTER V2.2 - Resilience Engine
+ */
+async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    if (retries <= 0) throw error;
+    console.warn(`⚠️ API Error, retrying... (${retries} attempts left)`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return withRetry(fn, retries - 1, delay * 2);
+  }
+}
+
 // ---------------------------------------------------------------------------
-// PRICING CONSTANTS
+// PRICING CONSTANTS (MASTER AUDIT V2.2)
 // ---------------------------------------------------------------------------
 
 export const PRICING = {
-  UBER_COMMISSION: 0.30,
+  UBER_COMMISSION: 0.30, // Commission standard Uber Eats
+  UBER_MARKETING_ADS: 0.15, // Budget moyen recommandé pour la visibilité (Ads)
+  STRIPE_FEE: 0.02, // Frais de transaction
   TVA_FOOD: 0.10,
   TVA_ALCOHOL: 0.20,
-  PACKAGING_COST: 0.50,
+  PACKAGING_COST: 0.75, // Ajusté pour le premium
 };
 
 function roundToPsychologicalPrice(price: number): number {
   const floor = Math.floor(price);
   const decimals = price - floor;
-  if (decimals < 0.25) return floor;
-  if (decimals < 0.75) return floor + 0.90;
+  if (decimals < 0.25) return floor - 0.10; // ex: 14.90
+  if (decimals < 0.75) return floor + 0.90; // ex: 15.90
   return floor + 1.0;
 }
 
@@ -42,7 +59,9 @@ export function calculateSellingPrice(
   netMargin: number, 
   tvaRate: number = PRICING.TVA_FOOD
 ): number {
-  const rawPrice = ((materialCost + netMargin + PRICING.PACKAGING_COST) * (1 + tvaRate) / (1 - PRICING.UBER_COMMISSION));
+  // Formule Master : Coût / (1 - Somme des frais)
+  const totalFees = PRICING.UBER_COMMISSION + PRICING.UBER_MARKETING_ADS + PRICING.STRIPE_FEE;
+  const rawPrice = ((materialCost + netMargin + PRICING.PACKAGING_COST) * (1 + tvaRate) / (1 - totalFees));
   return roundToPsychologicalPrice(rawPrice);
 }
 
@@ -283,14 +302,14 @@ export async function generateBrandCore(
   `;
 
   const openai = getOpenAI();
-  const response = await openai.chat.completions.create({
+  const response = await withRetry(() => openai.chat.completions.create({
     model: "gpt-4o-2024-08-06",
     messages: [
       { role: "system", content: "Tu réponds EXCLUSIVEMENT en français (sauf les prompts d'images en anglais)." },
       { role: "user", content: prompt },
     ],
     response_format: { type: "json_schema", json_schema: brandCoreSchema },
-  });
+  }));
 
   const rawData = JSON.parse(response.choices[0].message.content || "{}");
   return BrandCoreZod.parse(rawData);
@@ -317,14 +336,14 @@ export async function generateCoreItems(
   `;
 
   const openai = getOpenAI();
-  const response = await openai.chat.completions.create({
+  const response = await withRetry(() => openai.chat.completions.create({
     model: "gpt-4o-2024-08-06",
     messages: [
       { role: "system", content: "Tu es un chef cuisinier expert en rentabilité et SEO Uber Eats. Réponds EXCLUSIVEMENT en français." },
       { role: "user", content: prompt },
     ],
     response_format: { type: "json_schema", json_schema: coreItemsSchema },
-  });
+  }));
 
   const rawData = JSON.parse(response.choices[0].message.content || "{}");
   const validatedData = CoreItemsZod.parse(rawData);
@@ -376,32 +395,51 @@ export async function generateMenuAssembly(
   return validatedData;
 }
 
+const inventorySchema = {
+  name: "inventory_analysis",
+  strict: true,
+  schema: {
+    type: "object",
+    properties: {
+      items: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            qty: { type: "string" },
+            category: { type: "string", enum: ["Protéines", "Légumes/Fruits", "Laitages", "Épicerie", "Liquides", "Boulangerie", "Autre"] },
+            is_processed: { type: "boolean" }
+          },
+          required: ["name", "qty", "category", "is_processed"],
+          additionalProperties: false
+        }
+      }
+    },
+    required: ["items"],
+    additionalProperties: false
+  }
+};
+
 export async function analyzeInventoryImage(base64Image: string) {
   const prompt = `
-    Agis en tant qu'Expert Logistique Dark Kitchen.
-    Analyse cette image de stock/frigo/réserve.
+    Agis en tant qu'Expert Logistique Dark Kitchen. Analyse cette image de stock.
     
     MISSIONS :
-    1. Identifie TOUS les ingrédients alimentaires visibles.
-    2. Estime les quantités et les unités (ex: "kg", "pièces", "bouteilles").
-    3. Ignore les éléments non alimentaires (emballages vides, étagères, outils) sauf s'ils sont critiques.
-    
-    FORMAT DE SORTIE (JSON STRICT) :
-    {
-      "items": [
-        { "name": "Tomates", "qty": "2kg", "category": "Légumes" },
-        { "name": "Steaks hachés", "qty": "10 pièces", "category": "Viandes" }
-      ],
-      "analysis_quality": "High/Medium/Low"
-    }
+    1. Identifie uniquement les ingrédients alimentaires exploitables.
+    2. Quantifie précisément (ex: "5kg", "3 packs", "12 unités").
+    3. Catégorise chaque item selon le schéma fourni.
+    4. Ignore strictement : étagères, sols, outils, emballages vides, logos de marques de transport.
   `;
+  
   const openai = getOpenAI();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }]}],
-    response_format: { type: "json_object" }
+    response_format: { type: "json_schema", json_schema: inventorySchema }
   });
-  const data = JSON.parse(response.choices[0].message.content || "{}");
+  
+  const data = JSON.parse(response.choices[0].message.content || '{"items":[]}');
   return data.items || [];
 }
 

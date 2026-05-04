@@ -108,9 +108,19 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
     }
 
     setSaving(true);
-    const { error } = await supabase.from("menu_items").upsert(brand.menu_items);
-    if (error) setToast({ message: "Erreur de synchronisation base de données", type: 'error' });
-    else setToast({ message: "Menu synchronisé en local !", type: 'success' });
+    const menuToSave = brand.menu_items?.map(item => ({
+      ...item,
+      brand_id: brand.id
+    }));
+
+    const { error } = await supabase.from("menu_items").upsert(menuToSave, { onConflict: 'id' });
+    if (error) {
+      console.error(error);
+      setToast({ message: "Erreur de synchronisation", type: 'error' });
+    } else {
+      onRefresh();
+      setToast({ message: "Menu sauvegardé !", type: 'success' });
+    }
     setSaving(false);
   };
 
@@ -162,11 +172,11 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
               </div>
               <h3 className="text-sm font-bold text-black uppercase tracking-tight">Gestionnaire de menu</h3>
             </div>
-            <div className="h-6 w-px bg-gray-200" />
-            <div className="flex gap-1">
-               <button onClick={() => setActiveTab('identity')} className={`px-4 py-2 rounded text-xs font-bold transition-all ${activeTab === 'identity' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Identité</button>
-               <button onClick={() => setActiveTab('menu')} className={`px-4 py-2 rounded text-xs font-bold transition-all ${activeTab === 'menu' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Articles</button>
-               <button onClick={() => setActiveTab('ops')} className={`px-4 py-2 rounded text-xs font-bold transition-all ${activeTab === 'ops' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Paramètres</button>
+            <div className="h-6 w-px bg-gray-200 hidden md:block" />
+            <div className="flex gap-1 overflow-x-auto no-scrollbar max-w-[200px] md:max-w-none">
+               <button onClick={() => setActiveTab('identity')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'identity' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Identité</button>
+               <button onClick={() => setActiveTab('menu')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'menu' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Articles</button>
+               <button onClick={() => setActiveTab('ops')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'ops' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Paramètres</button>
             </div>
           </div>
 
@@ -208,28 +218,28 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                   </div>
                 </div>
 
-                <div className="pt-16 grid md:grid-cols-2 gap-10">
-                  <div className="space-y-6">
+                <div className="pt-8 grid md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
                     <div className="field-group-uber">
                       <label>Nom de l'établissement</label>
-                      <input value={brand.name} onChange={e => setBrand({...brand, name: e.target.value})} className="text-xl font-bold" />
+                      <input value={brand.name} onChange={e => setBrand({...brand, name: e.target.value})} className="text-lg font-bold" />
                     </div>
                     <div className="field-group-uber">
                       <label>Slogan marketing</label>
-                      <input value={brand.tagline} onChange={e => setBrand({...brand, tagline: e.target.value})} className="text-sm text-gray-600" />
+                      <input value={brand.tagline} onChange={e => setBrand({...brand, tagline: e.target.value})} className="text-sm text-gray-500 font-medium" />
                     </div>
                     <div className="field-group-uber">
                       <label>Catégorie de cuisine</label>
                       <input value={brand.culinary_style} onChange={e => setBrand({...brand, culinary_style: e.target.value})} className="text-[#06C167] font-bold text-sm" />
                     </div>
                   </div>
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <div className="field-group-uber">
                       <label>Présentation (Storytelling)</label>
-                      <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="min-h-[160px] text-sm leading-relaxed" />
+                      <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="min-h-[140px] text-sm leading-relaxed" />
                     </div>
-                    <button onClick={saveIdentity} disabled={saving} className="w-full py-3 bg-black text-white text-sm font-bold rounded-md hover:bg-gray-800 transition-all flex items-center justify-center gap-2">
-                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer les modifications'}
+                    <button onClick={saveIdentity} disabled={saving} className="w-full py-2.5 bg-black text-white text-xs font-bold rounded-md hover:bg-gray-800 transition-all flex items-center justify-center gap-2 uppercase tracking-widest">
+                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
                     </button>
                   </div>
                 </div>
@@ -284,15 +294,15 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                 <div className="flex-1 space-y-6">
                                    <input value={item.title} onChange={e => {
                                       const newItems = [...brand.menu_items]; newItems[idx].title = e.target.value; setBrand({...brand, menu_items: newItems});
-                                   }} className="text-5xl font-black text-slate-900 bg-transparent outline-none focus:text-[#06C167] w-full tracking-tighter" />
+                                   }} className="text-2xl font-bold text-black bg-transparent outline-none focus:text-[#06C167] w-full tracking-tight" />
                                    
                                    <div className="flex flex-wrap gap-4">
                                       <input value={item.category} onChange={e => {
                                         const newItems = [...brand.menu_items]; newItems[idx].category = e.target.value; setBrand({...brand, menu_items: newItems});
-                                      }} className="text-[11px] font-black uppercase text-slate-500 bg-slate-50 px-6 py-3 rounded-2xl outline-none border border-slate-100" placeholder="Categorie" />
+                                      }} className="text-[10px] font-bold uppercase text-gray-500 bg-gray-50 px-3 py-1.5 rounded-md outline-none border border-gray-100" placeholder="Categorie" />
                                       <input value={item.sub_category || ''} onChange={e => {
                                         const newItems = [...brand.menu_items]; newItems[idx].sub_category = e.target.value; setBrand({...brand, menu_items: newItems});
-                                      }} className="text-[11px] font-black uppercase text-indigo-500 bg-indigo-50 px-6 py-3 rounded-2xl outline-none border border-indigo-100" placeholder="Sous-Categorie" />
+                                      }} className="text-[10px] font-bold uppercase text-blue-500 bg-blue-50 px-3 py-1.5 rounded-md outline-none border border-blue-100" placeholder="Sous-Categorie" />
                                       <div className="flex items-center gap-3 bg-yellow-50 px-6 py-3 rounded-2xl border border-yellow-100">
                                          <span className="text-[11px] font-black text-yellow-600">TVA</span>
                                          <select 

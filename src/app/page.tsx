@@ -128,6 +128,36 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Global Presence Section */}
+      <section className="py-32 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold text-black tracking-tight mb-4">Une solution sans frontières</h2>
+            <p className="text-gray-500 text-lg font-medium max-w-2xl mx-auto">
+              Kitchenz.ai accompagne les restaurateurs partout où Uber Eats opère. Optimisez votre rentabilité, de Paris à Tokyo.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+            {[
+              { name: "France", flag: "🇫🇷" }, { name: "USA", flag: "🇺🇸" }, { name: "UK", flag: "🇬🇧" },
+              { name: "Espagne", flag: "🇪🇸" }, { name: "Italie", flag: "🇮🇹" }, { name: "Japon", flag: "🇯🇵" },
+              { name: "Brésil", flag: "🇧🇷" }, { name: "Canada", flag: "🇨🇦" }, { name: "Mexique", flag: "🇲🇽" },
+              { name: "Australie", flag: "🇦🇺" }, { name: "Allemagne", flag: "🇩🇪" }, { name: "Portugal", flag: "🇵🇹" }
+            ].map((country) => (
+              <div key={country.name} className="flex flex-col items-center p-6 rounded-xl border border-gray-100 bg-white hover:border-[#06C167] transition-all group shadow-sm">
+                <span className="text-4xl mb-3 grayscale group-hover:grayscale-0 transition-all">{country.flag}</span>
+                <span className="text-sm font-bold text-gray-900">{country.name}</span>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-20 p-8 text-center">
+            <p className="text-gray-400 text-xs font-bold uppercase tracking-[0.2em]">Et 20+ autres pays à travers le monde</p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA SECTION */}
       <section className="py-32 bg-white">
         <div className="max-w-5xl mx-auto px-6">
@@ -172,7 +202,7 @@ function PricingCard({ plan, price, features, popular }: { plan: string, price: 
           </li>
         ))}
       </ul>
-      <Link href="/audit" className={`w-full py-3 rounded font-bold text-sm text-center transition-all ${popular ? 'bg-[#06C167] text-white hover:bg-[#05a357]' : 'bg-black text-white hover:bg-gray-800'}`}>
+      <Link href="/audit" className={`w-full ${popular ? 'btn-primary' : 'btn-black'} !py-3 text-sm`}>
         Choisir {plan}
       </Link>
     </div>
