@@ -18,14 +18,14 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) alert(error.message);
-    else router.push("/dashboard");
+    else window.location.href = "/dashboard";
     setLoading(false);
   };
 
   useEffect(() => {
     const checkLoggedIn = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) router.push("/dashboard");
+      if (session) window.location.href = "/dashboard";
     };
     checkLoggedIn();
   }, [router]);
