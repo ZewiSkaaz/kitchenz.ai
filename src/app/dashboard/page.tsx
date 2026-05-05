@@ -51,7 +51,7 @@ export default function DashboardPage() {
       .from("user_integrations")
       .select("*")
       .eq("user_id", userId)
-      .eq("provider", "uber")
+      .eq("provider", "uber_eats")
       .single();
     setUberConnected(!!data);
   };

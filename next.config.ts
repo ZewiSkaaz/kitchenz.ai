@@ -8,6 +8,8 @@ const nextConfig: any = {
       { protocol: 'https', hostname: 'replicate.delivery' },
       { protocol: 'https', hostname: 'cdn.openai.com' },
       { protocol: 'https', hostname: 'upload.wikimedia.org' },
+      { protocol: 'https', hostname: '**.supabase.co' },
+      { protocol: 'https', hostname: '**.supabase.in' },
     ],
   },
   // On garde l'ignorance temporairement pour ne pas bloquer le déploiement actuel

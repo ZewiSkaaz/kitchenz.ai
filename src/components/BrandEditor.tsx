@@ -116,7 +116,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
     const { error } = await supabase.from("menu_items").upsert(menuToSave, { onConflict: 'id' });
     if (error) {
       console.error(error);
-      setToast({ message: "Erreur de synchronisation", type: 'error' });
+      setToast({ message: "Erreur Supabase: " + (error.message || error.details || "Erreur de synchronisation"), type: 'error' });
     } else {
       onRefresh();
       setToast({ message: "Menu sauvegardé !", type: 'success' });
@@ -124,11 +124,44 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
     setSaving(false);
   };
 
-  const updateHours = (dayIdx: number, field: 'startTime' | 'endTime', value: string) => {
+  const updateSlot = (dayIdx: number, slotIdx: number, field: 'startTime' | 'endTime', value: string) => {
     const newHours = [...(brand.business_hours || [])];
-    if (!newHours[dayIdx]) newHours[dayIdx] = { day: dayIdx, startTime: "08:00", endTime: "22:00" };
-    newHours[dayIdx][field] = value;
+    if (!newHours[dayIdx]) newHours[dayIdx] = { day: dayIdx, slots: [{ startTime: "08:00", endTime: "22:00" }] };
+    
+    // Migrate old format
+    if (newHours[dayIdx].startTime !== undefined) {
+      newHours[dayIdx].slots = [{ startTime: newHours[dayIdx].startTime, endTime: newHours[dayIdx].endTime }];
+      delete newHours[dayIdx].startTime;
+      delete newHours[dayIdx].endTime;
+    }
+    if (!newHours[dayIdx].slots) newHours[dayIdx].slots = [{ startTime: "08:00", endTime: "22:00" }];
+    
+    newHours[dayIdx].slots[slotIdx][field] = value;
     setBrand({ ...brand, business_hours: newHours });
+  };
+
+  const addSlot = (dayIdx: number) => {
+    const newHours = [...(brand.business_hours || [])];
+    if (!newHours[dayIdx]) {
+      newHours[dayIdx] = { day: dayIdx, slots: [{ startTime: "11:30", endTime: "14:30" }, { startTime: "18:30", endTime: "22:30" }] };
+    } else {
+      if (newHours[dayIdx].startTime !== undefined) {
+        newHours[dayIdx].slots = [{ startTime: newHours[dayIdx].startTime, endTime: newHours[dayIdx].endTime }];
+        delete newHours[dayIdx].startTime;
+        delete newHours[dayIdx].endTime;
+      }
+      if (!newHours[dayIdx].slots) newHours[dayIdx].slots = [];
+      newHours[dayIdx].slots.push({ startTime: "18:30", endTime: "22:30" });
+    }
+    setBrand({ ...brand, business_hours: newHours });
+  };
+
+  const removeSlot = (dayIdx: number, slotIdx: number) => {
+    const newHours = [...(brand.business_hours || [])];
+    if (newHours[dayIdx]?.slots) {
+      newHours[dayIdx].slots.splice(slotIdx, 1);
+      setBrand({ ...brand, business_hours: newHours });
+    }
   };
 
   const sanitizePrice = (val: string) => {
@@ -492,32 +525,48 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                    </div>
 
                     <div className="grid gap-4">
-                      {DAYS.map((day, i) => (
-                        <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all duration-300">
-                           <span className="font-bold text-slate-900 text-lg tracking-tight w-32">{day}</span>
-                           <div className="flex items-center gap-6">
-                              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                 <span className="text-[9px] font-black text-slate-300">OUVERTURE</span>
-                                 <input 
-                                   type="time" 
-                                   value={brand.business_hours?.[i]?.startTime || "08:00"} 
-                                   onChange={e => updateHours(i, 'startTime', e.target.value)}
-                                   className="font-bold text-lg text-slate-900 outline-none" 
-                                 />
-                              </div>
-                              <div className="w-6 h-px bg-slate-200" />
-                              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                 <span className="text-[9px] font-black text-slate-300">FERMETURE</span>
-                                 <input 
-                                   type="time" 
-                                   value={brand.business_hours?.[i]?.endTime || "22:00"} 
-                                   onChange={e => updateHours(i, 'endTime', e.target.value)}
-                                   className="font-bold text-lg text-slate-900 outline-none" 
-                                 />
-                              </div>
-                           </div>
-                        </div>
-                      ))}
+                      {DAYS.map((day, i) => {
+                        const dayData = brand.business_hours?.[i] || {};
+                        const slots = dayData.slots || (dayData.startTime ? [{ startTime: dayData.startTime, endTime: dayData.endTime }] : []);
+                        
+                        return (
+                          <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all duration-300 gap-4">
+                             <span className="font-bold text-slate-900 text-lg tracking-tight w-32">{day}</span>
+                             <div className="flex-1 space-y-3">
+                                {slots.length === 0 && <span className="text-sm font-bold text-slate-400">Fermé</span>}
+                                {slots.map((slot: any, sIdx: number) => (
+                                  <div key={sIdx} className="flex items-center gap-4">
+                                    <div className="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                                       <span className="text-[9px] font-black text-slate-300">OUVERTURE</span>
+                                       <input 
+                                         type="time" 
+                                         value={slot.startTime || "08:00"} 
+                                         onChange={e => updateSlot(i, sIdx, 'startTime', e.target.value)}
+                                         className="font-bold text-base text-slate-900 outline-none" 
+                                       />
+                                    </div>
+                                    <div className="w-4 h-px bg-slate-200" />
+                                    <div className="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                                       <span className="text-[9px] font-black text-slate-300">FERMETURE</span>
+                                       <input 
+                                         type="time" 
+                                         value={slot.endTime || "22:00"} 
+                                         onChange={e => updateSlot(i, sIdx, 'endTime', e.target.value)}
+                                         className="font-bold text-base text-slate-900 outline-none" 
+                                       />
+                                    </div>
+                                    <button onClick={() => removeSlot(i, sIdx)} className="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                ))}
+                                <button onClick={() => addSlot(i)} className="text-xs font-bold text-[#06C167] hover:text-[#05a357] flex items-center gap-1 mt-2">
+                                  <Plus className="w-3 h-3" /> Ajouter un service
+                                </button>
+                             </div>
+                          </div>
+                        );
+                      })}
                    </div>
 
                    <button onClick={saveIdentity} disabled={saving} className="w-full py-4 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-black transition-all flex items-center justify-center gap-3 disabled:opacity-50">
