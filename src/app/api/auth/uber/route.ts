@@ -1,3 +1,5 @@
+
+export const dynamic = 'force-dynamic';
 import { uberService } from "@/lib/uber";
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
@@ -35,3 +37,4 @@ export async function GET() {
     return NextResponse.redirect(`https://kitchenz-ai.onrender.com/dashboard?error=auth_failed&desc=${desc}`);
   }
 }
+

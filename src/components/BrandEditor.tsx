@@ -315,25 +315,25 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                          </select>
                                       </div>
                                    </div>
-                                                        <div className="bg-gray-900 p-4 rounded-xl text-white flex items-center gap-3 shadow-lg">
-                                   <input 
-                                      type="text" 
-                                      value={item.selling_price} 
-                                      onChange={e => {
-                                        const newItems = [...brand.menu_items]; 
-                                        newItems[idx].selling_price = sanitizePrice(e.target.value); 
-                                        setBrand({...brand, menu_items: newItems});
-                                      }} 
-                                      className="w-16 text-right bg-transparent font-bold text-2xl outline-none text-[#06C167]" 
-                                   />
-                                   <span className="text-xl font-bold text-[#06C167]">€</span>
+                                   <div className="bg-gray-900 p-4 rounded-xl text-white flex items-center gap-3 shadow-lg">
+                                      <input 
+                                         type="text" 
+                                         value={item.selling_price} 
+                                         onChange={e => {
+                                           const newItems = [...brand.menu_items]; 
+                                           newItems[idx].selling_price = sanitizePrice(e.target.value); 
+                                           setBrand({...brand, menu_items: newItems});
+                                         }} 
+                                         className="w-16 text-right bg-transparent font-bold text-2xl outline-none text-[#06C167]" 
+                                      />
+                                      <span className="text-xl font-bold text-[#06C167]">€</span>
+                                   </div>
                                 </div>
                              </div>
 
                              <textarea value={item.description} onChange={e => {
                                 const newItems = [...brand.menu_items]; newItems[idx].description = e.target.value; setBrand({...brand, menu_items: newItems});
                              }} className="w-full text-xs text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200 outline-none focus:border-[#06C167] focus:bg-white transition-all h-20 resize-none" placeholder="Description de l'article..." />
- l'article..." />
 
                              <div className="flex gap-4 items-center pt-4 border-t border-gray-50">
                                 <button 
@@ -472,8 +472,6 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                     </div>
                   ))}
                 </div>
-
-                {/* Ancien bouton supprimé car doublon avec la barre globale */}
               </div>
             ) : (
               <div className="max-w-4xl mx-auto space-y-20 pb-40">

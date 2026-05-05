@@ -1,3 +1,5 @@
+
+export const dynamic = 'force-dynamic';
 import { uberService } from "@/lib/uber";
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
@@ -71,3 +73,4 @@ export async function POST(request: Request) {
     }, { status: 500 });
   }
 }
+

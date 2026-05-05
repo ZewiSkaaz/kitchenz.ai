@@ -1,3 +1,5 @@
+
+export const dynamic = 'force-dynamic';
 import { HfInference } from "@huggingface/inference";
 import { NextResponse } from "next/server";
 
@@ -29,3 +31,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

@@ -1,3 +1,5 @@
+
+export const dynamic = 'force-dynamic';
 import { uberService } from "@/lib/uber";
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
@@ -63,3 +65,4 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/dashboard?error=auth_failed", baseUrl));
   }
 }
+
