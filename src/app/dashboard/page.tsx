@@ -177,7 +177,7 @@ function BrandCard({ brand, onDelete, onClick }: { brand: any, onDelete: () => v
     >
       <div className="h-40 relative bg-gray-100 overflow-hidden">
         <Image 
-          src={brand.background_url} 
+          src={brand.background_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop"} 
           alt={brand.name}
           fill
           className="object-cover" 
@@ -194,7 +194,7 @@ function BrandCard({ brand, onDelete, onClick }: { brand: any, onDelete: () => v
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-md border border-gray-100 bg-white relative overflow-hidden">
             <Image 
-              src={brand.logo_url} 
+              src={brand.logo_url || "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=200&auto=format&fit=crop"} 
               alt="Logo"
               width={40}
               height={40}

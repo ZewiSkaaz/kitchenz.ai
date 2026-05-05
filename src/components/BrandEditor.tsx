@@ -201,7 +201,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
               <div className="max-w-5xl mx-auto space-y-16 pb-32">
                 <div className="relative group rounded-lg overflow-hidden border border-gray-200">
                   <div className="h-64 w-full bg-gray-100">
-                    <img src={brand.background_url} className={`w-full h-full object-cover ${uploading === 'banner' ? 'opacity-30' : ''}`} />
+                    <img src={brand.background_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop"} className={`w-full h-full object-cover ${uploading === 'banner' ? 'opacity-30' : ''}`} alt="Banner" />
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
                       <button onClick={() => handleUploadClick('banner')} className="bg-white px-6 py-2 rounded font-bold text-xs shadow-lg flex items-center gap-2">
                         <Camera className="w-4 h-4" /> Changer l'image de couverture
@@ -210,7 +210,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                   </div>
                   <div className="absolute -bottom-8 left-10 group/logo">
                     <div className="w-24 h-24 rounded-md border-4 border-white shadow-lg overflow-hidden bg-white relative">
-                      <img src={brand.logo_url} className={`w-full h-full object-cover ${uploading === 'logo' ? 'opacity-30' : ''}`} />
+                      <img src={brand.logo_url || "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=200&auto=format&fit=crop"} className={`w-full h-full object-cover ${uploading === 'logo' ? 'opacity-30' : ''}`} alt="Logo" />
                       <button onClick={() => handleUploadClick('logo')} className="absolute inset-0 bg-black/40 opacity-0 group-hover/logo:opacity-100 transition-all flex items-center justify-center text-white">
                         <Camera className="w-5 h-5" />
                       </button>
@@ -268,7 +268,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                        <div className="flex gap-6">
                           <div className="w-24 space-y-3 shrink-0">
                              <div className="w-24 h-24 rounded-md overflow-hidden bg-gray-100 relative group/img cursor-pointer border border-gray-200">
-                                <img src={item.image_url} className="w-full h-full object-cover" />
+                                <img src={item.image_url || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop"} className="w-full h-full object-cover" alt={item.title} />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center text-white">
                                    <Camera className="w-5 h-5" />
                                 </div>
@@ -286,12 +286,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                              </button>
                           </div>
 
-                          <div className="flex-1 space-y-10">
-                             <div className="flex justify-between items-start">
-                                <div className="flex-1 space-y-6">
+                          <div className="flex-1 space-y-4">
+                             <div className="flex justify-between items-start gap-4">
+                                <div className="flex-1 space-y-4">
                                    <input value={item.title} onChange={e => {
                                       const newItems = [...brand.menu_items]; newItems[idx].title = e.target.value; setBrand({...brand, menu_items: newItems});
-                                   }} className="text-xl font-bold text-gray-900 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#06C167] focus:bg-white w-full transition-all" />
+                                   }} className="text-lg font-bold text-gray-900 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#06C167] focus:bg-white w-full transition-all" />
                                    
                                    <div className="flex flex-wrap gap-4">
                                       <input value={item.category} onChange={e => {
@@ -315,8 +315,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                          </select>
                                       </div>
                                    </div>
-                                </div>
-                                <div className="bg-slate-900 p-8 rounded-[35px] text-white flex items-center gap-4 shadow-2xl">
+                                                        <div className="bg-gray-900 p-4 rounded-xl text-white flex items-center gap-3 shadow-lg">
                                    <input 
                                       type="text" 
                                       value={item.selling_price} 
@@ -325,15 +324,16 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                         newItems[idx].selling_price = sanitizePrice(e.target.value); 
                                         setBrand({...brand, menu_items: newItems});
                                       }} 
-                                      className="w-24 text-right bg-transparent font-black text-4xl outline-none text-[#06C167]" 
+                                      className="w-16 text-right bg-transparent font-bold text-2xl outline-none text-[#06C167]" 
                                    />
-                                   <span className="text-3xl font-black text-[#06C167]">€</span>
+                                   <span className="text-xl font-bold text-[#06C167]">€</span>
                                 </div>
                              </div>
 
                              <textarea value={item.description} onChange={e => {
                                 const newItems = [...brand.menu_items]; newItems[idx].description = e.target.value; setBrand({...brand, menu_items: newItems});
-                             }} className="w-full text-xs text-gray-500 bg-gray-50 p-3 rounded outline-none border border-transparent focus:border-gray-200 transition-all h-20 resize-none" placeholder="Description de l'article..." />
+                             }} className="w-full text-xs text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200 outline-none focus:border-[#06C167] focus:bg-white transition-all h-20 resize-none" placeholder="Description de l'article..." />
+ l'article..." />
 
                              <div className="flex gap-4 items-center pt-4 border-t border-gray-50">
                                 <button 
@@ -411,7 +411,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                                    <div className="flex items-center gap-4">
                                                       <input value={group.name} onChange={e => {
                                                          const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].name = e.target.value; setBrand({...brand, menu_items: newItems});
-                                                      }} className="font-bold text-sm text-black outline-none w-48" />
+                                                      }} className="font-bold text-sm text-black bg-gray-50 border border-gray-100 rounded px-2 py-1 outline-none w-48 focus:border-black" />
                                                       <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
                                                         Min: <input type="number" value={group.min} onChange={e => {
                                                           const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].min = parseInt(e.target.value); setBrand({...brand, menu_items: newItems});
@@ -477,12 +477,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
               </div>
             ) : (
               <div className="max-w-4xl mx-auto space-y-20 pb-40">
-                <div className="space-y-4">
-                   <h2 className="text-6xl font-black text-slate-900 tracking-tighter uppercase">Opérations Uber</h2>
-                   <p className="text-slate-500 font-bold text-xl leading-relaxed italic">Paramètres critiques pour l&apos;algorithme Marketplace.</p>
+                <div className="space-y-2">
+                   <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Opérations Uber</h2>
+                   <p className="text-slate-500 font-bold text-sm leading-relaxed">Paramètres critiques pour l&apos;algorithme Marketplace.</p>
                 </div>
 
-                <div className="bg-white p-16 rounded-[60px] shadow-2xl border border-slate-50 space-y-12">
+                <div className="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100 space-y-8">
                    <div className="flex items-center gap-8 mb-10">
                       <div className="w-16 h-16 bg-green-50 rounded-3xl flex items-center justify-center text-[#06C167]">
                         <Clock className="w-10 h-10" />
@@ -493,28 +493,28 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                       </div>
                    </div>
 
-                   <div className="grid gap-6">
+                    <div className="grid gap-4">
                       {DAYS.map((day, i) => (
-                        <div key={i} className="flex items-center justify-between p-10 bg-slate-50 rounded-[40px] border border-slate-100 hover:bg-white hover:shadow-xl transition-all duration-500">
-                           <span className="font-black text-slate-900 text-xl tracking-tight w-40">{day}</span>
-                           <div className="flex items-center gap-10">
-                              <div className="flex items-center gap-4 bg-white p-6 rounded-[25px] shadow-inner border border-slate-100">
-                                 <span className="text-[10px] font-black text-slate-300">OUVERTURE</span>
+                        <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all duration-300">
+                           <span className="font-bold text-slate-900 text-lg tracking-tight w-32">{day}</span>
+                           <div className="flex items-center gap-6">
+                              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                 <span className="text-[9px] font-black text-slate-300">OUVERTURE</span>
                                  <input 
                                    type="time" 
                                    value={brand.business_hours?.[i]?.startTime || "08:00"} 
                                    onChange={e => updateHours(i, 'startTime', e.target.value)}
-                                   className="font-black text-2xl text-slate-900 outline-none" 
+                                   className="font-bold text-lg text-slate-900 outline-none" 
                                  />
                               </div>
-                              <div className="w-10 h-1 bg-slate-200 rounded-full" />
-                              <div className="flex items-center gap-4 bg-white p-6 rounded-[25px] shadow-inner border border-slate-100">
-                                 <span className="text-[10px] font-black text-slate-300">FERMETURE</span>
+                              <div className="w-6 h-px bg-slate-200" />
+                              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                 <span className="text-[9px] font-black text-slate-300">FERMETURE</span>
                                  <input 
                                    type="time" 
                                    value={brand.business_hours?.[i]?.endTime || "22:00"} 
                                    onChange={e => updateHours(i, 'endTime', e.target.value)}
-                                   className="font-black text-2xl text-slate-900 outline-none" 
+                                   className="font-bold text-lg text-slate-900 outline-none" 
                                  />
                               </div>
                            </div>
@@ -555,7 +555,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                    <div className="h-full overflow-y-auto bg-[#F6F6F6] pt-10 pb-20">
                       {/* Banner */}
                       <div className="h-48 w-full relative">
-                         <img src={brand.background_url} className="w-full h-full object-cover" />
+                         <img src={brand.background_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop"} className="w-full h-full object-cover" alt="Banner" />
                          <div className="absolute top-4 left-4 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
                            <ChevronLeft className="w-6 h-6" />
                          </div>
@@ -565,7 +565,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                       <div className="bg-white p-6 -mt-10 mx-4 rounded-3xl shadow-xl relative z-10 space-y-3">
                          <div className="flex justify-between items-start">
                             <h4 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{brand.name}</h4>
-                            <img src={brand.logo_url} className="w-14 h-14 rounded-2xl shadow-lg border-2 border-white -mt-10" />
+                            <img src={brand.logo_url || "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=200&auto=format&fit=crop"} className="w-14 h-14 rounded-2xl shadow-lg border-2 border-white -mt-10 object-cover" alt="Logo" />
                          </div>
                          <p className="text-slate-500 text-sm font-medium">{brand.culinary_style} • {brand.tagline}</p>
                          <div className="flex items-center gap-4 border-t border-slate-50 pt-3">
@@ -586,7 +586,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                     <span className="text-sm font-black text-slate-900 mt-2 block">{item.selling_price} €</span>
                                  </div>
                                  <div className="w-24 h-24 rounded-xl overflow-hidden shadow-inner shrink-0 relative">
-                                    <img src={item.image_url} className="w-full h-full object-cover" />
+                                    <img src={item.image_url || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop"} className="w-full h-full object-cover" alt={item.title} />
                                     <div className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
                                        <Plus className="w-4 h-4 text-[#06C167]" />
                                     </div>
@@ -624,12 +624,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
           <div className="flex items-center gap-4">
              <button onClick={onClose} className="px-8 py-3 text-xs font-bold text-gray-500 hover:text-black transition-all uppercase tracking-widest">Annuler</button>
              <button 
-                onClick={activeTab === 'identity' ? saveIdentity : saveMenu} 
+                onClick={activeTab === 'identity' || activeTab === 'ops' ? saveIdentity : saveMenu} 
                 disabled={saving} 
                 className="btn-primary !px-8 !py-4 shadow-xl shadow-[#06C167]/20 flex items-center gap-3"
              >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                {activeTab === 'identity' ? 'Sauvegarder' : 'Sauvegarder Menu'}
+                {activeTab === 'identity' || activeTab === 'ops' ? 'Sauvegarder' : 'Sauvegarder Menu'}
              </button>
              {uberConnected && activeTab === 'menu' && (
                <button 

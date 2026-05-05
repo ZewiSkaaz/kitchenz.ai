@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, ChefHat, Utensils, Zap, Sparkles, ArrowRight, Loader2, ShieldCheck, Image as ImageIcon, Coffee, CakeSlice, Bot, ZapOff, Download, Check } from "lucide-react";
-import { generateBrandCore, generateCoreItems, generateMenuAssembly, generateBrandImages, analyzeInventoryImage, generateMenuItemImage, PRICING, calculateSellingPrice } from "@/lib/ai";
+import { PRICING, calculateSellingPrice, generateMenuItemImage, generateBrandImages } from "@/lib/ai";
+import { generateBrandCoreAction, generateCoreItemsAction, generateMenuAssemblyAction, analyzeInventoryImageAction } from "@/app/actions/aiActions";
 import { useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -156,7 +157,7 @@ export default function AuditPage() {
       reader.readAsDataURL(file);
       reader.onload = async () => {
         const base64 = (reader.result as string).split(',')[1];
-        const items = await analyzeInventoryImage(base64);
+        const items = await analyzeInventoryImageAction(base64);
         const newIngredients = items.map((i: any) => `${i.name} (${i.qty})`);
         setIngredients([...ingredients, ...newIngredients]);
         setAnalyzingInventory(false);
@@ -174,10 +175,10 @@ export default function AuditPage() {
     try {
       setLoadingStep("Génération de l'Identité de Marque (Brand Core)...");
       const flexibilityOptions = { allowNewIngredients, allowNewEquipment };
-      const brandCore = await generateBrandCore(ingredients, equipment, brandName, concept, visualStyle, flexibilityOptions, location);
+      const brandCore = await generateBrandCoreAction(ingredients, equipment, brandName, concept, visualStyle, flexibilityOptions, location);
       
       setLoadingStep("Création du Menu & Recettes...");
-      const coreItems = await generateCoreItems(ingredients, brandCore, flexibilityOptions);
+      const coreItems = await generateCoreItemsAction(ingredients, brandCore, flexibilityOptions);
 
       setLoadingStep("Génération des Photos de TOUS les produits...");
       const allDishesWithPhotos = await Promise.all(
@@ -209,7 +210,7 @@ export default function AuditPage() {
       }
 
       setLoadingStep("Assemblage des Menus Combos...");
-      const menuAssembly = await generateMenuAssembly(coreItems, drinks, desserts, brandCore);
+      const menuAssembly = await generateMenuAssemblyAction(coreItems, drinks, desserts, brandCore);
 
       // Génération automatique des items Boissons et Desserts à partir des listes fournies
       const ALCOHOL_KEYWORDS = ["vin", "bière", "cocktail", "champagne", "bordeaux", "chardonnay", "rosé", "whisky", "rhum", "mojito", "spritz", "sangria"];
