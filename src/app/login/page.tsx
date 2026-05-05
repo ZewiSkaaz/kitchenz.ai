@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -22,11 +22,13 @@ export default function LoginPage() {
     setLoading(false);
   };
 
-  const checkLoggedIn = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) router.push("/dashboard");
-  };
-  checkLoggedIn();
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) router.push("/dashboard");
+    };
+    checkLoggedIn();
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6 pt-32 pb-20">

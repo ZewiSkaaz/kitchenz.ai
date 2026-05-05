@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import { ChefHat, Mail, Lock, ArrowRight, Loader2, ShieldCheck, Check } from "lucide-react";
@@ -34,11 +34,13 @@ export default function RegisterPage() {
     setLoading(false);
   };
 
-  const checkLoggedIn = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) router.push("/dashboard");
-  };
-  checkLoggedIn();
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) router.push("/dashboard");
+    };
+    checkLoggedIn();
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 relative overflow-hidden pt-32 pb-20">
