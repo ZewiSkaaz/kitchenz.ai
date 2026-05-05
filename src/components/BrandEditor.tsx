@@ -176,8 +176,6 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
       className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-0 md:p-8 overflow-hidden"
       onClick={onClose}
     >
-      <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
-
       {/* Premium Notification (Toast) */}
       <AnimatePresence>
         {toast && (
@@ -196,6 +194,8 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
         className="bg-white w-full max-w-[1400px] h-full md:h-[90vh] rounded-none md:rounded-lg overflow-hidden flex flex-col shadow-2xl relative"
         onClick={e => e.stopPropagation()}
       >
+        <input type="file" ref={fileInputRef} onChange={handleFileChange} onClick={e => e.stopPropagation()} className="hidden" accept="image/*" />
+        
         {/* Top Control Bar */}
         <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 z-[60]">
           <div className="flex items-center gap-8">
@@ -236,7 +236,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                   <div className="h-64 w-full bg-gray-100">
                     <img src={brand.background_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop"} className={`w-full h-full object-cover ${uploading === 'banner' ? 'opacity-30' : ''}`} alt="Banner" />
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
-                      <button onClick={() => handleUploadClick('banner')} className="bg-white px-6 py-2 rounded font-bold text-xs shadow-lg flex items-center gap-2">
+                      <button onClick={() => handleUploadClick('banner')} className="bg-white text-slate-900 px-6 py-2 rounded font-bold text-xs shadow-lg flex items-center gap-2">
                         <Camera className="w-4 h-4" /> Changer l'image de couverture
                       </button>
                     </div>
