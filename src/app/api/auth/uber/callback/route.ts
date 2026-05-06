@@ -1,7 +1,6 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { uberService } from "@/lib/uber";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,29 +14,44 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL(`/dashboard?error=${errorParam}&desc=${encodeURIComponent(errorDesc || '')}`, baseUrl));
   }
 
+  if (!code) {
+    return NextResponse.redirect(new URL("/dashboard?error=no_code", baseUrl));
+  }
+
   try {
-    // 1. Get code from URL
-    const { searchParams } = new URL(request.url);
-    const code = searchParams.get("code");
-    
-    // 2. Initialize Server-Side Supabase Client
     const cookieStore = cookies();
-    const supabaseServer = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            cookieStore.set({ name, value, ...options });
+          },
+          remove(name: string, options: CookieOptions) {
+            cookieStore.set({ name, value: "", ...options });
+          },
+        },
+      }
+    );
+
+    const { data: { session } } = await supabase.auth.getSession();
     
-    // 3. Get User Session
-    const { data: { session } } = await supabaseServer.auth.getSession();
     if (!session) {
       console.error("❌ No session found in Uber callback");
-      return NextResponse.redirect(new URL("/login?error=no_session", request.url));
+      return NextResponse.redirect(new URL("/login?error=no_session", baseUrl));
     }
 
-    // 4. Exchange code for tokens
+    // Exchange code for tokens
     const params = new URLSearchParams({
       client_id: process.env.UBER_CLIENT_ID!,
       client_secret: process.env.UBER_CLIENT_SECRET!,
       grant_type: 'authorization_code',
       redirect_uri: process.env.UBER_REDIRECT_URI || 'https://kitchenz-ai.onrender.com/api/auth/uber/callback',
-      code: code!,
+      code,
     });
 
     const tokenRes = await fetch('https://login.uber.com/oauth/v2/token', {
@@ -49,11 +63,11 @@ export async function GET(request: Request) {
     const tokens = await tokenRes.json();
     if (tokens.error) {
       console.error("❌ Uber Token Error:", tokens.error);
-      return NextResponse.redirect(new URL("/dashboard?error=auth_failed", request.url));
+      return NextResponse.redirect(new URL("/dashboard?error=auth_failed", baseUrl));
     }
 
-    // 5. Store in DB
-    const { error } = await supabaseServer
+    // Store in DB
+    const { error } = await supabase
       .from("user_integrations")
       .upsert({
         user_id: session.user.id,
@@ -65,13 +79,12 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("❌ DB Storage Error:", error.message);
-      return NextResponse.redirect(new URL("/dashboard?error=db_error", request.url));
+      return NextResponse.redirect(new URL("/dashboard?error=db_error", baseUrl));
     }
 
-    return NextResponse.redirect(new URL("/dashboard?success=uber_connected", request.url));
+    return NextResponse.redirect(new URL("/dashboard?success=uber_connected", baseUrl));
   } catch (error: any) {
-    console.error("Uber Auth Error:", error.response?.data || error.message);
+    console.error("Uber Auth Error:", error.message);
     return NextResponse.redirect(new URL("/dashboard?error=auth_failed", baseUrl));
   }
 }
-

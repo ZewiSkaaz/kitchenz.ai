@@ -502,6 +502,7 @@ export async function generateMenuItemImage(
       size: "1024x1024",
       quality: "hd",
       style: "natural",
+      response_format: "b64_json",
     } as any);
 
     const b64 = (response.data?.[0] as any)?.b64_json;
@@ -530,6 +531,7 @@ export async function generateBrandImages(
         size: "1024x1024",
         quality: "hd",
         style: "natural",
+        response_format: "b64_json",
       } as any),
       openai.images.generate({
         model: "dall-e-3",
@@ -538,6 +540,7 @@ export async function generateBrandImages(
         size: "1792x1024", 
         quality: "hd",
         style: "natural",
+        response_format: "b64_json",
       } as any),
     ]);
 
