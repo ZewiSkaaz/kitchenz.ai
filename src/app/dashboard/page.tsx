@@ -104,24 +104,50 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          {/* Stat Cards */}
           <StatCard title="Ventes" value="1,240" trend="+12%" icon={<TrendingUp className="text-[#06C167] w-4 h-4" />} />
           <StatCard title="Chiffre d'Affaires" value="18,450.00 €" trend="+8%" icon={<Zap className="text-yellow-500 w-4 h-4" />} />
           <StatCard title="Performance" value="98%" trend="+2%" icon={<ChefHat className="text-indigo-500 w-4 h-4" />} />
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-[11px] font-bold uppercase tracking-wider mb-1">Uber Eats</p>
-              {uberConnected ? (
-                <div className="flex flex-col gap-1">
-                  <span className="text-[11px] font-bold text-[#06C167] bg-[#06C167]/5 px-2 py-1 rounded w-fit">Actif</span>
-                  <button onClick={disconnectUber} className="text-[9px] text-red-500 font-bold hover:underline text-left">Déconnecter</button>
+          
+          {/* Uber Eats Integration Card */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" className="h-4 invert" alt="Uber Eats" />
                 </div>
+                <div>
+                  <h4 className="text-sm font-black text-slate-900 uppercase tracking-tighter">Uber Eats</h4>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Marketplace Manager</p>
+                </div>
+              </div>
+              <div className={`w-2 h-2 rounded-full ${uberConnected ? 'bg-[#06C167] animate-pulse' : 'bg-slate-200'}`} />
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Statut</span>
+                <span className={`text-[10px] font-black uppercase tracking-widest ${uberConnected ? 'text-[#06C167]' : 'text-slate-400'}`}>
+                  {uberConnected ? 'Connecté' : 'Non lié'}
+                </span>
+              </div>
+              
+              {uberConnected ? (
+                <button 
+                  onClick={disconnectUber}
+                  className="w-full py-2 bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg transition-all border border-slate-100"
+                >
+                  Déconnecter le compte
+                </button>
               ) : (
-                <Link href="/api/auth/uber" className="text-[11px] font-bold text-blue-600 hover:underline">Connecter</Link>
+                <Link 
+                  href="/api/auth/uber"
+                  className="w-full py-2 bg-[#06C167] hover:bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-lg transition-all flex items-center justify-center gap-2"
+                >
+                  Lier mon restaurant
+                </Link>
               )}
             </div>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" className="h-4" />
           </div>
         </div>
 
