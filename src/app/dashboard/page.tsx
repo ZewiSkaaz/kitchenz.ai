@@ -56,6 +56,23 @@ export default function DashboardPage() {
     setUberConnected(!!data);
   };
 
+  const disconnectUber = async () => {
+    if (!confirm("Voulez-vous vraiment déconnecter votre compte Uber Eats ?")) return;
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { error } = await supabase
+      .from("user_integrations")
+      .delete()
+      .eq("user_id", session.user.id)
+      .eq("provider", "uber_eats");
+
+    if (!error) {
+      setUberConnected(false);
+    }
+  };
+
   const fetchBrands = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -96,7 +113,10 @@ export default function DashboardPage() {
             <div>
               <p className="text-gray-500 text-[11px] font-bold uppercase tracking-wider mb-1">Uber Eats</p>
               {uberConnected ? (
-                <span className="text-[11px] font-bold text-[#06C167] bg-[#06C167]/5 px-2 py-1 rounded">Actif</span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[11px] font-bold text-[#06C167] bg-[#06C167]/5 px-2 py-1 rounded w-fit">Actif</span>
+                  <button onClick={disconnectUber} className="text-[9px] text-red-500 font-bold hover:underline text-left">Déconnecter</button>
+                </div>
               ) : (
                 <Link href="/api/auth/uber" className="text-[11px] font-bold text-blue-600 hover:underline">Connecter</Link>
               )}

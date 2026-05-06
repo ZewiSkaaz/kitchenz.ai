@@ -7,7 +7,7 @@ import {
   Camera, Trash2, Plus, TrendingUp, Save, X, Image as ImageIcon, 
   Info, AlertCircle, CheckCircle2, Download, ChevronRight, Tag,
   Settings2, Eye, EyeOff, ShieldAlert, BadgeCheck, UtensilsCrossed, Clock, Calendar,
-  ChevronDown, ChevronUp, Smartphone, Layout, ChefHat, ShieldCheck, Loader2
+  ChevronDown, ChevronUp, Smartphone, Layout, ChefHat, ShieldCheck, Loader2, Maximize2, ChevronLeft
 } from "lucide-react";
 
 interface BrandEditorProps {
@@ -19,6 +19,13 @@ interface BrandEditorProps {
 
 const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
+const getFallbackImage = (category?: string) => {
+  const cat = category?.toLowerCase() || "";
+  if (cat.includes("boisson") || cat.includes("drink")) return "https://images.unsplash.com/photo-1544145945-f904253d0c7b?q=80&w=400&auto=format&fit=crop"; // Boisson rafraîchissante
+  if (cat.includes("dessert") || cat.includes("sucré")) return "https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=400&auto=format&fit=crop"; // Dessert gourmand
+  if (cat.includes("burger") || cat.includes("plat")) return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop"; // Burger générique
+  return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=400&auto=format&fit=crop"; // Salade/Générique
+};
 export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, uberConnected }: BrandEditorProps) {
   const [brand, setBrand] = useState(initialBrand);
   const [saving, setSaving] = useState(false);
@@ -27,6 +34,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
   const [editingItemIdx, setEditingItemIdx] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+  const [fullImage, setFullImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadTarget, setUploadTarget] = useState<'logo' | 'banner' | { type: 'item', index: number } | null>(null);
 
@@ -170,6 +178,20 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
     return isNaN(parsed) ? 0 : parsed;
   };
 
+  const removeItem = (idx: number) => {
+    if (!confirm("Supprimer cet article ?")) return;
+    const newItems = [...(brand.menu_items || [])];
+    newItems.splice(idx, 1);
+    setBrand({ ...brand, menu_items: newItems });
+  };
+
+  const removeItem = (idx: number) => {
+    if (!confirm("Supprimer cet article ?")) return;
+    const newItems = [...(brand.menu_items || [])];
+    newItems.splice(idx, 1);
+    setBrand({ ...brand, menu_items: newItems });
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -221,6 +243,28 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
               {showPreview ? <Layout className="w-4 h-4" /> : <Smartphone className="w-4 h-4" />}
               {showPreview ? 'Éditeur' : 'Aperçu Uber'}
             </button>
+            <button 
+              onClick={() => {
+                if (activeTab === 'identity') saveIdentity();
+                else saveMenu();
+              }} 
+              disabled={saving}
+              className="bg-black text-white px-6 py-2 rounded text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+            </button>
+            <button 
+              onClick={() => {
+                if (activeTab === 'identity') saveIdentity();
+                else saveMenu();
+              }} 
+              disabled={saving}
+              className="bg-black text-white px-6 py-2 rounded text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50 shadow-lg"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+            </button>
             <button onClick={onClose} className="p-2 text-gray-400 hover:text-black">
                <X className="w-5 h-5" />
             </button>
@@ -235,18 +279,26 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                 <div className="relative group rounded-lg overflow-hidden border border-gray-200">
                   <div className="h-64 w-full bg-gray-100">
                     <img src={brand.background_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop"} className={`w-full h-full object-cover ${uploading === 'banner' ? 'opacity-30' : ''}`} alt="Banner" />
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
-                      <button onClick={() => handleUploadClick('banner')} className="bg-white text-slate-900 px-6 py-2 rounded font-bold text-xs shadow-lg flex items-center gap-2">
-                        <Camera className="w-4 h-4" /> Changer l'image de couverture
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-4">
+                      <button onClick={() => brand.background_url && setFullImage(brand.background_url)} className="bg-white text-slate-900 px-6 py-2 rounded-full font-bold text-xs shadow-lg flex items-center gap-2 hover:bg-gray-100 transition-all">
+                        <Eye className="w-4 h-4" /> Afficher
+                      </button>
+                      <button onClick={() => handleUploadClick('banner')} className="bg-[#06C167] text-white px-6 py-2 rounded-full font-bold text-xs shadow-lg flex items-center gap-2 hover:bg-[#05a357] transition-all">
+                        <Camera className="w-4 h-4" /> Modifier
                       </button>
                     </div>
                   </div>
                   <div className="absolute -bottom-8 left-10 group/logo">
                     <div className="w-24 h-24 rounded-md border-4 border-white shadow-lg overflow-hidden bg-white relative">
                       <img src={brand.logo_url || "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=200&auto=format&fit=crop"} className={`w-full h-full object-cover ${uploading === 'logo' ? 'opacity-30' : ''}`} alt="Logo" />
-                      <button onClick={() => handleUploadClick('logo')} className="absolute inset-0 bg-black/40 opacity-0 group-hover/logo:opacity-100 transition-all flex items-center justify-center text-white">
-                        <Camera className="w-5 h-5" />
-                      </button>
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/logo:opacity-100 transition-all flex flex-col items-center justify-center gap-2">
+                        <button onClick={() => brand.logo_url && setFullImage(brand.logo_url)} className="p-1.5 bg-white rounded-full text-black hover:bg-gray-100 transition-all">
+                           <Eye className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => handleUploadClick('logo')} className="p-1.5 bg-[#06C167] rounded-full text-white hover:bg-[#05a357] transition-all">
+                           <Camera className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -276,86 +328,155 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
               </div>
             ) : activeTab === 'menu' ? (
               <div className="max-w-6xl mx-auto space-y-12 pb-40">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                   <div>
-                    <h2 className="text-xl font-bold text-black">Articles du menu</h2>
-                    <p className="text-xs text-gray-500 font-medium">Gérez vos plats, prix et disponibilités.</p>
+                    <h2 className="text-2xl font-black text-black tracking-tighter">Éditeur de Menu</h2>
+                    <p className="text-xs text-gray-500 font-medium">Configurez vos plats, ajustez vos prix et optimisez votre rentabilité.</p>
                   </div>
                   <button 
                     onClick={() => {
                       const newItem = {
-                        brand_id: brand.id, title: "Nouveau produit", description: "Description...", category: "Plats",
-                        selling_price: 10, vat_rate: 10, is_available: true, options: [], sub_category: "Général", image_url: ""
+                        brand_id: brand.id, title: "Nouveau produit", description_seo: "Ajoutez une description appétissante...", category: "Plat Principal",
+                        selling_price: 15, material_cost: 4, net_margin_target: 5, is_available: true, ingredients: [], image_url: ""
                       };
                       setBrand({...brand, menu_items: [...(brand.menu_items || []), newItem]});
                     }}
-                    className="bg-[#06C167] text-white text-xs font-bold px-4 py-2 rounded-md flex items-center gap-2"
+                    className="bg-slate-900 text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-black transition-all"
                   >
                     <Plus className="w-4 h-4" /> Ajouter un article
                   </button>
                 </div>
 
-                <div className="grid gap-8">
+                <div className="space-y-6">
                   {brand.menu_items?.map((item: any, idx: number) => (
-                    <div key={idx} className="bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all group/item">
-                       <div className="flex gap-6">
-                          <div className="w-24 space-y-3 shrink-0">
-                             <div className="w-24 h-24 rounded-md overflow-hidden bg-gray-100 relative group/img cursor-pointer border border-gray-200">
-                                <img src={item.image_url || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop"} className="w-full h-full object-cover" alt={item.title} />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-all flex items-center justify-center text-white">
-                                   <Camera className="w-5 h-5" />
+                    <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-200 hover:border-[#06C167]/30 transition-all group/item shadow-sm relative overflow-hidden">
+                       <div className="flex flex-col md:flex-row gap-8">
+                          <div className="w-full md:w-40 space-y-4 shrink-0">
+                             <div className="aspect-square rounded-xl overflow-hidden bg-slate-50 relative group/img border border-slate-100">
+                                <img 
+                                  src={item.image_url || getFallbackImage(item.category)} 
+                                  className="w-full h-full object-cover transition-transform group-hover/img:scale-110 duration-700" 
+                                  alt={item.title} 
+                                />
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-all flex flex-col items-center justify-center gap-3">
+                                   <button onClick={(e) => { e.stopPropagation(); setFullImage(item.image_url || getFallbackImage(item.category)); }} className="flex items-center gap-2 bg-white text-black px-4 py-1.5 rounded-full text-[10px] font-bold hover:bg-gray-100 transition-all shadow-lg">
+                                      <Eye className="w-3.5 h-3.5" /> Afficher
+                                   </button>
+                                   <button onClick={(e) => { e.stopPropagation(); handleUploadClick({ type: 'item', index: idx }); }} className="flex items-center gap-2 bg-[#06C167] text-white px-4 py-1.5 rounded-full text-[10px] font-bold hover:bg-[#05a357] transition-all shadow-lg">
+                                      <Camera className="w-3.5 h-3.5" /> Modifier
+                                   </button>
                                 </div>
-                                <button onClick={() => handleUploadClick({ type: 'item', index: idx })} className="absolute inset-0 z-20" />
                              </div>
-                             <button 
-                                onClick={() => {
-                                  const newItems = [...brand.menu_items];
-                                  newItems[idx].is_available = !newItems[idx].is_available;
-                                  setBrand({...brand, menu_items: newItems});
-                                }}
-                                className={`w-full py-1.5 rounded text-[10px] font-bold uppercase transition-all ${item.is_available ? 'bg-green-50 text-[#06C167]' : 'bg-red-50 text-red-500'}`}
-                             >
-                                {item.is_available ? 'Disponible' : 'Indisponible'}
-                             </button>
+                             <div className="space-y-2">
+                                <button 
+                                  onClick={() => {
+                                    const newItems = [...brand.menu_items];
+                                    newItems[idx].is_available = !newItems[idx].is_available;
+                                    setBrand({...brand, menu_items: newItems});
+                                  }}
+                                  className={`w-full py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border ${item.is_available ? 'bg-[#06C167]/5 text-[#06C167] border-[#06C167]/20' : 'bg-red-50 text-red-600 border-red-200'}`}
+                                >
+                                   {item.is_available ? 'EN VENTE' : 'ÉPUISÉ'}
+                                </button>
+                                <button onClick={() => removeItem(idx)} className="w-full py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all flex items-center justify-center gap-2">
+                                   <Trash2 className="w-3 h-3" /> Supprimer
+                                </button>
+                             </div>
                           </div>
 
-                          <div className="flex-1 space-y-4">
-                             <div className="flex justify-between items-start gap-4">
-                                <div className="flex-1 space-y-4">
-                                   <input value={item.title} onChange={e => {
-                                      const newItems = [...brand.menu_items]; newItems[idx].title = e.target.value; setBrand({...brand, menu_items: newItems});
-                                   }} className="text-lg font-bold text-gray-900 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#06C167] focus:bg-white w-full transition-all" />
-                                   
-                                   <div className="flex flex-wrap gap-4">
-                                      <input value={item.category} onChange={e => {
-                                        const newItems = [...brand.menu_items]; newItems[idx].category = e.target.value; setBrand({...brand, menu_items: newItems});
-                                      }} className="text-[10px] font-bold uppercase text-gray-500 bg-gray-50 px-3 py-1.5 rounded-md outline-none border border-gray-100" placeholder="Categorie" />
-                                      <input value={item.sub_category || ''} onChange={e => {
-                                        const newItems = [...brand.menu_items]; newItems[idx].sub_category = e.target.value; setBrand({...brand, menu_items: newItems});
-                                      }} className="text-[10px] font-bold uppercase text-blue-500 bg-blue-50 px-3 py-1.5 rounded-md outline-none border border-blue-100" placeholder="Sous-Categorie" />
-                                      <div className="flex items-center gap-3 bg-yellow-50 px-6 py-3 rounded-2xl border border-yellow-100">
-                                         <span className="text-[11px] font-black text-yellow-600">TVA</span>
-                                         <select 
-                                           value={item.vat_rate} 
-                                           onChange={e => {
-                                             const newItems = [...brand.menu_items]; newItems[idx].vat_rate = parseFloat(e.target.value); setBrand({...brand, menu_items: newItems});
-                                           }}
-                                           className="bg-transparent text-[10px] font-bold text-gray-600 outline-none"
-                                         >
-                                            <option value={5.5}>5.5%</option>
-                                            <option value={10}>10%</option>
-                                            <option value={20}>20%</option>
-                                         </select>
-                                      </div>
+                          <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                             <div className="lg:col-span-8 space-y-5">
+                                <div className="space-y-1.5">
+                                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nom du plat</label>
+                                   <input 
+                                     value={item.title} 
+                                     onChange={e => {
+                                       const newItems = [...brand.menu_items];
+                                       newItems[idx].title = e.target.value;
+                                       setBrand({...brand, menu_items: newItems});
+                                     }}
+                                     className="w-full bg-transparent border-none p-0 text-xl font-black text-slate-900 outline-none focus:text-[#06C167] transition-colors" 
+                                   />
+                                </div>
+                                <div className="space-y-1.5">
+                                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Description Uber Eats</label>
+                                   <textarea 
+                                     value={item.description_seo || item.description} 
+                                     onChange={e => {
+                                       const newItems = [...brand.menu_items];
+                                       newItems[idx].description_seo = e.target.value;
+                                       newItems[idx].description = e.target.value;
+                                       setBrand({...brand, menu_items: newItems});
+                                     }}
+                                     className="w-full bg-slate-50/50 border border-transparent hover:border-slate-100 focus:border-[#06C167]/20 rounded-xl px-4 py-3 text-xs text-slate-500 leading-relaxed outline-none min-h-[80px] resize-none italic transition-all" 
+                                     placeholder="Décrivez votre plat pour mettre l'eau à la bouche..."
+                                   />
+                                </div>
+                                <div className="space-y-1.5">
+                                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Ingrédients (clarté client)</label>
+                                   <input 
+                                     value={item.ingredients?.join(', ')} 
+                                     onChange={e => {
+                                       const newItems = [...brand.menu_items];
+                                       newItems[idx].ingredients = e.target.value.split(',').map(s => s.trim());
+                                       setBrand({...brand, menu_items: newItems});
+                                     }}
+                                     className="w-full bg-transparent border-none p-0 text-[11px] font-bold text-slate-400 outline-none italic" 
+                                     placeholder="Ex: Bœuf haché, Cheddar fondu, Sauce secrète..."
+                                   />
+                                </div>
+                                <div className="flex flex-wrap gap-4 pt-2">
+                                   <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TVA</span>
+                                      <select 
+                                        value={item.vat_rate} 
+                                        onChange={e => {
+                                          const newItems = [...brand.menu_items]; newItems[idx].vat_rate = parseFloat(e.target.value); setBrand({...brand, menu_items: newItems});
+                                        }}
+                                        className="bg-transparent text-[10px] font-bold text-slate-600 outline-none"
+                                      >
+                                         <option value={5.5}>5.5%</option>
+                                         <option value={10}>10%</option>
+                                         <option value={20}>20%</option>
+                                      </select>
                                    </div>
-                                   <div className="bg-gray-900 p-4 rounded-xl text-white flex items-center gap-3 shadow-lg">
+                                </div>
+                             </div>
+
+                             <div className="lg:col-span-4 space-y-6">
+                                <div className="bg-slate-900 rounded-2xl p-5 text-white shadow-xl shadow-slate-900/10">
+                                   <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Prix de vente Final (€)</label>
+                                   <div className="flex items-center gap-3">
                                       <input 
-                                         type="text" 
-                                         value={item.selling_price} 
-                                         onChange={e => {
-                                           const newItems = [...brand.menu_items]; 
-                                           newItems[idx].selling_price = sanitizePrice(e.target.value); 
-                                           setBrand({...brand, menu_items: newItems});
+                                        type="text" 
+                                        value={item.selling_price} 
+                                        onChange={e => {
+                                          const newItems = [...brand.menu_items];
+                                          newItems[idx].selling_price = sanitizePrice(e.target.value);
+                                          setBrand({...brand, menu_items: newItems});
+                                        }}
+                                        className="bg-transparent text-3xl font-black text-white w-full outline-none" 
+                                      />
+                                      <span className="text-2xl font-black text-[#06C167]">€</span>
+                                   </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-4">
+                                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                      <label className="block text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Coût Mat.</label>
+                                      <p className="text-sm font-black text-slate-600">{item.material_cost} €</p>
+                                   </div>
+                                   <div className="bg-[#06C167]/5 p-4 rounded-xl border border-[#06C167]/10">
+                                      <label className="block text-[8px] font-black uppercase tracking-widest text-[#06C167]/60 mb-1">Marge Nette</label>
+                                      <p className="text-sm font-black text-[#06C167]">{item.net_margin_target} €</p>
+                                   </div>
+                                </div>
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                  ))}
+                </div>                                           setBrand({...brand, menu_items: newItems});
                                          }} 
                                          className="w-16 text-right bg-transparent font-bold text-2xl outline-none text-[#06C167]" 
                                       />
@@ -629,11 +750,11 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                               <div key={i} className="flex gap-4 items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                                  <div className="flex-1 space-y-1">
                                     <h6 className="font-black text-slate-900 text-sm leading-tight">{item.title}</h6>
-                                    <p className="text-slate-400 text-[10px] leading-tight line-clamp-2 italic">{item.description}</p>
+                                    <p className="text-slate-400 text-[10px] leading-tight line-clamp-2 italic">{item.description_seo}</p>
                                     <span className="text-sm font-black text-slate-900 mt-2 block">{item.selling_price} €</span>
                                  </div>
-                                 <div className="w-24 h-24 rounded-xl overflow-hidden shadow-inner shrink-0 relative">
-                                    <img src={item.image_url || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop"} className="w-full h-full object-cover" alt={item.title} />
+                                 <div className="w-24 h-24 rounded-xl overflow-hidden shadow-inner shrink-0 relative cursor-zoom-in" onClick={() => item.image_url && setFullImage(item.image_url)}>
+                                    <img src={item.image_url || getFallbackImage(item.category)} className="w-full h-full object-cover" alt={item.title} />
                                     <div className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
                                        <Plus className="w-4 h-4 text-[#06C167]" />
                                     </div>
@@ -695,6 +816,31 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
              )}
           </div>
         </div>
+        
+        {/* Lightbox Modal */}
+        <AnimatePresence>
+          {fullImage && (
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[500] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-20 cursor-zoom-out"
+              onClick={() => setFullImage(null)}
+            >
+              <button onClick={() => setFullImage(null)} className="absolute top-10 right-10 text-white/50 hover:text-white transition-all">
+                <X className="w-10 h-10" />
+              </button>
+              <motion.img 
+                initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                src={fullImage} 
+                className="max-w-full max-h-full object-contain shadow-2xl rounded-lg" 
+                alt="Original size" 
+              />
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white text-[10px] font-black uppercase tracking-[0.3em]">
+                Image Haute Résolution
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </motion.div>
 
       <style>{`

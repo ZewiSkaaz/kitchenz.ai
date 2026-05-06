@@ -12,7 +12,8 @@ async function upgradeBusinessHours() {
   ];
 
   for (const query of queries) {
-    await supabase.rpc('run_sql', { sql_query: query });
+    const { error } = await supabase.rpc('run_sql', { sql_query: query });
+    if (error) console.error("Error:", error.message);
   }
 
   console.log("✅ Business Hours upgrade completed.");

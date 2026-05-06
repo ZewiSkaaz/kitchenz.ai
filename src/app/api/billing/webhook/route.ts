@@ -34,13 +34,13 @@ export async function POST(req: Request) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
     const userId = session.metadata?.userId;
-    const plan = session.metadata?.plan;
+    const planType = session.metadata?.planType;
 
     if (userId) {
       const { error } = await supabaseAdmin
         .from('profiles')
         .update({ 
-          plan: plan,
+          plan: planType,
           subscription_id: session.subscription,
           customer_id: session.customer,
           updated_at: new Date().toISOString()

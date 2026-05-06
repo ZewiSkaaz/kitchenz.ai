@@ -202,7 +202,7 @@ function PricingCard({ plan, price, features, popular }: { plan: string, price: 
           </li>
         ))}
       </ul>
-      <Link href="/audit" className={`w-full ${popular ? 'btn-primary' : 'btn-black'} !py-3 text-sm`}>
+      <Link href="/pricing" className={`w-full text-center flex justify-center items-center ${popular ? 'btn-primary' : 'btn-black'} !py-3 text-sm`}>
         Choisir {plan}
       </Link>
     </div>

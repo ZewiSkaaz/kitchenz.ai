@@ -217,14 +217,14 @@ export default function AuditPage() {
       
       const drinkItems = drinks.map((drink: string) => {
         const isAlcohol = ALCOHOL_KEYWORDS.some(kw => drink.toLowerCase().includes(kw));
+        const sellingPrice = isAlcohol ? 4.90 : 2.50; // Prix marché réaliste
         const materialCost = isAlcohol ? 1.50 : 0.50;
-        const netMargin = isAlcohol ? 2.50 : 1.50;
-        const tvaRate = isAlcohol ? PRICING.TVA_ALCOHOL : PRICING.TVA_FOOD;
+        const netMargin = sellingPrice - materialCost - PRICING.PACKAGING_COST;
         return {
           title: drink,
           description_seo: drink,
           ingredients: [drink],
-          financials: { material_cost: materialCost, net_margin_target: netMargin, selling_price: calculateSellingPrice(materialCost, netMargin, tvaRate) },
+          financials: { material_cost: materialCost, net_margin_target: parseFloat(netMargin.toFixed(2)), selling_price: sellingPrice },
           category: "Boisson",
           dietary_tags: [],
           allergens: isAlcohol ? ["Alcool"] : [],
@@ -236,13 +236,14 @@ export default function AuditPage() {
       
       const dessertItems = desserts.map((dessert: string) => {
         const isPremium = PREMIUM_DESSERT_KEYWORDS.some(kw => dessert.toLowerCase().includes(kw));
+        const sellingPrice = isPremium ? 6.90 : 4.50; // Prix marché réaliste
         const materialCost = isPremium ? 2.00 : 1.00;
-        const netMargin = isPremium ? 3.00 : 2.00;
+        const netMargin = sellingPrice - materialCost - PRICING.PACKAGING_COST;
         return {
           title: dessert,
           description_seo: dessert,
           ingredients: [dessert],
-          financials: { material_cost: materialCost, net_margin_target: netMargin, selling_price: calculateSellingPrice(materialCost, netMargin) },
+          financials: { material_cost: materialCost, net_margin_target: parseFloat(netMargin.toFixed(2)), selling_price: sellingPrice },
           category: "Dessert",
           dietary_tags: [],
           allergens: [],

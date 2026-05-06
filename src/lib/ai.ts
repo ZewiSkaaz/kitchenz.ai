@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { HfInference } from "@huggingface/inference";
+
 import { z } from "zod";
 
 let openaiInstance: OpenAI | null = null;
@@ -15,7 +15,8 @@ function getOpenAI() {
 }
 
 function getHF() {
-  return new HfInference(process.env.NEXT_PUBLIC_HUGGINGFACE_TOKEN || process.env.HUGGINGFACE_TOKEN || "");
+  // Deprecated — remplacé par OpenAI gpt-image-1
+  throw new Error("HuggingFace is no longer used. Use generateMenuItemImage or generateBrandImages directly.");
 }
 
 /**
@@ -32,6 +33,8 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Pr
     return withRetry(fn, retries - 1, delay * 2);
   }
 }
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // ---------------------------------------------------------------------------
 // PRICING CONSTANTS (MASTER AUDIT V2.2)
@@ -61,7 +64,9 @@ export function calculateSellingPrice(
 ): number {
   // Formule Master : Coût / (1 - Somme des frais)
   const totalFees = PRICING.UBER_COMMISSION + PRICING.UBER_MARKETING_ADS + PRICING.STRIPE_FEE;
-  const rawPrice = ((materialCost + netMargin + PRICING.PACKAGING_COST) * (1 + tvaRate) / (1 - totalFees));
+  // On ajoute une sécurité pour ne pas diviser par zéro ou négatif si les frais changent
+  const safetyMargin = Math.max(0.1, 1 - totalFees);
+  const rawPrice = ((materialCost + netMargin + PRICING.PACKAGING_COST) * (1 + tvaRate) / safetyMargin);
   return roundToPsychologicalPrice(rawPrice);
 }
 
@@ -330,7 +335,10 @@ export async function generateCoreItems(
     - Mots-clés : Utilise des termes recherchés (ex: "Gourmet", "Réconfortant", "Croustillant").
 
     RÈGLES FINANCIÈRES (CRITIQUE) :
-    - Fournis 'material_cost' et 'net_margin_target'.
+    - Fournis 'material_cost' (coût matières premières EN EUROS) et 'net_margin_target' (marge nette visée EN EUROS).
+    - PLAGES OBLIGATOIRES : material_cost entre 1.50€ et 8€, net_margin_target entre 2€ et 8€.
+    - Un burger doit coûter 3-5€ en matières premières, un side 1-2€.
+    - NE PAS mettre des valeurs absurdes comme 50€ ou 100€.
     
     ${flexibilityOptions?.allowNewIngredients ? "AUTORISATION : Ajoute jusqu'à 3 ingrédients rentables hors liste." : "STRICT : Uniquement les ingrédients fournis."}
   `;
@@ -348,14 +356,19 @@ export async function generateCoreItems(
   const rawData = JSON.parse(response.choices[0].message.content || "{}");
   const validatedData = CoreItemsZod.parse(rawData);
   
-  const applyPricing = (item: any) => {
+  // Guardrails : éviter les prix aberrants de l'IA (Ciblage 12-18€ pour les plats)
+  const clampFinancials = (item: any, isMain: boolean) => {
     if (item.financials) {
+      // Coût matière réaliste (ex: 2.50€ à 5.50€)
+      item.financials.material_cost = Math.max(1.50, Math.min(isMain ? 6 : 3, item.financials.material_cost));
+      // Marge nette réaliste (ex: 3€ à 6€)
+      item.financials.net_margin_target = Math.max(2, Math.min(6, item.financials.net_margin_target));
       item.financials.selling_price = calculateSellingPrice(item.financials.material_cost, item.financials.net_margin_target);
     }
   };
 
-  if (validatedData.main_dishes) validatedData.main_dishes.forEach(applyPricing);
-  if (validatedData.generated_sides) validatedData.generated_sides.forEach(applyPricing);
+  if (validatedData.main_dishes) validatedData.main_dishes.forEach((i: any) => clampFinancials(i, true));
+  if (validatedData.generated_sides) validatedData.generated_sides.forEach((i: any) => clampFinancials(i, false));
 
   return validatedData;
 }
@@ -366,10 +379,24 @@ export async function generateMenuAssembly(
   desserts: string[],
   brandCore: any
 ) {
+  const mainDishTitles = (coreItems.main_dishes || []).map((d: any) => d.title).join(", ");
+  const sideTitles = (coreItems.generated_sides || []).map((d: any) => d.title).join(", ");
+  const drinkList = drinks.join(", ") || "Coca-Cola, Eau";
+  const dessertList = desserts.join(", ") || "Cookie";
+
   const prompt = `
-    Agis en tant qu'Expert Marketing Uber Eats. Assemble 3 "Menus Combos".
-    RÈGLE D'UPSELL : Pour CHAQUE combo, crée un groupe de modificateurs nommé "🔥 LES SUPPLÉMENTS GOURMANDS" avec des prix payants.
-    RÈGLE DE NOMMAGE : Le titre doit être "Menu [Nom du Plat]".
+    Agis en tant qu'Expert Marketing Uber Eats pour la marque "${brandCore.name}" (${brandCore.culinary_style}).
+    
+    TU DOIS ABSOLUMENT utiliser UNIQUEMENT les plats suivants pour créer les combos :
+    - Plats Principaux disponibles : ${mainDishTitles}
+    - Accompagnements disponibles : ${sideTitles}
+    - Boissons disponibles : ${drinkList}
+    - Desserts disponibles : ${dessertList}
+    
+    Crée EXACTEMENT 3 Menus Combos cohérents avec ces plats.
+    RÈGLE DE NOMMAGE : Le titre DOIT être "Menu [Nom du Plat Principal]".
+    RÈGLE D'UPSELL : Pour CHAQUE combo, crée un groupe de modificateurs nommé "🔥 SUPPLÉMENTS GOURMANDS" avec 2-3 options payantes cohérentes avec le concept.
+    INTERDIT : N'invente AUCUN plat qui n'est pas dans la liste ci-dessus.
   `;
 
   const openai = getOpenAI();
@@ -385,13 +412,16 @@ export async function generateMenuAssembly(
   const rawData = JSON.parse(response.choices[0].message.content || "{}");
   const validatedData = MenuAssemblyZod.parse(rawData);
 
-  const applyPricing = (item: any) => {
+  // Guardrails combos : Ciblage 18.90€ - 26.90€ (Le sweet spot Uber Eats)
+  const clampCombo = (item: any) => {
     if (item.financials) {
+      item.financials.material_cost = Math.max(3, Math.min(8, item.financials.material_cost));
+      item.financials.net_margin_target = Math.max(3, Math.min(7, item.financials.net_margin_target));
       item.financials.selling_price = calculateSellingPrice(item.financials.material_cost, item.financials.net_margin_target);
     }
   };
 
-  if (validatedData.combos) validatedData.combos.forEach(applyPricing);
+  if (validatedData.combos) validatedData.combos.forEach(clampCombo);
   return validatedData;
 }
 
@@ -447,56 +477,79 @@ export async function analyzeInventoryImage(base64Image: string) {
  * GÉNÉRATION PHOTO HARDENED (Audit #2)
  * Unifie l'arrière-plan et maximise l'appétence culinaire.
  */
-export async function generateMenuItemImage(itemTitle: string, itemDescription: string, culinaryStyle: string, visualStyle: string) {
+/**
+ * GÉNÉRATION PHOTO via OpenAI gpt-image-1
+ * Modèle natif OpenAI — bien supérieur à FLUX pour la cohérence et les logos.
+ */
+export async function generateMenuItemImage(
+  itemTitle: string,
+  itemDescription: string,
+  culinaryStyle: string,
+  visualStyle: string
+): Promise<string | null> {
   try {
-    // Audit Fix: Background Locking
-    // On force un arrière-plan cohérent (dark slate ou light marble selon le style visuel)
-    const bgSurface = visualStyle.toLowerCase().includes("clair") || visualStyle.toLowerCase().includes("minimal") 
-      ? "on a clean white marble kitchen counter" 
+    const openai = getOpenAI();
+    const bgSurface = visualStyle.toLowerCase().includes("clair") || visualStyle.toLowerCase().includes("minimal")
+      ? "on a clean white marble kitchen counter"
       : "on a dark slate textured ceramic plate, rustic wooden table";
 
-    const response = await fetch("/api/generate-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        prompt: `ULTRA-PHOTOREALISTIC gourmet food photography of ${itemTitle}. ${itemDescription}. 
-        Close-up shot, macro lens, professional studio softbox lighting, 8k resolution. 
-        Texture: glistening sauce, steam rising, crispy edges, moisture.
-        Background: ${bgSurface}. Warm orange bokeh in the distance.
-        Aesthetic: "${visualStyle}" combined with "${culinaryStyle}".
-        CRITICAL: No text, no napkins with logos, no utensils with text. Centered composition.`,
-        model: "black-forest-labs/FLUX.1-schnell",
-        width: 1024, height: 1024,
-      }),
-    });
-    const result = await response.json();
-    return result.dataUrl;
-  } catch (error) { return null; }
+    const imagePrompt = `Authentic, raw food photography of ${itemTitle}. ${itemDescription}. Shot on a 35mm lens, high-end culinary photography, natural morning window light, realistic textures, slight imperfections like fresh herb scattering, visible steam, shallow depth of field. Professional food styling, no artificial gloss, no CGI. Background: ${bgSurface}. Aesthetic: ${visualStyle}, ${culinaryStyle}. Minimalist, clean, authentic, restaurant-grade quality. No text, no watermarks, no branding.`;
+
+    const response = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: imagePrompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "hd",
+      style: "natural",
+    } as any);
+
+    const b64 = (response.data?.[0] as any)?.b64_json;
+    if (!b64) return null;
+    return `data:image/png;base64,${b64}`;
+  } catch (error) {
+    console.warn(`⚠️ Image generation failed for ${itemTitle}:`, (error as any).message);
+    return null;
+  }
 }
 
-export async function generateBrandImages(logoPrompt: string, backgroundPrompt: string, mainDishesContext?: string) {
+export async function generateBrandImages(
+  brandName: string,
+  logoPrompt: string,
+  backgroundPrompt: string,
+  mainDishesContext?: string
+): Promise<{ logoUrl: string | null; backgroundUrl: string | null }> {
   try {
+    const openai = getOpenAI();
+
     const [logoRes, bgRes] = await Promise.all([
-      fetch("/api/generate-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: `A professional minimalist vector logo. Solid black background. ULTRA-CLEAN TYPOGRAPHY. Aesthetic: ${logoPrompt}`,
-          model: "black-forest-labs/FLUX.1-schnell",
-          width: 1024, height: 1024,
-        }),
-      }).then(r => r.json()),
-      fetch("/api/generate-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          // Audit Fix: Format 16:9 pour Uber Eats Banner
-          prompt: `Cinematic wide landscape banner for a high-end restaurant featuring: ${mainDishesContext}. Professional food photography, 8k, extreme detail. Aesthetic: ${backgroundPrompt}. No text.`,
-          model: "black-forest-labs/FLUX.1-schnell",
-          width: 1280, height: 720,
-        }),
-      }).then(r => r.json())
+      openai.images.generate({
+        model: "dall-e-3",
+        prompt: `A simple, clean minimalist restaurant logo for "${brandName}". Flat vector style, solid matte background, sharp typography. Style: ${logoPrompt}. Minimalist, iconic, professional. NO 3D, NO SHADOWS, NO GRADIENTS.`,
+        n: 1,
+        size: "1024x1024",
+        quality: "hd",
+        style: "natural",
+      } as any),
+      openai.images.generate({
+        model: "dall-e-3",
+        prompt: `Atmospheric wide-angle interior or tabletop shot for a premium restaurant. Natural warm lighting, shot on film. Featuring: ${mainDishesContext || ""}. Style: ${backgroundPrompt}. No text.`,
+        n: 1,
+        size: "1792x1024", 
+        quality: "hd",
+        style: "natural",
+      } as any),
     ]);
-    return { logoUrl: logoRes.dataUrl, backgroundUrl: bgRes.dataUrl };
-  } catch (error) { return { logoUrl: null, backgroundUrl: null }; }
+
+    const logoB64 = (logoRes.data?.[0] as any)?.b64_json;
+    const bgB64 = (bgRes.data?.[0] as any)?.b64_json;
+
+    return {
+      logoUrl: logoB64 ? `data:image/png;base64,${logoB64}` : null,
+      backgroundUrl: bgB64 ? `data:image/png;base64,${bgB64}` : null,
+    };
+  } catch (error) {
+    console.warn("⚠️ Brand image generation failed:", (error as any).message);
+    return { logoUrl: null, backgroundUrl: null };
+  }
 }
