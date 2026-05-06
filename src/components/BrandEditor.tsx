@@ -185,12 +185,6 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
     setBrand({ ...brand, menu_items: newItems });
   };
 
-  const removeItem = (idx: number) => {
-    if (!confirm("Supprimer cet article ?")) return;
-    const newItems = [...(brand.menu_items || [])];
-    newItems.splice(idx, 1);
-    setBrand({ ...brand, menu_items: newItems });
-  };
 
   return (
     <motion.div 
@@ -476,155 +470,6 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                        </div>
                     </div>
                   ))}
-                </div>                                           setBrand({...brand, menu_items: newItems});
-                                         }} 
-                                         className="w-16 text-right bg-transparent font-bold text-2xl outline-none text-[#06C167]" 
-                                      />
-                                      <span className="text-xl font-bold text-[#06C167]">€</span>
-                                   </div>
-                                </div>
-                             </div>
-
-                             <textarea value={item.description} onChange={e => {
-                                const newItems = [...brand.menu_items]; newItems[idx].description = e.target.value; setBrand({...brand, menu_items: newItems});
-                             }} className="w-full text-xs text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200 outline-none focus:border-[#06C167] focus:bg-white transition-all h-20 resize-none" placeholder="Description de l'article..." />
-
-                             <div className="flex gap-4 items-center pt-4 border-t border-gray-50">
-                                <button 
-                                  onClick={() => setEditingItemIdx(editingItemIdx === idx ? null : idx)}
-                                  className={`flex items-center gap-2 px-4 py-2 rounded text-[10px] font-bold uppercase tracking-wider transition-all ${editingItemIdx === idx ? 'bg-black text-white' : 'bg-gray-100 text-gray-600'}`}
-                                >
-                                  {editingItemIdx === idx ? <ChevronUp className="w-4 h-4" /> : <Settings2 className="w-4 h-4" />}
-                                  Options
-                                </button>
-                                
-                                <label className="flex items-center gap-2 cursor-pointer p-2 bg-orange-50 rounded border border-orange-100">
-                                   <input 
-                                     type="checkbox"
-                                     checked={item.is_special_offer}
-                                     onChange={e => {
-                                        const newItems = [...brand.menu_items];
-                                        newItems[idx].is_special_offer = e.target.checked;
-                                        setBrand({...brand, menu_items: newItems});
-                                     }}
-                                     className="w-4 h-4 rounded border-orange-300 text-orange-600"
-                                   />
-                                   <span className="text-[10px] font-bold uppercase tracking-wider text-orange-700">Offre</span>
-                                </label>
-                                
-                                {item.is_special_offer && (
-                                  <input 
-                                    value={item.special_offer_text || ''}
-                                    onChange={e => {
-                                      const newItems = [...brand.menu_items];
-                                      newItems[idx].special_offer_text = e.target.value;
-                                      setBrand({...brand, menu_items: newItems});
-                                    }}
-                                    className="flex-1 text-[10px] font-bold text-orange-900 bg-white px-3 py-2 rounded border border-orange-200 outline-none"
-                                    placeholder="Ex: 1 acheté = 1 offert"
-                                  />
-                                )}
-
-                                <div className="flex-1" />
-                                <button 
-                                  onClick={() => {
-                                    if(confirm("Supprimer cet article ?")) {
-                                      const newItems = [...brand.menu_items]; newItems.splice(idx, 1); setBrand({...brand, menu_items: newItems});
-                                    }
-                                  }}
-                                  className="p-2 text-gray-300 hover:text-red-500"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                             </div>
-
-                             <AnimatePresence>
-                                {editingItemIdx === idx && (
-                                   <motion.div 
-                                      initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-                                      className="overflow-hidden bg-gray-50 p-6 rounded-md border border-gray-100 mt-4 space-y-6"
-                                    >
-                                       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-                                          <h4 className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Groupes d'options</h4>
-                                          <button 
-                                            onClick={() => {
-                                              const newItems = [...brand.menu_items];
-                                              const newGroup = { name: "Options", min: 0, max: 1, modifiers: [{ name: "Standard", price: 0 }] };
-                                              newItems[idx].options = [...(newItems[idx].options || []), newGroup];
-                                              setBrand({...brand, menu_items: newItems});
-                                            }}
-                                            className="text-[10px] font-bold text-blue-600 hover:underline"
-                                          >
-                                             + Ajouter un groupe
-                                          </button>
-                                       </div>
-                                       <div className="grid gap-6">
-                                          {(item.options || []).map((group: any, gIdx: number) => (
-                                             <div key={gIdx} className="bg-white p-4 rounded border border-gray-200 shadow-sm">
-                                                <div className="flex justify-between items-center mb-6">
-                                                   <div className="flex items-center gap-4">
-                                                      <input value={group.name} onChange={e => {
-                                                         const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].name = e.target.value; setBrand({...brand, menu_items: newItems});
-                                                      }} className="font-bold text-sm text-black bg-gray-50 border border-gray-100 rounded px-2 py-1 outline-none w-48 focus:border-black" />
-                                                      <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
-                                                        Min: <input type="number" value={group.min} onChange={e => {
-                                                          const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].min = parseInt(e.target.value); setBrand({...brand, menu_items: newItems});
-                                                        }} className="w-8 bg-gray-50 border border-gray-100 p-1" />
-                                                        Max: <input type="number" value={group.max} onChange={e => {
-                                                          const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].max = parseInt(e.target.value); setBrand({...brand, menu_items: newItems});
-                                                        }} className="w-8 bg-gray-50 border border-gray-100 p-1" />
-                                                      </div>
-                                                   </div>
-                                                   <button onClick={() => {
-                                                      const newItems = [...brand.menu_items]; newItems[idx].options.splice(gIdx, 1); setBrand({...brand, menu_items: newItems});
-                                                   }} className="text-gray-300 hover:text-red-500"><X className="w-4 h-4" /></button>
-                                                </div>
-                                                <div className="grid md:grid-cols-2 gap-4">
-                                                   {group.modifiers.map((mod: any, mIdx: number) => (
-                                                      <div key={mIdx} className="flex items-center gap-3 bg-gray-50 p-3 rounded border border-gray-100">
-                                                         <input value={mod.name} onChange={e => {
-                                                            const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].modifiers[mIdx].name = e.target.value; setBrand({...brand, menu_items: newItems});
-                                                         }} className="flex-1 text-[11px] font-bold bg-transparent outline-none" />
-                                                         <div className="flex items-center gap-1 text-[#06C167] font-bold">
-                                                            <span className="text-[10px]">+</span>
-                                                            <input 
-                                                               type="text" 
-                                                               value={mod.price} 
-                                                               onChange={e => {
-                                                                 const newItems = [...brand.menu_items]; 
-                                                                 newItems[idx].options[gIdx].modifiers[mIdx].price = sanitizePrice(e.target.value); 
-                                                                 setBrand({...brand, menu_items: newItems});
-                                                               }} 
-                                                               className="w-10 text-right outline-none text-[11px] bg-transparent" 
-                                                            />
-                                                            <span className="text-[10px]">€</span>
-                                                         </div>
-                                                         <button onClick={() => {
-                                                            const newItems = [...brand.menu_items]; newItems[idx].options[gIdx].modifiers.splice(mIdx, 1); setBrand({...brand, menu_items: newItems});
-                                                         }} className="text-gray-300 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
-                                                      </div>
-                                                   ))}
-                                                   <button 
-                                                     onClick={() => {
-                                                       const newItems = [...brand.menu_items];
-                                                       newItems[idx].options[gIdx].modifiers.push({ name: "Option", price: 0 });
-                                                       setBrand({...brand, menu_items: newItems});
-                                                     }}
-                                                     className="p-3 border border-dashed border-gray-300 rounded text-[10px] font-bold text-gray-400 hover:border-black hover:text-black transition-all"
-                                                   >
-                                                      + Ajouter un choix
-                                                   </button>
-                                                </div>
-                                             </div>
-                                          ))}
-                                       </div>
-                                   </motion.div>
-                                )}
-                             </AnimatePresence>
-                          </div>
-                       </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             ) : (
@@ -853,8 +698,3 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
   );
 }
 
-function ChevronLeft(props: any) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-  )
-}
