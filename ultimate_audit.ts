@@ -68,8 +68,19 @@ async function run() {
     }
   }
 
-  console.log("🖼️  Identity Assets...");
-  const brandImages = await generateBrandImages(brandCore.name, brandCore.logo_prompt, brandCore.background_prompt, "Italian Smash Burgers");
+  // --- PHASE D'IDENTITÉ VISUELLE (APRÈS PRODUITS) ---
+  console.log("🖼️  Identity Assets (Basés sur vos produits)...");
+  
+  // On récupère les 3 meilleurs plats pour le background
+  const topDishes = dishes.slice(0, 3).map(d => d.title).join(", ");
+  const identityContext = `Featuring: ${topDishes}.`;
+
+  const brandImages = await generateBrandImages(
+    brandCore.name, 
+    "Minimalist high-end vector logo, single icon, professional, matte finish, NO TEXT", 
+    "Cinematic food photography of a table with multiple items, shallow depth of field, NO TEXT, NO PEOPLE, high-end restaurant lighting",
+    identityContext
+  );
   
   const { data: brandData } = await supabase.from("brands").insert({
     name: brandCore.name, tagline: brandCore.tagline, culinary_style: brandCore.culinary_style,

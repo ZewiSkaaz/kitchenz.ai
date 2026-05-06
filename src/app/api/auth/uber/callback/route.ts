@@ -67,7 +67,7 @@ export async function GET(request: Request) {
     }
 
     // Store in DB
-    const { error } = await supabase
+    const { error: dbError } = await supabase
       .from("user_integrations")
       .upsert({
         user_id: session.user.id,
@@ -77,14 +77,14 @@ export async function GET(request: Request) {
         expires_at: new Date(Date.now() + (tokens.expires_in || 3600) * 1000).toISOString(),
       }, { onConflict: "user_id,provider" });
 
-    if (error) {
-      console.error("❌ DB Storage Error:", error.message);
-      return NextResponse.redirect(new URL("/dashboard?error=db_error", baseUrl));
+    if (dbError) {
+      console.error("❌ DB Storage Error:", dbError.message);
+      return NextResponse.redirect(new URL(`/dashboard?error=db_error&msg=${encodeURIComponent(dbError.message)}`, baseUrl));
     }
 
     return NextResponse.redirect(new URL("/dashboard?success=uber_connected", baseUrl));
   } catch (error: any) {
     console.error("Uber Auth Error:", error.message);
-    return NextResponse.redirect(new URL("/dashboard?error=auth_failed", baseUrl));
+    return NextResponse.redirect(new URL(`/dashboard?error=auth_failed&msg=${encodeURIComponent(error.message)}`, baseUrl));
   }
 }

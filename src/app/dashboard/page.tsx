@@ -34,11 +34,13 @@ export default function DashboardPage() {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     const error = params.get("error");
+    const msg = params.get("msg");
+    
     if (error === "invalid_scope") {
       alert("Erreur Uber : Vous devez sélectionner et activer les permissions (Scopes) dans l'onglet 'Setup' de votre Dashboard Uber Developer.");
       router.replace("/dashboard");
     } else if (error) {
-      alert("Erreur de connexion Uber : " + error);
+      alert(`Erreur de connexion Uber : ${error}${msg ? ` (${msg})` : ''}`);
       router.replace("/dashboard");
     } else if (params.get("success") === "uber_connected") {
       setUberConnected(true);
