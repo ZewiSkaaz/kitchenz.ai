@@ -526,7 +526,7 @@ export async function generateBrandImages(
     const [logoRes, bgRes] = await Promise.all([
       openai.images.generate({
         model: "dall-e-3",
-        prompt: `A simple, clean minimalist restaurant logo for "${brandName}". Flat vector style, solid matte background, sharp typography. Style: ${logoPrompt}. Minimalist, iconic, professional. NO 3D, NO SHADOWS, NO GRADIENTS.`,
+        prompt: `A ultra-minimalist, high-end vector logo for a restaurant called "${brandName}". Single iconic symbol representing ${logoPrompt}. Solid matte background, flat design, sharp geometric shapes, professional luxury brand aesthetic. NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS. SINGLE ICON ONLY.`,
         n: 1,
         size: "1024x1024",
         quality: "hd",
@@ -535,7 +535,7 @@ export async function generateBrandImages(
       } as any),
       openai.images.generate({
         model: "dall-e-3",
-        prompt: `Atmospheric wide-angle interior or tabletop shot for a premium restaurant. Natural warm lighting, shot on film. Featuring: ${mainDishesContext || ""}. Style: ${backgroundPrompt}. No text.`,
+        prompt: `Atmospheric wide-angle cinematic shot of a premium restaurant tabletop. Warm natural light, shallow depth of field. Featured dishes: ${mainDishesContext || ""}. Elegant table setting, fine textures of linen and wood. Style: ${backgroundPrompt}. NO TEXT, NO PEOPLE, NO LOGOS ON THE WALLS.`,
         n: 1,
         size: "1792x1024", 
         quality: "hd",
