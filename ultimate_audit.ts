@@ -19,13 +19,25 @@ const equipment   = ["Plancha", "Presse à Smash", "Friteuse"];
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const uploadB64 = async (b64: string | null, name: string): Promise<string | null> => {
-  if (!b64 || !b64.startsWith("data:image")) return null;
+  if (!b64) {
+    console.error(`   ❌ [Storage] No base64 provided for ${name}`);
+    return null;
+  }
+  if (!b64.startsWith("data:image")) {
+    console.error(`   ❌ [Storage] Invalid image format for ${name}: ${b64.substring(0, 30)}...`);
+    return null;
+  }
   const safeName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   const buffer = Buffer.from(b64.split(",")[1], "base64");
   const fileName = `smash_it_${safeName}_${Date.now()}.png`;
   const { error } = await supabase.storage.from("brands").upload(fileName, buffer, { contentType: "image/png", upsert: true });
-  if (error) return null;
-  return supabase.storage.from("brands").getPublicUrl(fileName).data.publicUrl;
+  if (error) {
+    console.error(`   ❌ [Storage] Upload failed for ${name}:`, error.message);
+    return null;
+  }
+  const publicUrl = supabase.storage.from("brands").getPublicUrl(fileName).data.publicUrl;
+  console.log(`   ✅ [Storage] Uploaded ${name} -> ${publicUrl}`);
+  return publicUrl;
 };
 
 async function run() {
