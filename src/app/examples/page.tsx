@@ -45,16 +45,16 @@ export default function ExamplesPage() {
       tag: "Efficience"
     },
     {
-      title: "Boulangerie ➡️ Lunch Club",
-      icon: <Sandwich className="w-10 h-10 text-orange-600" />,
-      color: "bg-orange-50",
-      border: "border-orange-100",
-      strategy: "Valorisation du savoir-faire",
-      details: "Transformez vos invendus de pain et votre traiteur en une marque de sandwicherie premium.",
-      copyPasteIngredients: "Baguette Tradition, Pain de mie artisanal, Jambon blanc supérieur, Emmental français, Poulet rôti (frais), Œufs durs, Thon en conserve, Tomates, Salade batavia, Mayo maison, Moutarde à l'ancienne, Beurre doux, Cornichons, Oignons jaunes, Bacon de dinde (sec), Avocat, Graines de pavot, Fromage frais (type St Moret), Herbes de Provence.",
-      copyPasteEquipment: "Toasteur vertical, Trancheuse à pain, Saladette réfrigérée, Four de remise en température, Mixeur à sauce, Planche à découper, Couteau à pain cranté, Emballeuse papier kraft.",
-      result: "CA Midi +100% | Ticket moyen 18€",
-      tag: "Profit"
+      title: "Kebab Shop ➡️ Smash Sultan",
+      icon: <ChefHat className="w-10 h-10 text-emerald-600" />,
+      color: "bg-emerald-50",
+      border: "border-emerald-100",
+      strategy: "Hybridation & Pivot Premium",
+      details: "Utilisez votre base technique (broches, sauces, plancha) pour lancer une marque de burgers fusion Cyber-Oriental.",
+      copyPasteIngredients: "Broche Kebab (Veau/Dinde), Filet de poulet mariné, Steak haché 20% MG, Merguez, Tenders, Pain Kebab rond, Galettes Tortillas (Dürüm), Pain Baguette, Laitue Iceberg, Tomates, Oignons rouges, Chou Rouge, Concombres, Poivrons, Sauce Blanche maison, Sauce Algérienne, Sauce Samouraï, Biggy Burger, Harissa, Cheddar tranches, Emmental râpé, Boursin, Feta, Frites surgelées, Ayran, Boissons Softs.",
+      copyPasteEquipment: "Rôtissoire verticale (Döner), Couteau électrique, Friteuse double cuve, Plancha/Grill, Presse à Panini, Saladette réfrigérée GN, Armoire négative, Toaster salamandre.",
+      result: "Rentabilité record | Marge nette +22%",
+      tag: "Best-Seller"
     }
   ];
 

@@ -17,10 +17,10 @@ export default function GuidePage() {
     {
       title: "2. Scanner l'Existant",
       icon: <Utensils className="w-8 h-8 text-orange-500" />,
-      caseStudy: "L'inventaire Kebab standard",
+      caseStudy: "L'inventaire Kebab Professionnel",
       description: "L'IA analyse vos stocks actuels pour créer des recettes sans nouveaux investissements lourds.",
-      details: "Copiez ce stock réel : Bœuf haché, Pain Pita, Tortillas, Cheddar, Oignons, Salade, Tomates, Sauce Blanche, Sauce Algérienne, Frites surgelées, Sel, Poivre, Huile.",
-      input: "Matériel existant : Plancha (Plaque à snacker), Friteuse, Saladette."
+      details: "Copiez ce stock complet : Broche Kebab (Veau/Dinde), Filet de poulet mariné, Steak haché, Merguez, Tenders, Pain Kebab rond, Galettes Tortillas (Dürüm), Pain Baguette, Laitue Iceberg, Tomates, Oignons, Chou Rouge, Concombres, Poivrons, Sauce Blanche (maison), Sauce Algérienne, Sauce Samouraï, Biggy Burger, Harissa, Mayo, Ketchup, Cheddar tranches, Emmental râpé, Boursin, Feta, Frites surgelées, Ayran, Boissons Softs.",
+      input: "Matériel existant : Rôtissoire verticale (Döner), Couteau électrique spécialisé, Friteuse double cuve, Plancha/Grill, Presse à Panini, Saladette réfrigérée GN, Armoire négative, Toaster salamandre."
     },
     {
       title: "3. La Magie de l'IA",
