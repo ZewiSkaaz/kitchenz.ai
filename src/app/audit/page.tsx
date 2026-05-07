@@ -833,16 +833,16 @@ export default function AuditPage() {
 
           {/* RESULT VIEW */}
           {step === "result" && fullMenu && (() => {
-            const averageOrderValue = fullMenu?.menu_items?.length 
-              ? fullMenu.menu_items.reduce((acc: number, item: any) => acc + (item.financials?.selling_price || 0), 0) / fullMenu.menu_items.length 
+            const averageOrderValue = (fullMenu?.menu_items || []).length 
+              ? (fullMenu.menu_items || []).reduce((acc: number, item: any) => acc + (item?.financials?.selling_price || 0), 0) / (fullMenu.menu_items || []).length 
               : 15;
-            const averageMargin = fullMenu?.menu_items?.length
-              ? fullMenu.menu_items.reduce((acc: number, item: any) => acc + (item.financials?.net_margin_target || 0), 0) / fullMenu.menu_items.length
+            const averageMargin = (fullMenu?.menu_items || []).length
+              ? (fullMenu.menu_items || []).reduce((acc: number, item: any) => acc + (item?.financials?.net_margin_target || 0), 0) / (fullMenu.menu_items || []).length
               : 5;
             
-            const monthlyRevenue = dailyOrders * 30 * averageOrderValue;
-            const monthlyGrossMargin = dailyOrders * 30 * averageMargin;
-            const monthlyNetProfit = monthlyGrossMargin - rent - staff;
+            const monthlyRevenue = (dailyOrders || 0) * 30 * (averageOrderValue || 0);
+            const monthlyGrossMargin = (dailyOrders || 0) * 30 * (averageMargin || 0);
+            const monthlyNetProfit = monthlyGrossMargin - (rent || 0) - (staff || 0);
 
             return (
               <motion.div key="result" variants={containerVariants} initial="hidden" animate="visible" className="space-y-8">
@@ -1097,19 +1097,24 @@ export default function AuditPage() {
                       {isEditing ? (
                         <div className="flex flex-col items-end">
                           <input 
+                      {isEditing ? (
+                        <div className="flex items-center gap-1">
+                          <input 
                             type="number" 
                             className="text-right w-16 bg-gray-50 border-none outline-none font-black"
-                            value={item.financials.selling_price}
+                            value={item?.financials?.selling_price || 0}
                             onClick={(e) => e.stopPropagation()}
                             onChange={(e) => {
                               const newData = {...fullMenu};
-                              newData.menu_items[i].financials.selling_price = parseFloat(e.target.value);
-                              setFullMenu(newData);
+                              if (newData.menu_items[i].financials) {
+                                newData.menu_items[i].financials.selling_price = parseFloat(e.target.value);
+                                setFullMenu(newData);
+                              }
                             }}
                           />
                         </div>
                       ) : (
-                        <span className="text-lg font-black">{item.financials.selling_price.toFixed(2)}€</span>
+                        <span className="text-lg font-black">{(item?.financials?.selling_price || 0).toFixed(2)}€</span>
                       )}
                     </div>
                     {isEditing ? (
@@ -1189,15 +1194,15 @@ export default function AuditPage() {
                     <div className="pt-4 border-t border-gray-50 space-y-2">
                       <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-400">
                         <span>Coût Matière</span>
-                        <span className="text-black">{item.financials.material_cost.toFixed(2)}€</span>
+                        <span className="text-black">{(item?.financials?.material_cost || 0).toFixed(2)}€</span>
                       </div>
                       <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-400">
                         <span>Commission Uber ({(PRICING.UBER_COMMISSION * 100).toFixed(0)}%)</span>
-                        <span className="text-red-500">-{(item.financials.selling_price * PRICING.UBER_COMMISSION).toFixed(2)}€</span>
+                        <span className="text-red-500">-{( (item?.financials?.selling_price || 0) * PRICING.UBER_COMMISSION).toFixed(2)}€</span>
                       </div>
                       <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-400">
                         <span>TVA (10%)</span>
-                        <span className="text-red-500">-{(item.financials.selling_price * PRICING.UBER_COMMISSION * PRICING.TVA_FOOD / (1 + PRICING.TVA_FOOD)).toFixed(2)}€</span>
+                        <span className="text-red-500">{( (item?.financials?.selling_price || 0) * 0.1).toFixed(2)}€</span>
                       </div>
                       <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-400">
                         <span>Packaging</span>
@@ -1205,7 +1210,7 @@ export default function AuditPage() {
                       </div>
                       <div className="flex justify-between text-sm font-black text-[#06C167] bg-[#06C167]/5 p-2 rounded-xl mt-2">
                         <span>Marge Nette</span>
-                        <span>+{item.financials.net_margin_target.toFixed(2)}€</span>
+                        <span>+{(item?.financials?.net_margin_target || 0).toFixed(2)}€</span>
                       </div>
                     </div>
                   </motion.div>
