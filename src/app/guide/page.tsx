@@ -1,4 +1,5 @@
 "use client";
+// Version 1.0.1 - Exhaustive Industry Data
 
 import { motion } from "framer-motion";
 import { ChefHat, Utensils, Zap, Sparkles, ArrowRight, ShieldCheck, DollarSign, Image as ImageIcon, Flame, Rocket, CheckCircle2 } from "lucide-react";
