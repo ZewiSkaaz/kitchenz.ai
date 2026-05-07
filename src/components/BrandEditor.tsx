@@ -97,7 +97,8 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
       name: brand.name, culinary_style: brand.culinary_style,
       tagline: brand.tagline, storytelling: brand.storytelling,
       logo_url: brand.logo_url, background_url: brand.background_url,
-      business_hours: brand.business_hours
+      business_hours: brand.business_hours,
+      uber_store_id: brand.uber_store_id
     }).eq("id", brand.id);
     
     if (error) setToast({ message: "Erreur lors de la sauvegarde", type: 'error' });
@@ -480,6 +481,21 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                 </div>
 
                 <div className="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100 space-y-8">
+ 
+                   <div className="space-y-6 mb-12 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Smartphone className="w-5 h-5 text-slate-900" />
+                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">Identifiant Uber Eats</h4>
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4">Requis pour la synchronisation automatique du menu</p>
+                      <input 
+                        value={brand.uber_store_id || ""} 
+                        onChange={e => setBrand({...brand, uber_store_id: e.target.value})} 
+                        placeholder="Ex: 5743c70e-..."
+                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-[#06C167] transition-all"
+                      />
+                   </div>
+
                    <div className="flex items-center gap-8 mb-10">
                       <div className="w-16 h-16 bg-green-50 rounded-3xl flex items-center justify-center text-[#06C167]">
                         <Clock className="w-10 h-10" />
@@ -648,12 +664,12 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                <button 
                 onClick={async () => {
                   setSaving(true);
-                  const res = await fetch("/api/uber/sync", { method: "POST", body: JSON.stringify({ brandId: brand.id }) });
-                  const data = await res.json();
-                  setSaving(false);
-                  if (data.success) setToast({ message: "🚀 Publié !", type: 'success' });
-                  else setToast({ message: "⚠️ Erreur Uber", type: 'error' });
-                }}
+                   const res = await fetch("/api/uber/sync", { method: "POST", body: JSON.stringify({ brandId: brand.id }) });
+                   const data = await res.json();
+                   setSaving(false);
+                   if (data.success) setToast({ message: "🚀 Menu publié avec succès !", type: 'success' });
+                   else setToast({ message: `⚠️ ${data.error || "Erreur de synchro"}`, type: 'error' });
+                 }}
                 className="bg-[#06C167] text-white text-xs font-bold px-8 py-4 rounded-full hover:bg-[#05a357] transition-all flex items-center gap-2 shadow-xl shadow-[#06C167]/10"
                >
                  🚀 Publier sur Uber Eats

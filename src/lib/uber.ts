@@ -1,7 +1,7 @@
 import { Brand, MenuItem } from "@/types";
 
-const UBER_API_BASE = "https://test-api.uber.com/v1";
-const UBER_AUTH_BASE = "https://sandbox-login.uber.com/oauth/v2";
+const UBER_API_BASE = process.env.UBER_ENV === "production" ? "https://api.uber.com/v1" : "https://test-api.uber.com/v1";
+const UBER_AUTH_BASE = process.env.UBER_ENV === "production" ? "https://login.uber.com/oauth/v2" : "https://sandbox-login.uber.com/oauth/v2";
 
 export class UberService {
   private clientId: string;
@@ -26,7 +26,30 @@ export class UberService {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: formData.toString()
     });
-    if (!response.ok) throw new Error(`Uber token error: ${response.status}`);
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(`Uber token error: ${err.error || response.status}`);
+    }
+    return response.json();
+  }
+
+  async refreshToken(refreshToken: string) {
+    const formData = new URLSearchParams();
+    formData.append('client_id', this.clientId);
+    formData.append('client_secret', this.clientSecret);
+    formData.append('grant_type', 'refresh_token');
+    formData.append('refresh_token', refreshToken);
+
+    const response = await fetch(`${UBER_AUTH_BASE}/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString()
+    });
+    
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(`Uber refresh error: ${err.error || response.status}`);
+    }
     return response.json();
   }
 

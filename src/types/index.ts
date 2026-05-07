@@ -11,6 +11,7 @@ export interface Brand {
   equipment: string[];
   prep_time_avg: number;
   business_hours: BusinessHour[];
+  uber_store_id?: string;
   created_at: string;
   menu_items?: MenuItem[];
 }
