@@ -19,8 +19,8 @@ export default function GuidePage() {
       icon: <Utensils className="w-8 h-8 text-orange-500" />,
       caseStudy: "L'inventaire complet",
       description: "L'IA analyse vos stocks pour créer des recettes sans nouveaux investissements lourds.",
-      details: "On liste TOUT : Bœuf haché 20%, Buns Briochés, Cheddar Mature, Oignons Rouges, Sauce Signature, Piments, Pain Pita (stock), Frites.",
-      input: "Équipement: Plancha Chrome Dur, Presse à Smash fonte, Friteuse double bac."
+      details: "Copiez cette liste : Bœuf haché 20% MG (frais), Buns Briochés, Cheddar Mature, Oignons Rouges, Sauce Signature, Piments Jalapenos, Pain Pita, Frites surgelées, Tomates batavia, Sauce Blanche, Sauce Algérienne, Sel, Poivre, Beurre.",
+      input: "Matériel : Plancha Chrome Dur, Presse à Smash fonte, Friteuse double bac."
     },
     {
       title: "3. La Magie de l'IA",
