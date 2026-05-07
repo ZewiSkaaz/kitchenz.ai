@@ -291,9 +291,9 @@ export default function AuditPage() {
       clearDraft(); // On nettoie le brouillon une fois terminé
       setStep("result");
     } catch (error: any) {
-      console.error(error);
-      alert(`Erreur de génération : ${error.message || "Problème inconnu"}. Veuillez réessayer.`);
-      setStep("equipment");
+      console.error("ERREUR CRITIQUE GENERATION:", error);
+      alert(`Erreur de génération : ${error.message || "Problème de connexion avec l'IA"}. Veuillez réessayer dans quelques instants.`);
+      setStep("flexibility");
     }
   };
 
