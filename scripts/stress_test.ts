@@ -39,7 +39,7 @@ async function stressTest() {
     fs.writeFileSync("STRESS_TEST_REPORT.json", JSON.stringify(report, null, 2));
     console.log("\n✅ STRESS TEST TERMINE !");
     console.log("Vérification de l'intégrité des ingrédients :", report.data_integrity.ingredient_compliance ? "PARFAITE" : "ATTENTION (Hallucinations détectées)");
-    console.log("Prix de vente moyen généré :", (report.audit_result.menu_items ? 0 : 0)); // Placeholder
+    console.log("Prix de vente moyen généré :", 0);
   } catch (e) {
     console.error("❌ ECHEC DU STRESS TEST :", e);
   }

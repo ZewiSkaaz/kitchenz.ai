@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Utensils, Fish, Pizza, Sandwich, ArrowRight, Zap, TrendingUp, Target, Plus } from "lucide-react";
+import { Utensils, Fish, Pizza, Sandwich, ArrowRight, Zap, TrendingUp, Target, Plus, ChefHat } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
