@@ -55,6 +55,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-8">
           <NavLink href="/audit" label="Audit IA" scrolled={scrolled} />
           <NavLink href="/dashboard" label="Dashboard" scrolled={scrolled} />
+          <NavLink href="/guide" label="Guide" scrolled={scrolled} />
           
           {/* Language Selector (Master Audit #8) */}
           <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-md border border-gray-100">
@@ -113,6 +114,7 @@ export default function Navbar() {
           >
             <Link href="/audit" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Audit IA</Link>
             <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Dashboard</Link>
+            <Link href="/guide" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Guide</Link>
             <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Blog</Link>
             <Link href="/wiki" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-black text-slate-900">Wiki</Link>
             <div className="h-px bg-slate-100 my-2" />

@@ -241,18 +241,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
             </button>
             <button 
               onClick={() => {
-                if (activeTab === 'identity') saveIdentity();
-                else saveMenu();
-              }} 
-              disabled={saving}
-              className="bg-black text-white px-6 py-2 rounded text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              {saving ? 'Sauvegarde...' : 'Sauvegarder'}
-            </button>
-            <button 
-              onClick={() => {
-                if (activeTab === 'identity') saveIdentity();
+                if (activeTab === 'identity' || activeTab === 'ops') saveIdentity();
                 else saveMenu();
               }} 
               disabled={saving}

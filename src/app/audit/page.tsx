@@ -767,14 +767,36 @@ export default function AuditPage() {
           {/* STEP: GENERATING */}
           {step === "generating" && (
             <motion.div key="generating" variants={containerVariants} initial="hidden" animate="visible" className="glass-card p-12 bg-white border border-slate-200 shadow-2xl shadow-slate-200/50">
-              <div className="text-center mb-16">
+              <div className="text-center mb-12">
                 <div className="relative w-32 h-32 mx-auto mb-10">
                   <div className="absolute inset-0 border-4 border-slate-50 rounded-full"></div>
                   <div className="absolute inset-0 border-4 border-[#06C167] rounded-full border-t-transparent animate-spin"></div>
                   <ChefHat className="absolute inset-0 m-auto w-12 h-12 text-[#06C167] animate-pulse" />
                 </div>
                 <h2 className="text-5xl font-black mb-4 tracking-tight text-slate-900 leading-none">Analyse IA en cours...</h2>
-                <p className="text-slate-500 font-medium text-xl">Nous concevons votre futur empire culinaire.</p>
+                
+                {/* Real Progress Bar */}
+                <div className="max-w-md mx-auto mt-8 mb-4">
+                   <div className="flex justify-between items-center mb-2 px-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#06C167]">Progression</span>
+                      <span className="text-[10px] font-black text-slate-400">
+                        {Math.round(((["Génération de l'Identité de Marque (Brand Core)...", "Création du Menu & Recettes...", "Génération des Photos de TOUS les produits...", "Création du Logo & de la Bannière Contextuelle...", "Assemblage des Menus Combos..."].indexOf(loadingStep) + 1) / 5) * 100)}%
+                      </span>
+                   </div>
+                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${((["Génération de l'Identité de Marque (Brand Core)...", "Création du Menu & Recettes...", "Génération des Photos de TOUS les produits...", "Création du Logo & de la Bannière Contextuelle...", "Assemblage des Menus Combos..."].indexOf(loadingStep) + 1) / 5) * 100}%` }}
+                        className="h-full bg-[#06C167]"
+                      />
+                   </div>
+                   <p className="mt-4 text-slate-400 text-sm font-medium italic animate-pulse">
+                      {loadingStep.includes("Photos") ? "Cuisson des visuels HD en cours (cela peut prendre 30s)..." : 
+                       loadingStep.includes("Identité") ? "Définition de l'ADN de votre marque..." :
+                       loadingStep.includes("Menu") ? "Création des fiches techniques et prix de vente..." :
+                       "Finalisation du dossier d'audit..."}
+                   </p>
+                </div>
               </div>
 
               <div className="max-w-md mx-auto space-y-4">
@@ -785,14 +807,14 @@ export default function AuditPage() {
                   { text: "Création du Logo & de la Bannière Contextuelle...", key: 4 },
                   { text: "Assemblage des Menus Combos...", key: 5 }
                 ].map((s, i) => {
-                  const currentIdx = [
+                  const LOADING_STEPS = [
                     "Génération de l'Identité de Marque (Brand Core)...",
                     "Création du Menu & Recettes...",
                     "Génération des Photos de TOUS les produits...",
                     "Création du Logo & de la Bannière Contextuelle...",
                     "Assemblage des Menus Combos..."
-                  ].indexOf(loadingStep);
-                  
+                  ];
+                  const currentIdx = LOADING_STEPS.indexOf(loadingStep);
                   const isActive = loadingStep === s.text;
                   const isPast = i < currentIdx;
                   
@@ -812,10 +834,10 @@ export default function AuditPage() {
           {/* RESULT VIEW */}
           {step === "result" && fullMenu && (() => {
             const averageOrderValue = fullMenu?.menu_items?.length 
-              ? fullMenu.menu_items.reduce((acc: number, item: any) => acc + item.financials.selling_price, 0) / fullMenu.menu_items.length 
+              ? fullMenu.menu_items.reduce((acc: number, item: any) => acc + (item.financials?.selling_price || 0), 0) / fullMenu.menu_items.length 
               : 15;
             const averageMargin = fullMenu?.menu_items?.length
-              ? fullMenu.menu_items.reduce((acc: number, item: any) => acc + item.financials.net_margin_target, 0) / fullMenu.menu_items.length
+              ? fullMenu.menu_items.reduce((acc: number, item: any) => acc + (item.financials?.net_margin_target || 0), 0) / fullMenu.menu_items.length
               : 5;
             
             const monthlyRevenue = dailyOrders * 30 * averageOrderValue;

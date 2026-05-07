@@ -312,6 +312,10 @@ const MenuAssemblyZod = z.object({
 // FUNCTIONS
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// FUNCTIONS
+// ---------------------------------------------------------------------------
+
 export async function generateBrandCore(
   ingredients: string[],
   equipment: string[],
@@ -321,20 +325,38 @@ export async function generateBrandCore(
   flexibilityOptions?: { allowNewIngredients?: boolean; allowNewEquipment?: boolean },
   location?: string
 ) {
-  const systemPrompt = `You are a branding expert. Respond ONLY with valid JSON. No talk.`;
-  const locationHint = location ? ` Located in: ${location}.` : "";
-  const flexHint = flexibilityOptions?.allowNewIngredients ? " You may suggest up to 3 new ingredients." : "";
-  const prompt = `Create an identity for: ${brandName}. Concept: ${concept}. Style: ${visualStyle}.${locationHint}${flexHint}
+  const systemPrompt = `You are a high-end restaurant consultant and branding expert for delivery platforms like Uber Eats. 
+  Your goal is to create a viral, high-converting virtual brand. 
+  Respond ONLY with valid JSON following the provided schema.`;
+
+  const locationHint = location ? ` The restaurant is located in ${location}, adapt the tone if necessary.` : "";
+  const flexHint = flexibilityOptions?.allowNewIngredients 
+    ? " You are allowed to suggest up to 3 strategic new ingredients to unlock high-margin dishes." 
+    : " STRICT RULE: Do not suggest or use any ingredients outside of the provided list.";
+
+  const prompt = `Create a complete brand identity for: "${brandName || "a new concept"}". 
+  User Concept: ${concept || "Surprise me with a trendy delivery-first concept"}. 
+  Visual Style: ${visualStyle || "Modern and appetizing"}.
+  Available Ingredients: ${ingredients.join(", ")}.
+  Available Equipment: ${equipment.join(", ")}.
+  ${locationHint}
+  ${flexHint}
+
+  The "storytelling" should be short, punchy, and emotional (3-4 sentences max).
+  The "logo_prompt" must be a description of a MINIMALIST VECTOR LOGO only (ex: "A stylized fork and leaf, flat design, vector"). STRICT RULE: NO realistic details, NO backgrounds, NO photos.
+  The "background_prompt" must be a high-end restaurant interior or a close-up food shot prompt.
+  
   Return structure:
   {
-    "name": "${brandName}",
+    "name": "...",
     "tagline": "...",
     "storytelling": "...",
     "culinary_style": "...",
-    "logo_prompt": "simple minimalist logo description in english",
-    "background_prompt": "restaurant background description in english",
+    "logo_prompt": "simple minimalist graphic icon description in english, flat design",
+    "background_prompt": "...",
     "suggested_new_equipment": []
   }`;
+
   const data = await askAI(prompt, systemPrompt, brandCoreSchema);
   return BrandCoreZod.parse(data);
 }
@@ -344,46 +366,95 @@ export async function generateCoreItems(
   brandCore: any,
   flexibilityOptions?: { allowNewIngredients?: boolean; allowNewEquipment?: boolean }
 ) {
-  const systemPrompt = `You are a Chef. Respond ONLY with valid JSON. No talk.`;
-  const flexHint = flexibilityOptions?.allowNewIngredients ? " You may suggest up to 3 new ingredients." : "";
-  const prompt = `Create 4 main dishes and 3 sides for "${brandCore.name}".${flexHint}
+  const systemPrompt = `You are an Executive Chef specializing in high-margin delivery menus. 
+  You must create recipes that are easy to prep, travel well, and maximize the use of the shared inventory.
+  Respond ONLY with valid JSON.`;
+
+  const flexHint = flexibilityOptions?.allowNewIngredients 
+    ? " You can include the suggested new ingredients: " + (brandCore.suggested_new_ingredients?.join(", ") || "none")
+    : " STRICT RULE: Use ONLY the provided ingredients list. No exceptions.";
+
+  const prompt = `Create 4 signature main dishes and 3 smart sides for the brand "${brandCore.name}".
+  Brand Style: ${brandCore.culinary_style}.
+  Available Inventory: ${ingredients.join(", ")}.
+  ${flexHint}
+
+  For each item:
+  - "description_seo": Write a mouth-watering description (150-200 chars) optimized for search.
+  - "financials": "material_cost" is the cost of ingredients per portion, "net_margin_target" is the desired profit after all delivery fees.
+  - "prep_instructions": Precise steps for a kitchen operator.
+
   Return structure:
   {
-    "main_dishes": [
-      { "title": "...", "description_seo": "...", "ingredients": [], "financials": { "material_cost": 3, "net_margin_target": 10 }, "category": "Plats", "dietary_tags": [], "allergens": [], "prep_instructions": "..." }
-    ],
-    "generated_sides": [
-       { "title": "...", "description_seo": "...", "ingredients": [], "financials": { "material_cost": 1, "net_margin_target": 5 }, "category": "Sides", "dietary_tags": [], "allergens": [], "prep_instructions": "..." }
-    ],
+    "main_dishes": [...],
+    "generated_sides": [...],
     "suggested_new_ingredients": []
   }`;
+
   const data = await askAI(prompt, systemPrompt, coreItemsSchema);
-  data.main_dishes = (data.main_dishes || []).map(healItem).map((i: any) => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
-  data.generated_sides = (data.generated_sides || []).map(healItem).map((i: any) => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
+  
+  // Post-processing: Calculate final selling prices based on the consultant logic
+  data.main_dishes = (data.main_dishes || []).map(healItem).map((i: any) => ({
+    ...i, 
+    financials: {
+      ...i.financials, 
+      selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)
+    }
+  }));
+  
+  data.generated_sides = (data.generated_sides || []).map(healItem).map((i: any) => ({
+    ...i, 
+    financials: {
+      ...i.financials, 
+      selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)
+    }
+  }));
+
   return CoreItemsZod.parse(data);
 }
 
 export async function generateMenuAssembly(coreItems: any, drinks: string[], desserts: string[], brandCore: any) {
-  const systemPrompt = `Expert Marketing. Respond ONLY with valid JSON. No talk.`;
-  const prompt = `Assemble 3 menu combos for "${brandCore.name}".
+  const systemPrompt = `You are a Delivery Marketing Specialist. Your job is to create high-value "Combos" to increase the average basket size on Uber Eats.
+  Respond ONLY with valid JSON.`;
+
+  const availableItems = [...coreItems.main_dishes, ...coreItems.generated_sides].map(d => d.title).join(", ");
+
+  const prompt = `Create 3 optimized Menu Combos for "${brandCore.name}".
+  Use ONLY the following products as base: ${availableItems}.
+  Incorporate these drinks: ${drinks.join(", ") || "Standard soft drinks"}.
+  Incorporate these desserts: ${desserts.join(", ") || "Standard desserts"}.
+
+  Rules for Combos:
+  1. "title": Catchy names (ex: "Le Menu Best-Seller", "Le Sultan Pack").
+  2. "modifier_groups": Essential for Uber Eats. Add groups like "Choisissez votre boisson" or "Votre accompagnement".
+  3. "financials": Ensure the combo price is slightly cheaper than buying items separately, but still highly profitable.
+
   Return structure:
   {
     "combos": [
       { 
-        "title": "Nom du Menu", 
+        "title": "...", 
         "description_seo": "...", 
-        "ingredients": ["Item 1", "Item 2"], 
-        "financials": { "material_cost": 5, "net_margin_target": 15 },
-        "category": "Menus",
-        "dietary_tags": [],
-        "allergens": [],
-        "prep_instructions": "...",
-        "modifier_groups": []
+        "ingredients": [], 
+        "financials": { "material_cost": 5, "net_margin_target": 12 },
+        "category": "Menu Combo",
+        "modifier_groups": [
+          { "name": "Choix de la boisson", "min_selection": 1, "max_selection": 1, "options": [{ "name": "Coca-Cola", "price_override": 0 }] }
+        ]
       }
     ]
   }`;
+
   const data = await askAI(prompt, systemPrompt, menuAssemblySchema);
-  data.combos = (data.combos || []).map(healItem).map((i: any) => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
+  
+  data.combos = (data.combos || []).map(healItem).map((i: any) => ({
+    ...i, 
+    financials: {
+      ...i.financials, 
+      selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)
+    }
+  }));
+
   return MenuAssemblyZod.parse(data);
 }
 
@@ -468,7 +539,7 @@ export async function generateBrandImages(
       const openai = getOpenAI();
       const logoResp = await openai.images.generate({
         model: "dall-e-3",
-        prompt: `Professional minimalist restaurant logo for "${brandName}". ${logoPrompt}. Clean typography, flat design, solid white background. NO taglines, NO background imagery.`,
+        prompt: `Professional MINIMALIST FLAT VECTOR LOGO for "${brandName}". ${logoPrompt}. Solid white background, high contrast, simple geometric shapes. NO 3D, NO shadows, NO realistic textures, NO photos, NO gradients.`,
         n: 1,
         size: "1024x1024",
         quality: "hd",
