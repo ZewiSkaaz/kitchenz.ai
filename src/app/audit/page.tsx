@@ -1131,9 +1131,6 @@ export default function AuditPage() {
                     <div className="flex justify-between items-start mb-4">
                       <span className="text-[10px] font-black text-[#06C167] bg-[#06C167]/10 px-2 py-1 rounded-md uppercase tracking-widest">{item.category}</span>
                       {isEditing ? (
-                        <div className="flex flex-col items-end">
-                          <input 
-                      {isEditing ? (
                         <div className="flex items-center gap-1">
                           <input 
                             type="number" 
