@@ -10,33 +10,33 @@ export default function GuidePage() {
       title: "1. Définir la Vision",
       icon: <ChefHat className="w-8 h-8 text-[#06C167]" />,
       caseStudy: "Smash Sultan",
-      description: "Tout commence par une idée. Vous n'avez pas besoin d'un business plan de 50 pages, juste d'une direction.",
-      details: "Dans notre exemple, un gérant de Kebab souhaite exploiter son temps mort l'après-midi en lançant une marque de Smash Burger.",
-      input: "Nom: Smash Sultan | Style: Industriel & Oriental | Concept: Fusion Kebab/Smash."
+      description: "Tout commence par une idée précise pour dominer votre zone de chalandise.",
+      details: "Un gérant de Kebab veut lancer une marque de Smash Burger premium pour optimiser son temps mort l'après-midi.",
+      input: "Nom: Smash Sultan | Style: Cyber-Oriental | Concept: Smash Burger gourmet fusion."
     },
     {
       title: "2. Scanner l'Existant",
       icon: <Utensils className="w-8 h-8 text-orange-500" />,
-      caseStudy: "L'inventaire hybride",
-      description: "L'IA analyse vos stocks actuels pour minimiser vos investissements de départ.",
-      details: "On liste les produits du Kebab : Viande hachée, Broche, Pain Pita, Oignons, Cheddar. L'IA va chercher comment les transformer en Burgers.",
-      input: "Liste : Bœuf 20%, Pita, Salade, Tomates, Sauce Blanche, Sauce Algérienne..."
+      caseStudy: "L'inventaire complet",
+      description: "L'IA analyse vos stocks pour créer des recettes sans nouveaux investissements lourds.",
+      details: "On liste TOUT : Bœuf haché 20%, Buns Briochés, Cheddar Mature, Oignons Rouges, Sauce Signature, Piments, Pain Pita (stock), Frites.",
+      input: "Équipement: Plancha Chrome Dur, Presse à Smash fonte, Friteuse double bac."
     },
     {
       title: "3. La Magie de l'IA",
       icon: <Sparkles className="w-8 h-8 text-purple-500" />,
-      caseStudy: "Cohérence Totale",
-      description: "Kitchenz.ai génère une identité de marque complète, du logo aux photos de plats, avec un style visuel unique.",
-      details: "Le système crée un 'SceneSeed' unique. Résultat : l'ambiance 'Lave & Métal' se retrouve sur votre bannière Uber Eats et sur chaque photo de burger.",
-      input: "Génération : Logo Cyber-Oriental, Photos de produits en Dark Mode."
+      caseStudy: "Génération de Marque",
+      description: "Le moteur crée un univers cohérent : storytelling, logo vectoriel et photos de plats.",
+      details: "Création du 'Sultan Supreme' et du 'Pita Fusion Smash' (utilisant le stock de pain kebab pour éviter le gaspillage).",
+      input: "Logo: Couronne dorée & presse à smash | Photos: Style 'Dark Street-food'."
     },
     {
       title: "4. Audit & Rentabilité",
       icon: <DollarSign className="w-8 h-8 text-emerald-500" />,
-      caseStudy: "Marge Nette",
-      description: "L'IA ne fait pas que de la déco : elle calcule vos fiches techniques et vos prix de vente cibles.",
-      details: "Elle suggère d'ajouter du Bacon de Dinde (ingrédient flexible) pour créer un 'Mega Sultan Smash' et booster la marge de 15%.",
-      input: "Simulation : Panier moyen à 18.50€, Profit net cible de 22%."
+      caseStudy: "Simulation Réelle",
+      description: "On calcule les fiches techniques après commissions Uber Eats (30%) et marketing (15%).",
+      details: "L'IA fixe le prix du Sultan Supreme à 27,90€ pour garantir une marge nette de 7€ malgré les frais de plateforme élevés.",
+      input: "Profit : +1,240€/mois estimé sur la base de 40 commandes/jour."
     }
   ];
 
