@@ -551,11 +551,48 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                       })}
                    </div>
 
-                   <button onClick={saveIdentity} disabled={saving} className="w-full py-4 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-black transition-all flex items-center justify-center gap-3 disabled:opacity-50">
-                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
-                      Enregistrer les Paramètres
-                   </button>
-                </div>
+                    <button onClick={saveIdentity} disabled={saving} className="w-full py-4 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-black transition-all flex items-center justify-center gap-3 disabled:opacity-50">
+                       {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                       Enregistrer les Paramètres
+                    </button>
+
+                    <div className="pt-12 border-t border-red-100 mt-12">
+                       <div className="bg-red-50 p-8 rounded-3xl border border-red-100 space-y-4">
+                          <div className="flex items-center gap-3 text-red-600">
+                             <ShieldAlert className="w-6 h-6" />
+                             <h4 className="text-lg font-black uppercase tracking-tight">Zone de Danger</h4>
+                          </div>
+                          <p className="text-sm text-red-400 font-medium">La suppression d'une marque est irréversible. Tous les articles et photos associés seront définitivement effacés.</p>
+                          <button 
+                            onClick={async () => {
+                              if (!confirm("SUPPRIMER DÉFINITIVEMENT CETTE MARQUE ? Cette action effacera TOUT (Menu, Photos, Config).")) return;
+                              setSaving(true);
+                              try {
+                                // 1. Clean menu items
+                                await supabase.from("menu_items").delete().eq("brand_id", brand.id);
+                                // 2. Delete brand
+                                const { error } = await supabase.from("brands").delete().eq("id", brand.id);
+                                if (error) throw error;
+                                
+                                setToast({ message: "Marque supprimée !", type: 'success' });
+                                setTimeout(() => {
+                                  onRefresh();
+                                  onClose();
+                                }, 1500);
+                              } catch (e: any) {
+                                setToast({ message: "Erreur: " + e.message, type: 'error' });
+                              } finally {
+                                setSaving(false);
+                              }
+                            }}
+                            disabled={saving}
+                            className="bg-white border-2 border-red-500 text-red-500 px-8 py-3 rounded-xl text-xs font-black uppercase tracking-[0.2em] hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
+                          >
+                             {saving ? "Suppression..." : "Supprimer la Marque"}
+                          </button>
+                       </div>
+                    </div>
+                 </div>
               </div>
             )}
           </div>
