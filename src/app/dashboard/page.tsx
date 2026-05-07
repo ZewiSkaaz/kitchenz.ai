@@ -87,38 +87,7 @@ export default function DashboardPage() {
   };
 
   const deleteBrand = async (id: string) => {
-    // Note: on garde une sécurité simple ici ou on laisse l'éditeur gérer la suppression propre
-    // Pour éviter les clics accidentels sur la home, on peut juste désactiver ce bouton 
-    // et forcer le passage par l'éditeur qui a maintenant une validation robuste.
     alert("Veuillez supprimer la marque via l'onglet 'Paramètres' du menu Gérer pour plus de sécurité.");
-  };
-    
-    setLoading(true);
-    try {
-      // 1. Supprimer les articles du menu d'abord (contrainte de clé étrangère)
-      const { error: menuError } = await supabase
-        .from("menu_items")
-        .delete()
-        .eq("brand_id", id);
-
-      if (menuError) throw new Error(`Erreur suppression menu: ${menuError.message}`);
-
-      // 2. Supprimer la marque
-      const { error: brandError } = await supabase
-        .from("brands")
-        .delete()
-        .eq("id", id);
-
-      if (brandError) throw new Error(`Erreur suppression marque: ${brandError.message}`);
-
-      // 3. Mise à jour de l'état local
-      setBrands(brands.filter(b => b.id !== id));
-    } catch (error: any) {
-      console.error("Delete failed:", error);
-      alert(error.message || "Une erreur est survenue lors de la suppression.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
