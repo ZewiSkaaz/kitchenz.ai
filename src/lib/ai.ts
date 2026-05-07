@@ -18,13 +18,13 @@ function getHF() {
   return new HfInference(process.env.HUGGINGFACE_TOKEN);
 }
 
-async function askAI(prompt: string, systemPrompt: string = "You are a professional culinary branding expert.", schema?: any) {
+async function askAI(prompt: string, systemPrompt: string = "You are a professional culinary branding expert.", schema?: any, model: string = "gpt-4o-mini") {
   // 1. Essai avec OpenAI (Priorité car rechargé + Qualité JSON supérieure)
   try {
     const openai = getOpenAI();
     if (process.env.OPENAI_API_KEY) {
       const response = await openai.chat.completions.create({
-        model: "gpt-4o-2024-08-06",
+        model: model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt }
@@ -357,7 +357,7 @@ export async function generateBrandCore(
     "suggested_new_equipment": []
   }`;
 
-  const data = await askAI(prompt, systemPrompt, brandCoreSchema);
+  const data = await askAI(prompt, systemPrompt, brandCoreSchema, "gpt-4o-mini");
   return BrandCoreZod.parse(data);
 }
 
@@ -391,7 +391,7 @@ export async function generateCoreItems(
     "suggested_new_ingredients": []
   }`;
 
-  const data = await askAI(prompt, systemPrompt, coreItemsSchema);
+  const data = await askAI(prompt, systemPrompt, coreItemsSchema, "gpt-4o-mini");
   
   // Post-processing: Calculate final selling prices based on the consultant logic
   data.main_dishes = (data.main_dishes || []).map(healItem).map((i: any) => ({
@@ -445,7 +445,7 @@ export async function generateMenuAssembly(coreItems: any, drinks: string[], des
     ]
   }`;
 
-  const data = await askAI(prompt, systemPrompt, menuAssemblySchema);
+  const data = await askAI(prompt, systemPrompt, menuAssemblySchema, "gpt-4o-mini");
   
   data.combos = (data.combos || []).map(healItem).map((i: any) => ({
     ...i, 
