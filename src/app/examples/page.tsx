@@ -15,8 +15,8 @@ export default function ExamplesPage() {
       border: "border-amber-100",
       strategy: "Exploitation des produits nobles",
       details: "Un bistro traditionnel utilise ses viandes et fromages AOP pour dominer le marché du burger premium.",
-      copyPasteIngredients: "Entrecôte de bœuf (frais), Poitrine de porc, Brie de Meaux AOP, Comté 18 mois, Oignons rouges, Salade mesclun, Tomates cerises, Pommes de terre Agria, Beurre demi-sel, Huile de tournesol, Farine T55, Levure, Œufs, Sel de Guérande, Poivre noir, Thym frais, Romarin, Ail, Échalotes, Moutarde de Dijon, Miel, Vinaigre balsamique, Cornichons Malossol, Crème liquide 30%, Vin rouge (réduction), Champignons de Paris.",
-      copyPasteEquipment: "Plancha Chrome Dur, Four à convection, Friteuse double bac, Toasteur à convoyeur, Robot coupe, Mixeur plongeant, Balance de précision, Presse à burger en fonte, Saladette réfrigérée, Couteau de chef, Bac GN inox, Thermomètre de cuisson, Bain-marie, Trancheuse professionnelle.",
+      copyPasteIngredients: "Entrecôte de bœuf (frais), Poitrine de porc, Brie de Meaux AOP, Comté 18 mois, Oignons rouges, Salade mesclun, Tomates cerises, Pommes de terre Agria, Beurre demi-sel, Huile de tournesol, Farine T55, Levure, Œufs, Sel de Guérande, Poivre noir, Thym frais, Romarin, Ail, Échalotes, Moutarde de Dijon, Miel, Vinaigre balsamique, Cornichons Malossol, Crème liquide 30%, Vin rouge (réduction), Champignons de Paris, Pain Baguette, Pain de campagne artisanal.",
+      copyPasteEquipment: "Plancha Chrome Dur, Four à convection, Friteuse double bac, Toasteur à convoyeur, Robot coupe, Mixeur plongeant, Balance de précision, Presse à burger en fonte, Saladette réfrigérée, Couteau de chef, Bac GN inox, Thermomètre de cuisson, Bain-marie, Trancheuse professionnelle, Grille-pain professionnel.",
       result: "Marge brute +18% | Panier moyen +5€",
       tag: "Premium"
     },
