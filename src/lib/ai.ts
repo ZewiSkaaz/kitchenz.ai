@@ -312,9 +312,19 @@ const MenuAssemblyZod = z.object({
 // FUNCTIONS
 // ---------------------------------------------------------------------------
 
-export async function generateBrandCore(ingredients: string[], equipment: string[], brandName: string, concept: string, visualStyle: string) {
+export async function generateBrandCore(
+  ingredients: string[],
+  equipment: string[],
+  brandName: string,
+  concept: string,
+  visualStyle: string,
+  flexibilityOptions?: { allowNewIngredients?: boolean; allowNewEquipment?: boolean },
+  location?: string
+) {
   const systemPrompt = `You are a branding expert. Respond ONLY with valid JSON. No talk.`;
-  const prompt = `Create an identity for: ${brandName}. Concept: ${concept}. Style: ${visualStyle}.
+  const locationHint = location ? ` Located in: ${location}.` : "";
+  const flexHint = flexibilityOptions?.allowNewIngredients ? " You may suggest up to 3 new ingredients." : "";
+  const prompt = `Create an identity for: ${brandName}. Concept: ${concept}. Style: ${visualStyle}.${locationHint}${flexHint}
   Return structure:
   {
     "name": "${brandName}",
@@ -329,9 +339,14 @@ export async function generateBrandCore(ingredients: string[], equipment: string
   return BrandCoreZod.parse(data);
 }
 
-export async function generateCoreItems(ingredients: string[], brandCore: any) {
+export async function generateCoreItems(
+  ingredients: string[],
+  brandCore: any,
+  flexibilityOptions?: { allowNewIngredients?: boolean; allowNewEquipment?: boolean }
+) {
   const systemPrompt = `You are a Chef. Respond ONLY with valid JSON. No talk.`;
-  const prompt = `Create 4 main dishes and 3 sides for "${brandCore.name}".
+  const flexHint = flexibilityOptions?.allowNewIngredients ? " You may suggest up to 3 new ingredients." : "";
+  const prompt = `Create 4 main dishes and 3 sides for "${brandCore.name}".${flexHint}
   Return structure:
   {
     "main_dishes": [
@@ -343,8 +358,8 @@ export async function generateCoreItems(ingredients: string[], brandCore: any) {
     "suggested_new_ingredients": []
   }`;
   const data = await askAI(prompt, systemPrompt, coreItemsSchema);
-  data.main_dishes = (data.main_dishes || []).map(healItem).map(i => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
-  data.generated_sides = (data.generated_sides || []).map(healItem).map(i => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
+  data.main_dishes = (data.main_dishes || []).map(healItem).map((i: any) => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
+  data.generated_sides = (data.generated_sides || []).map(healItem).map((i: any) => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
   return CoreItemsZod.parse(data);
 }
 
@@ -368,8 +383,35 @@ export async function generateMenuAssembly(coreItems: any, drinks: string[], des
     ]
   }`;
   const data = await askAI(prompt, systemPrompt, menuAssemblySchema);
-  data.combos = (data.combos || []).map(healItem).map(i => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
+  data.combos = (data.combos || []).map(healItem).map((i: any) => ({...i, financials: {...i.financials, selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)}}));
   return MenuAssemblyZod.parse(data);
+}
+
+/**
+ * 📸 ANALYSE D'IMAGE D'INVENTAIRE (GPT-4o Vision)
+ */
+export async function analyzeInventoryImage(base64Image: string): Promise<{ name: string; qty: string }[]> {
+  try {
+    const openai = getOpenAI();
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: 'Analyze this kitchen inventory photo. List all visible food ingredients with their estimated quantities. Respond ONLY with valid JSON: { "items": [{ "name": "string", "qty": "string" }] }' },
+            { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
+          ]
+        }
+      ],
+      response_format: { type: "json_object" }
+    });
+    const data = JSON.parse(response.choices[0].message.content || "{}");
+    return data.items || [];
+  } catch (error) {
+    console.warn("⚠️ analyzeInventoryImage failed:", (error as any).message);
+    return [];
+  }
 }
 
 /**

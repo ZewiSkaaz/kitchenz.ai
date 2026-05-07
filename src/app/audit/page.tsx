@@ -173,18 +173,42 @@ export default function AuditPage() {
     setStep("generating");
 
     try {
+      // Étape 1 : Brand Core
       setLoadingStep("Génération de l'Identité de Marque (Brand Core)...");
       const flexibilityOptions = { allowNewIngredients, allowNewEquipment };
       const brandCore = await generateBrandCoreAction(ingredients, equipment, brandName, concept, visualStyle, flexibilityOptions, location);
-      
+
+      // Étape 2 : Core Items
       setLoadingStep("Création du Menu & Recettes...");
       const coreItems = await generateCoreItemsAction(ingredients, brandCore, flexibilityOptions);
 
+      // Étape 3 : Logo & Background EN PREMIER → récupère le sceneSeed partagé
+      setLoadingStep("Création du Logo & de la Bannière...");
+      let brandImages: { logoUrl: string | null; backgroundUrl: string | null; sceneSeed: number } = {
+        logoUrl: null,
+        backgroundUrl: null,
+        sceneSeed: Math.floor(Math.random() * 1000000),
+      };
+      try {
+        const dishesContext = coreItems.main_dishes.slice(0, 3).map((d: any) => d.title).join(", ");
+        brandImages = await generateBrandImages(brandCore.name, brandCore.logo_prompt, brandCore.background_prompt, dishesContext);
+      } catch (e) {
+        console.error("Erreur images marque:", e);
+      }
+
+      // Étape 4 : Photos produits — même sceneSeed & backgroundPrompt pour cohérence visuelle
       setLoadingStep("Génération des Photos de TOUS les produits...");
       const allDishesWithPhotos = await Promise.all(
         [...coreItems.main_dishes, ...coreItems.generated_sides].map(async (item: any) => {
           try {
-            const imageUrl = await generateMenuItemImage(item.title, item.description_seo, brandCore.culinary_style, visualStyle);
+            const imageUrl = await generateMenuItemImage(
+              item.title,
+              item.description_seo,
+              brandCore.culinary_style,
+              visualStyle,
+              brandCore.background_prompt,
+              brandImages.sceneSeed
+            );
             return { ...item, imageUrl };
           } catch (e) {
             console.warn(`Génération photo échouée pour ${item.title}, utilisation fallback.`);
@@ -193,22 +217,10 @@ export default function AuditPage() {
         })
       );
 
-      const allMainDishes = allDishesWithPhotos.filter(i => i.category === "Plat Principal");
-      const allSides = allDishesWithPhotos.filter(i => i.category === "Accompagnement");
+      const allMainDishes = allDishesWithPhotos.filter((i: any) => i.category === "Plat Principal" || i.category === "Plats");
+      const allSides = allDishesWithPhotos.filter((i: any) => i.category === "Accompagnement" || i.category === "Sides");
 
-      setLoadingStep("Création du Logo & de la Bannière...");
-      let brandImages = { logoUrl: "", backgroundUrl: "" };
-      try {
-        const dishesContext = allMainDishes.map((d: any) => d.title).join(", ");
-        brandImages = await generateBrandImages(brandCore.logo_prompt, brandCore.background_prompt, dishesContext);
-      } catch (e) {
-        console.error("Erreur images marque:", e);
-        brandImages = { 
-          logoUrl: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=200", 
-          backgroundUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1200" 
-        };
-      }
-
+      // Étape 5 : Menu Assembly
       setLoadingStep("Assemblage des Menus Combos...");
       const menuAssembly = await generateMenuAssemblyAction(coreItems, drinks, desserts, brandCore);
 

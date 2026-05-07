@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "ultimate_audit.ts", "src/test-compare-ai.ts", "src/test-compare-ai.js"]
 }
