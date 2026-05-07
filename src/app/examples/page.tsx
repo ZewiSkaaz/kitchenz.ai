@@ -159,7 +159,6 @@ export default function ExamplesPage() {
                   </div>
                   <span className="text-sm font-black text-[#06C167] uppercase">{c.result}</span>
                 </div>
-              </div>
             </motion.div>
           ))}
         </div>
