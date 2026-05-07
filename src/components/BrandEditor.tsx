@@ -37,6 +37,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
   const [fullImage, setFullImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadTarget, setUploadTarget] = useState<'logo' | 'banner' | { type: 'item', index: number } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Auto-hide toast
   useEffect(() => {
@@ -563,33 +564,55 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                              <h4 className="text-lg font-black uppercase tracking-tight">Zone de Danger</h4>
                           </div>
                           <p className="text-sm text-red-400 font-medium">La suppression d'une marque est irréversible. Tous les articles et photos associés seront définitivement effacés.</p>
-                          <button 
-                            onClick={async () => {
-                              if (!confirm("SUPPRIMER DÉFINITIVEMENT CETTE MARQUE ? Cette action effacera TOUT (Menu, Photos, Config).")) return;
-                              setSaving(true);
-                              try {
-                                // 1. Clean menu items
-                                await supabase.from("menu_items").delete().eq("brand_id", brand.id);
-                                // 2. Delete brand
-                                const { error } = await supabase.from("brands").delete().eq("id", brand.id);
-                                if (error) throw error;
-                                
-                                setToast({ message: "Marque supprimée !", type: 'success' });
-                                setTimeout(() => {
-                                  onRefresh();
-                                  onClose();
-                                }, 1500);
-                              } catch (e: any) {
-                                setToast({ message: "Erreur: " + e.message, type: 'error' });
-                              } finally {
-                                setSaving(false);
-                              }
-                            }}
-                            disabled={saving}
-                            className="bg-white border-2 border-red-500 text-red-500 px-8 py-3 rounded-xl text-xs font-black uppercase tracking-[0.2em] hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
-                          >
-                             {saving ? "Suppression..." : "Supprimer la Marque"}
-                          </button>
+                          
+                          {!isDeleting ? (
+                            <button 
+                              onClick={() => setIsDeleting(true)}
+                              className="bg-white border-2 border-red-500 text-red-500 px-8 py-3 rounded-xl text-xs font-black uppercase tracking-[0.2em] hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                            >
+                               Supprimer la Marque
+                            </button>
+                          ) : (
+                            <div className="flex flex-col md:flex-row items-center gap-4">
+                              <button 
+                                onClick={async () => {
+                                  setSaving(true);
+                                  try {
+                                    console.log("🗑️ Starting deletion for brand:", brand.id);
+                                    // 1. Clean menu items
+                                    const { error: me } = await supabase.from("menu_items").delete().eq("brand_id", brand.id);
+                                    if (me) throw me;
+                                    
+                                    // 2. Delete brand
+                                    const { error: be } = await supabase.from("brands").delete().eq("id", brand.id);
+                                    if (be) throw be;
+                                    
+                                    setToast({ message: "Marque supprimée avec succès", type: 'success' });
+                                    setTimeout(() => {
+                                      onRefresh();
+                                      onClose();
+                                    }, 1000);
+                                  } catch (e: any) {
+                                    console.error("❌ Delete error:", e);
+                                    setToast({ message: "Erreur: " + (e.message || "Inconnue"), type: 'error' });
+                                    setIsDeleting(false);
+                                  } finally {
+                                    setSaving(false);
+                                  }
+                                }}
+                                disabled={saving}
+                                className="bg-red-600 text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-[0.2em] hover:bg-red-700 transition-all shadow-lg animate-pulse"
+                              >
+                                 {saving ? "Suppression..." : "OUI, CONFIRMER LA SUPPRESSION"}
+                              </button>
+                              <button 
+                                onClick={() => setIsDeleting(false)}
+                                className="text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-slate-600"
+                              >
+                                 Annuler
+                              </button>
+                            </div>
+                          )}
                        </div>
                     </div>
                  </div>

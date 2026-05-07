@@ -87,7 +87,11 @@ export default function DashboardPage() {
   };
 
   const deleteBrand = async (id: string) => {
-    if (!confirm("Voulez-vous vraiment supprimer cette marque et tous ses articles ? Cette action est irréversible.")) return;
+    // Note: on garde une sécurité simple ici ou on laisse l'éditeur gérer la suppression propre
+    // Pour éviter les clics accidentels sur la home, on peut juste désactiver ce bouton 
+    // et forcer le passage par l'éditeur qui a maintenant une validation robuste.
+    alert("Veuillez supprimer la marque via l'onglet 'Paramètres' du menu Gérer pour plus de sécurité.");
+  };
     
     setLoading(true);
     try {
