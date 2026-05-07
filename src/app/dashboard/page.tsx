@@ -87,9 +87,34 @@ export default function DashboardPage() {
   };
 
   const deleteBrand = async (id: string) => {
-    if (!confirm("Supprimer cette marque ?")) return;
-    const { error } = await supabase.from("brands").delete().eq("id", id);
-    if (!error) setBrands(brands.filter(b => b.id !== id));
+    if (!confirm("Voulez-vous vraiment supprimer cette marque et tous ses articles ? Cette action est irréversible.")) return;
+    
+    setLoading(true);
+    try {
+      // 1. Supprimer les articles du menu d'abord (contrainte de clé étrangère)
+      const { error: menuError } = await supabase
+        .from("menu_items")
+        .delete()
+        .eq("brand_id", id);
+
+      if (menuError) throw new Error(`Erreur suppression menu: ${menuError.message}`);
+
+      // 2. Supprimer la marque
+      const { error: brandError } = await supabase
+        .from("brands")
+        .delete()
+        .eq("id", id);
+
+      if (brandError) throw new Error(`Erreur suppression marque: ${brandError.message}`);
+
+      // 3. Mise à jour de l'état local
+      setBrands(brands.filter(b => b.id !== id));
+    } catch (error: any) {
+      console.error("Delete failed:", error);
+      alert(error.message || "Une erreur est survenue lors de la suppression.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
