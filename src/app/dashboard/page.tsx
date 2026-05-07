@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChefHat, Calendar, LayoutGrid, ListFilter, Trash2, ExternalLink, Utensils, BookOpen, Plus, Download, TrendingUp, Zap, LogOut } from "lucide-react";
+import { ChefHat, Calendar, LayoutGrid, ListFilter, Trash2, ExternalLink, Utensils, BookOpen, Plus, Download, TrendingUp, Zap, LogOut, Store, MapPin } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BrandEditor from "@/components/BrandEditor";
@@ -14,6 +14,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState<any | null>(null);
   const [uberConnected, setUberConnected] = useState(false);
+  const [establishments, setEstablishments] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -23,6 +25,8 @@ export default function DashboardPage() {
         router.push("/login");
       } else {
         fetchBrands();
+        fetchEstablishments(session.user.id);
+        fetchProfile(session.user.id);
         checkUberConnection(session.user.id);
         handleUrlParams();
       }
@@ -84,6 +88,16 @@ export default function DashboardPage() {
 
     if (!error) setBrands(data || []);
     setLoading(false);
+  };
+
+  const fetchEstablishments = async (userId: string) => {
+    const { data } = await supabase.from("establishments").select("*").eq("user_id", userId).order("created_at", { ascending: false });
+    if (data) setEstablishments(data);
+  };
+
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
+    if (data) setProfile(data);
   };
 
   const deleteBrand = async (id: string) => {
@@ -178,6 +192,58 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+
+        {/* Establishments Section */}
+        <div className="mt-20">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Vos Établissements</h2>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gérez vos stocks et matériel par site</p>
+            </div>
+            <Link href="/onboarding" className="p-3 bg-white border border-slate-100 rounded-xl hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2 text-xs font-black uppercase tracking-widest">
+              <Plus className="w-4 h-4 text-[#06C167]" /> Ajouter un site
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {establishments.map((est) => (
+              <motion.div 
+                key={est.id}
+                whileHover={{ y: -4 }}
+                className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all"
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-3 bg-indigo-50 rounded-2xl">
+                    <Store className="w-6 h-6 text-indigo-600" />
+                  </div>
+                  <span className="bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">ID: {est.id.slice(0,8)}</span>
+                </div>
+                <h3 className="text-xl font-black text-slate-900 mb-1">{est.name}</h3>
+                <div className="flex items-center gap-2 text-slate-400 text-xs font-medium mb-6">
+                  <MapPin className="w-3.5 h-3.5" /> {est.address}, {est.city}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-50">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Ingrédients</p>
+                    <p className="text-sm font-bold text-slate-900">{est.default_ingredients?.length || 0} sauv.</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Matériel</p>
+                    <p className="text-sm font-bold text-slate-900">{est.default_equipment?.length || 0} sauv.</p>
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={() => router.push(`/dashboard/establishments/${est.id}`)}
+                  className="w-full mt-8 py-4 bg-slate-50 hover:bg-slate-900 hover:text-white text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+                >
+                  Gérer l'inventaire
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <AnimatePresence>

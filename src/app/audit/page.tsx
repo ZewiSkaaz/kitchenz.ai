@@ -24,6 +24,7 @@ export default function AuditPage() {
         router.push("/login");
       } else {
         checkUberConnection(session.user.id);
+        fetchEstablishments(session.user.id);
       }
     };
     checkUser();
@@ -38,12 +39,29 @@ export default function AuditPage() {
       .single();
     setUberConnected(!!data);
   };
+
+  const fetchEstablishments = async (userId: string) => {
+    const { data } = await supabase.from("establishments").select("*").eq("user_id", userId);
+    if (data) setEstablishments(data);
+  };
+
+  const handleEstablishmentSelect = (id: string) => {
+    const est = establishments.find(e => e.id === id);
+    if (est) {
+      setSelectedEstablishmentId(id);
+      setLocation(est.city || "");
+      if (est.default_ingredients && Array.isArray(est.default_ingredients)) setIngredients(est.default_ingredients);
+      if (est.default_equipment && Array.isArray(est.default_equipment)) setEquipment(est.default_equipment);
+    }
+  };
   
   // Data State
   const [brandName, setBrandName] = useState("");
   const [concept, setConcept] = useState("");
   const [visualStyle, setVisualStyle] = useState("");
   const [location, setLocation] = useState("");
+  const [establishments, setEstablishments] = useState<any[]>([]);
+  const [selectedEstablishmentId, setSelectedEstablishmentId] = useState<string>("");
 
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [currentIngredient, setCurrentIngredient] = useState("");
@@ -462,6 +480,24 @@ export default function AuditPage() {
                 <ChefHat className="text-[#06C167] w-8 h-8" />
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">Concept & Vision</h2>
               </div>
+              
+              {establishments.length > 0 && (
+                <div className="mb-10 p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                  <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">Utiliser un établissement existant</label>
+                  <select 
+                    className="input-premium w-full bg-white"
+                    value={selectedEstablishmentId}
+                    onChange={(e) => handleEstablishmentSelect(e.target.value)}
+                  >
+                    <option value="">-- Choisir un établissement --</option>
+                    {establishments.map(est => (
+                      <option key={est.id} value={est.id}>{est.name} ({est.city})</option>
+                    ))}
+                  </select>
+                  <p className="mt-2 text-[10px] text-slate-400 font-medium">Ceci chargera automatiquement vos ingrédients et votre matériel sauvegardés.</p>
+                </div>
+              )}
+
               <div className="space-y-8 mb-10">
                 <div>
                   <label className="block text-xs font-black text-slate-400 mb-3 uppercase tracking-[0.2em]">Nom de la Marque (Optionnel)</label>
