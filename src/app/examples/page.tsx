@@ -14,8 +14,9 @@ export default function ExamplesPage() {
       color: "bg-amber-50",
       border: "border-amber-100",
       strategy: "Exploitation des produits nobles",
-      details: "Un bistro traditionnel utilise ses restes d'Entrecôte et son Brie de Meaux pour créer une marque de Burgers 'Signature' à 25€ sur Uber Eats.",
-      inventory: ["Entrecôte", "Brie de Meaux", "Oignons rouges", "Pommes de terre"],
+      details: "Un bistro traditionnel utilise ses viandes et fromages AOP pour dominer le marché du burger premium.",
+      copyPasteIngredients: "Entrecôte de bœuf (frais), Poitrine fumée, Brie de Meaux AOP, Comté 18 mois, Oignons rouges, Salade mesclun, Tomates cerises, Pommes de terre Agria (pour frites), Beurre demi-sel, Huile de tournesol, Farine T55, Levure, Œufs, Sel de Guérande, Poivre noir, Thym frais, Romarin, Ail, Échalotes, Moutarde de Dijon, Miel, Vinaigre balsamique, Cornichons Malossol, Crème liquide 30%.",
+      copyPasteEquipment: "Plancha Chrome Dur, Four à convection, Friteuse double bac, Toasteur à convoyeur, Robot coupe, Mixeur plongeant, Balance de précision, Presse à burger en fonte, Saladette réfrigérée, Couteau de chef, Bac GN inox, Thermomètre de cuisson.",
       result: "Marge brute +18% | Panier moyen +5€",
       tag: "Premium"
     },
@@ -25,9 +26,10 @@ export default function ExamplesPage() {
       color: "bg-blue-50",
       border: "border-blue-100",
       strategy: "Optimisation des chutes de poisson",
-      details: "Le surplus de Saumon et de Thon (non utilisable pour les Nigiris) est transformé en Poke Bowls colorés avec une identité visuelle Zen.",
-      inventory: ["Saumon", "Thon", "Riz vinaigré", "Avocat", "Mangue"],
-      result: "Gaspillage alimentaire -30% | CA livraison +25%",
+      details: "Transformez vos surplus de poisson frais en bowls colorés ultra-rentables sans matériel supplémentaire.",
+      copyPasteIngredients: "Saumon frais entier, Thon rouge, Crevettes décortiquées, Riz vinaigré japonais, Avocats mûrs, Mangues fraîches, Edamame surgelés, Gingembre mariné, Algues Wakamé, Graines de sésame noir, Sauce soja salée, Sauce soja sucrée, Huile de sésame, Vinaigre de riz, Wasabi, Radis daikon, Concombres, Oignons frits (sec), Mayo japonaise, Sriracha, Jus de citron vert, Coriandre fraîche.",
+      copyPasteEquipment: "Cuiseur à riz (Ricer), Couteau Yanagiba (sashimi), Saladette réfrigérée, Balance électronique, Planche à découper PEHD, Bols de service, Pinces de précision, Machine à glace pilée.",
+      result: "Gaspillage -30% | CA livraison +25%",
       tag: "Eco-Friendly"
     },
     {
@@ -36,9 +38,10 @@ export default function ExamplesPage() {
       color: "bg-red-50",
       border: "border-red-100",
       strategy: "Nouveau format de vente",
-      details: "La pâte à pizza et les garnitures italiennes sont utilisées pour créer des sandwichs 'Panuozzo' cuits au four, parfaits pour le transport.",
-      inventory: ["Pâte à pizza", "Burrata", "Parme", "Pesto", "Roquette"],
-      result: "Facilité de livraison 10/10 | Pas de matériel sup.",
+      details: "Utilisez votre pâte à pizza pour créer des sandwichs italiens pressés, la nouvelle tendance Uber Eats.",
+      copyPasteIngredients: "Pâtons de pizza fermentés (frais), Mozzarella di Bufala, Jambon de Parme, Speck fumé, Mortadelle, Burrata crémeuse, Tomates séchées, Pesto basilic maison, Roquette fraîche, Huile d'olive extra vierge, Origan séché, Olives Taggiasche, Artichauts marinés, Crème de truffe, Parmesan Reggiano, Sel fin, Poivre du moulin.",
+      copyPasteEquipment: "Four à pizza (Bois ou Électrique), Pétrin spirale, Presse à Panini rainurée, Trancheuse à jambon pro, Saladette à condiments, Pelle à pizza, Thermomètre infrarouge, Bac de fermentation.",
+      result: "Livraison facilitée | 0€ d'investissement",
       tag: "Efficience"
     },
     {
@@ -47,9 +50,10 @@ export default function ExamplesPage() {
       color: "bg-orange-50",
       border: "border-orange-100",
       strategy: "Valorisation du savoir-faire",
-      details: "Le pain artisanal et les invendus sont transformés en une marque de sandwicherie haut de gamme avec des fiches techniques précises.",
-      inventory: ["Baguette Tradition", "Lardons", "Œufs", "Fromage de chèvre"],
-      result: "CA du midi doublé | Ticket moyen 18€",
+      details: "Transformez vos invendus de pain et votre traiteur en une marque de sandwicherie premium.",
+      copyPasteIngredients: "Baguette Tradition, Pain de mie artisanal, Jambon blanc supérieur, Emmental français, Poulet rôti (frais), Œufs durs, Thon en conserve, Tomates, Salade batavia, Mayo maison, Moutarde à l'ancienne, Beurre doux, Cornichons, Oignons jaunes, Bacon de dinde (sec), Avocat, Graines de pavot, Fromage frais (type St Moret), Herbes de Provence.",
+      copyPasteEquipment: "Toasteur vertical, Trancheuse à pain, Saladette réfrigérée, Four de remise en température, Mixeur à sauce, Planche à découper, Couteau à pain cranté, Emballeuse papier kraft.",
+      result: "CA Midi +100% | Ticket moyen 18€",
       tag: "Profit"
     }
   ];
@@ -69,17 +73,17 @@ export default function ExamplesPage() {
             Bibliothèque de Combinaisons
           </motion.div>
           <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter mb-8 leading-none">
-            Inspirez-vous des <br/><span className="text-[#06C167]">meilleurs pivots.</span>
+            Copiez, Collez, <br/><span className="text-[#06C167]">Lancez l'Audit.</span>
           </h1>
           <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium">
-            Découvrez comment d'autres restaurateurs ont utilisé Kitchenz.ai pour transformer leur inventaire en marques digitales ultra-rentables.
+            Utilisez ces listes ultra-complètes pour tester la puissance de notre IA dans votre situation réelle.
           </p>
         </div>
       </section>
 
       {/* CASES GRID */}
       <section className="pb-32 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
           {cases.map((c, index) => (
             <motion.div
               key={index}
@@ -108,17 +112,45 @@ export default function ExamplesPage() {
                 {c.details}
               </p>
 
-              <div className="space-y-6">
-                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Inventaire Clé</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {c.inventory.map((ing, i) => (
-                      <span key={i} className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600">
-                        {ing}
-                      </span>
-                    ))}
+              <div className="space-y-8 mb-10">
+                {/* COPY-PASTE INGREDIENTS */}
+                <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ingrédients (Prêt à copier)</h4>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(c.copyPasteIngredients);
+                        alert("Liste copiée !");
+                      }}
+                      className="text-[10px] font-black text-[#06C167] uppercase border-b-2 border-[#06C167]"
+                    >
+                      Copier
+                    </button>
                   </div>
+                  <p className="text-xs text-slate-600 font-medium leading-relaxed bg-white p-4 rounded-xl border border-slate-100 line-clamp-3">
+                    {c.copyPasteIngredients}
+                  </p>
                 </div>
+
+                {/* COPY-PASTE EQUIPMENT */}
+                <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Matériel (Prêt à copier)</h4>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(c.copyPasteEquipment);
+                        alert("Liste copiée !");
+                      }}
+                      className="text-[10px] font-black text-[#06C167] uppercase border-b-2 border-[#06C167]"
+                    >
+                      Copier
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium leading-relaxed bg-white p-4 rounded-xl border border-slate-100 line-clamp-3">
+                    {c.copyPasteEquipment}
+                  </p>
+                </div>
+              </div>
 
                 <div className="flex items-center justify-between p-6 bg-[#06C167]/5 rounded-3xl border border-[#06C167]/10">
                   <div className="flex items-center gap-3">
