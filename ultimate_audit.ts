@@ -77,8 +77,8 @@ async function run() {
 
   const brandImages = await generateBrandImages(
     brandCore.name, 
-    "Minimalist high-end vector logo, single icon, professional, matte finish, NO TEXT", 
-    "Cinematic food photography of a table with multiple items, shallow depth of field, NO TEXT, NO PEOPLE, high-end restaurant lighting",
+    brandCore.logo_prompt, 
+    brandCore.background_prompt,
     identityContext
   );
   
