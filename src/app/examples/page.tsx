@@ -15,8 +15,8 @@ export default function ExamplesPage() {
       border: "border-amber-100",
       strategy: "Exploitation des produits nobles",
       details: "Un bistro traditionnel utilise ses viandes et fromages AOP pour dominer le marché du burger premium.",
-      copyPasteIngredients: "Entrecôte de bœuf (frais), Poitrine de porc, Brie, Comté, Oignons, Salade mesclun, Tomates, Pommes de terre, Beurre, Huile, Farine, Œufs, Sel, Poivre, Moutarde, Crème liquide.",
-      copyPasteEquipment: "Four à convection, Plancha, Friteuse, Robot coupe, Mixeur plongeant, Balance, Saladette, Couteau de chef, Bacs GN.",
+      copyPasteIngredients: "Entrecôte de bœuf (frais), Poitrine de porc, Brie de Meaux AOP, Comté 18 mois, Oignons rouges, Salade mesclun, Tomates cerises, Pommes de terre Agria, Beurre demi-sel, Huile de tournesol, Farine T55, Levure, Œufs, Sel de Guérande, Poivre noir, Thym frais, Romarin, Ail, Échalotes, Moutarde de Dijon, Miel, Vinaigre balsamique, Cornichons Malossol, Crème liquide 30%, Vin rouge (réduction), Champignons de Paris.",
+      copyPasteEquipment: "Plancha Chrome Dur, Four à convection, Friteuse double bac, Toasteur à convoyeur, Robot coupe, Mixeur plongeant, Balance de précision, Presse à burger en fonte, Saladette réfrigérée, Couteau de chef, Bac GN inox, Thermomètre de cuisson, Bain-marie, Trancheuse professionnelle.",
       result: "Marge brute +18% | Panier moyen +5€",
       tag: "Premium"
     },
@@ -27,8 +27,8 @@ export default function ExamplesPage() {
       border: "border-blue-100",
       strategy: "Optimisation des chutes de poisson",
       details: "Transformez vos surplus de poisson frais en bowls colorés ultra-rentables sans matériel supplémentaire.",
-      copyPasteIngredients: "Saumon frais entier, Thon rouge, Crevettes décortiquées, Riz vinaigré japonais, Avocats mûrs, Mangues fraîches, Edamame surgelés, Gingembre mariné, Algues Wakamé, Graines de sésame noir, Sauce soja salée, Sauce soja sucrée, Huile de sésame, Vinaigre de riz, Wasabi, Radis daikon, Concombres, Oignons frits (sec), Mayo japonaise, Sriracha, Jus de citron vert, Coriandre fraîche.",
-      copyPasteEquipment: "Cuiseur à riz (Ricer), Couteau Yanagiba (sashimi), Saladette réfrigérée, Balance électronique, Planche à découper PEHD, Bols de service, Pinces de précision, Machine à glace pilée.",
+      copyPasteIngredients: "Saumon frais entier, Thon rouge, Crevettes décortiquées, Riz vinaigré japonais, Avocats mûrs, Mangues fraîches, Edamame surgelés, Gingembre mariné, Algues Wakamé, Graines de sésame noir, Sauce soja salée, Sauce soja sucrée, Huile de sésame, Vinaigre de riz, Wasabi, Radis daikon, Concombres, Oignons frits, Mayo japonaise, Sriracha, Jus de citron vert, Coriandre fraîche, Yuzu, Masago, Oignons verts, Chou rouge.",
+      copyPasteEquipment: "Cuiseur à riz (Ricer), Couteau Yanagiba (sashimi), Saladette réfrigérée, Balance électronique, Planche à découper PEHD, Bols de service, Pinces de précision, Machine à glace pilée, Bassine à riz (Hangiri), Ventilateur à riz (Uchiwa).",
       result: "Gaspillage -30% | CA livraison +25%",
       tag: "Eco-Friendly"
     },
@@ -39,8 +39,8 @@ export default function ExamplesPage() {
       border: "border-red-100",
       strategy: "Nouveau format de vente",
       details: "Utilisez votre pâte à pizza pour créer des sandwichs italiens pressés, la nouvelle tendance Uber Eats.",
-      copyPasteIngredients: "Pâtons de pizza fermentés (frais), Mozzarella di Bufala, Jambon de Parme, Speck fumé, Mortadelle, Burrata crémeuse, Tomates séchées, Pesto basilic maison, Roquette fraîche, Huile d'olive extra vierge, Origan séché, Olives Taggiasche, Artichauts marinés, Crème de truffe, Parmesan Reggiano, Sel fin, Poivre du moulin.",
-      copyPasteEquipment: "Four à pizza (Bois ou Électrique), Pétrin spirale, Presse à Panini rainurée, Trancheuse à jambon pro, Saladette à condiments, Pelle à pizza, Thermomètre infrarouge, Bac de fermentation.",
+      copyPasteIngredients: "Pâtons de pizza fermentés (Farine Caputo), Mozzarella di Bufala, Jambon de Parme, Speck fumé, Mortadelle Pistache, Burrata crémeuse, Tomates séchées, Pesto basilic maison, Roquette fraîche, Huile d'olive extra vierge, Origan séché, Olives Taggiasche, Artichauts marinés, Crème de truffe, Parmesan Reggiano, Sel fin, Poivre du moulin, N'duja (piquant), Gorgonzola, Miel pimenté.",
+      copyPasteEquipment: "Four à pizza (Bois ou Électrique), Pétrin spirale, Presse à Panini rainurée, Trancheuse à jambon pro, Saladette à condiments, Pelle à pizza, Thermomètre infrarouge, Bac de fermentation, Roulette à pizza, Balance pro.",
       result: "Livraison facilitée | 0€ d'investissement",
       tag: "Efficience"
     },
