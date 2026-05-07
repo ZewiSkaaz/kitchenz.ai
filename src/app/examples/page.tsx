@@ -15,8 +15,8 @@ export default function ExamplesPage() {
       border: "border-amber-100",
       strategy: "Exploitation des produits nobles",
       details: "Un bistro traditionnel utilise ses viandes et fromages AOP pour dominer le marché du burger premium.",
-      copyPasteIngredients: "Entrecôte de bœuf (frais), Poitrine fumée, Brie de Meaux AOP, Comté 18 mois, Oignons rouges, Salade mesclun, Tomates cerises, Pommes de terre Agria (pour frites), Beurre demi-sel, Huile de tournesol, Farine T55, Levure, Œufs, Sel de Guérande, Poivre noir, Thym frais, Romarin, Ail, Échalotes, Moutarde de Dijon, Miel, Vinaigre balsamique, Cornichons Malossol, Crème liquide 30%.",
-      copyPasteEquipment: "Plancha Chrome Dur, Four à convection, Friteuse double bac, Toasteur à convoyeur, Robot coupe, Mixeur plongeant, Balance de précision, Presse à burger en fonte, Saladette réfrigérée, Couteau de chef, Bac GN inox, Thermomètre de cuisson.",
+      copyPasteIngredients: "Entrecôte de bœuf (frais), Poitrine de porc, Brie, Comté, Oignons, Salade mesclun, Tomates, Pommes de terre, Beurre, Huile, Farine, Œufs, Sel, Poivre, Moutarde, Crème liquide.",
+      copyPasteEquipment: "Four à convection, Plancha, Friteuse, Robot coupe, Mixeur plongeant, Balance, Saladette, Couteau de chef, Bacs GN.",
       result: "Marge brute +18% | Panier moyen +5€",
       tag: "Premium"
     },
