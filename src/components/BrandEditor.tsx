@@ -258,7 +258,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {saving ? 'Sauvegarde...' : 'Sauvegarder'}
             </button>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-black">
+            <button onClick={onClose} className="p-2 text-slate-500 hover:text-black">
                <X className="w-5 h-5" />
             </button>
           </div>
@@ -380,7 +380,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
                              <div className="lg:col-span-8 space-y-5">
                                 <div className="space-y-1.5">
-                                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nom du plat</label>
+                                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Nom du plat</label>
                                    <input 
                                      value={item.title} 
                                      onChange={e => {
@@ -392,7 +392,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                    />
                                 </div>
                                 <div className="space-y-1.5">
-                                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Description Uber Eats</label>
+                                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Description Uber Eats</label>
                                    <textarea 
                                      value={item.description_seo || item.description} 
                                      onChange={e => {
@@ -406,7 +406,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                    />
                                 </div>
                                 <div className="space-y-1.5">
-                                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Ingrédients (clarté client)</label>
+                                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Ingrédients (clarté client)</label>
                                    <input 
                                      value={item.ingredients?.join(', ')} 
                                      onChange={e => {
@@ -420,7 +420,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                 </div>
                                 <div className="flex flex-wrap gap-4 pt-2">
                                    <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-                                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TVA</span>
+                                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">TVA</span>
                                       <select 
                                         value={item.vat_rate} 
                                         onChange={e => {
@@ -438,7 +438,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
 
                              <div className="lg:col-span-4 space-y-6">
                                 <div className="bg-slate-900 rounded-2xl p-5 text-white shadow-xl shadow-slate-900/10">
-                                   <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Prix de vente Final (€)</label>
+                                   <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-3">Prix de vente Final (€)</label>
                                    <div className="flex items-center gap-3">
                                       <input 
                                         type="text" 
@@ -456,7 +456,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                                 
                                 <div className="grid grid-cols-2 gap-4">
                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                      <label className="block text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Coût Mat.</label>
+                                      <label className="block text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Coût Mat.</label>
                                       <p className="text-sm font-black text-slate-600">{item.material_cost} €</p>
                                    </div>
                                    <div className="bg-[#06C167]/5 p-4 rounded-xl border border-[#06C167]/10">
@@ -485,7 +485,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                         <Smartphone className="w-5 h-5 text-slate-900" />
                         <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">Identifiant Uber Eats</h4>
                       </div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4">Requis pour la synchronisation automatique du menu</p>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-4">Requis pour la synchronisation automatique du menu</p>
                       <input 
                         value={brand.uber_store_id || ""} 
                         onChange={e => setBrand({...brand, uber_store_id: e.target.value})} 
@@ -500,7 +500,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                       </div>
                       <div>
                         <h3 className="text-3xl font-black text-slate-900 tracking-tight">Horaires de Disponibilité</h3>
-                        <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Calculés en heure locale du restaurant</p>
+                        <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">Calculés en heure locale du restaurant</p>
                       </div>
                    </div>
 
@@ -513,7 +513,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                           <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all duration-300 gap-4">
                              <span className="font-bold text-slate-900 text-lg tracking-tight w-32">{day}</span>
                              <div className="flex-1 space-y-3">
-                                {slots.length === 0 && <span className="text-sm font-bold text-slate-400">Fermé</span>}
+                                {slots.length === 0 && <span className="text-sm font-bold text-slate-500">Fermé</span>}
                                 {slots.map((slot: any, sIdx: number) => (
                                   <div key={sIdx} className="flex items-center gap-4">
                                     <div className="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
@@ -668,7 +668,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                               <div key={i} className="flex gap-4 items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                                  <div className="flex-1 space-y-1">
                                     <h6 className="font-black text-slate-900 text-sm leading-tight">{item.title}</h6>
-                                    <p className="text-slate-400 text-[10px] leading-tight line-clamp-2 italic">{item.description_seo}</p>
+                                    <p className="text-slate-500 text-[10px] leading-tight line-clamp-2 italic">{item.description_seo}</p>
                                     <span className="text-sm font-black text-slate-900 mt-2 block">{item.selling_price} €</span>
                                  </div>
                                  <div className="w-24 h-24 rounded-xl overflow-hidden shadow-inner shrink-0 relative cursor-zoom-in" onClick={() => item.image_url && setFullImage(item.image_url)}>
@@ -704,7 +704,7 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
 
         {/* Unified Action Bar - FIXED at bottom */}
         <div className="px-10 py-6 bg-white border-t border-gray-100 flex justify-between items-center z-[70] shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
-          <div className="flex items-center gap-4 text-gray-400">
+          <div className="flex items-center gap-4 text-slate-500">
             <span className="text-[10px] font-black uppercase tracking-widest">Modifications en attente</span>
           </div>
           <div className="flex items-center gap-4">
