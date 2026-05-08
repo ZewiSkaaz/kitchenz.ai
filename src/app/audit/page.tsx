@@ -2,19 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, ChefHat, Utensils, Zap, Sparkles, ArrowRight, Loader2, ShieldCheck, Image as ImageIcon, Coffee, CakeSlice, Bot, ZapOff, Download, Check } from "lucide-react";
+import { Plus, Trash2, ChefHat, Utensils, Zap, Sparkles, ArrowRight, Loader2, ShieldCheck, Image as ImageIcon, Coffee, CakeSlice, Bot, ZapOff, Download, Check, Store, MapPin } from "lucide-react";
 import { PRICING, calculateSellingPrice, generateMenuItemImage, generateBrandImages } from "@/lib/ai";
 import { generateBrandCoreAction, generateCoreItemsAction, generateMenuAssemblyAction, analyzeInventoryImageAction } from "@/app/actions/aiActions";
 import { useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Step = "concept" | "ingredients" | "extras" | "equipment" | "flexibility" | "generating" | "result";
+type Step = "establishment" | "concept" | "ingredients" | "extras" | "equipment" | "flexibility" | "generating" | "result";
 
-const STEP_ORDER: Step[] = ["concept", "ingredients", "extras", "equipment", "flexibility", "result"];
+const STEP_ORDER: Step[] = ["establishment", "concept", "ingredients", "extras", "equipment", "flexibility", "result"];
 
 export default function AuditPage() {
-  const [step, setStep] = useState<Step>("concept");
+  const [step, setStep] = useState<Step>("establishment");
   const router = useRouter();
 
   useEffect(() => {
@@ -450,29 +451,109 @@ export default function AuditPage() {
           <p className="text-slate-500 text-lg font-medium">Créez votre empire culinaire avec l'expertise Uber Eats.</p>
         </div>
 
-        {/* Step Progress */}
+        {/* Step Progress — 7 steps */}
         <div className="flex justify-between mb-12 px-4">
-          {["concept", "ingredients", "extras", "equipment", "flexibility", "result"].map((s, i) => {
+          {["Site", "Concept", "Ingr.", "Extras", "Mat.ériel", "Optim.", "Résultat"].map((label, i) => {
             const currentStepIndex = STEP_ORDER.indexOf(step === "generating" ? "result" : step);
             const isCompleted = i < currentStepIndex;
-            const isActive = i === currentStepIndex || (s === "result" && step === "generating");
-            
+            const isActive = i === currentStepIndex || (STEP_ORDER[i] === "result" && step === "generating");
             return (
-              <div key={s} className="flex items-center">
-                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 font-bold ${
-                  isActive || isCompleted
-                  ? "bg-[#06C167] border-[#06C167] text-white" 
-                  : "bg-white border-slate-200 text-slate-300"
-                }`}>
-                  {i + 1}
+              <div key={label} className="flex items-center">
+                <div className="flex flex-col items-center gap-1">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-500 font-bold text-xs ${
+                    isActive || isCompleted
+                    ? "bg-[#06C167] border-[#06C167] text-white"
+                    : "bg-white border-slate-200 text-slate-300"
+                  }`}>
+                    {isCompleted ? "✓" : i + 1}
+                  </div>
+                  <span className={`text-[9px] font-black uppercase tracking-wider hidden md:block ${
+                    isActive ? "text-[#06C167]" : isCompleted ? "text-slate-400" : "text-slate-300"
+                  }`}>{label}</span>
                 </div>
-                {i < 5 && <div className={`w-4 md:w-8 h-[2px] mx-1 md:mx-2 ${isCompleted ? "bg-[#06C167]" : "bg-slate-200"}`} />}
+                {i < 6 && <div className={`w-4 md:w-8 h-[2px] mx-1 md:mx-2 mb-4 ${isCompleted ? "bg-[#06C167]" : "bg-slate-200"}`} />}
               </div>
             );
           })}
         </div>
 
         <AnimatePresence mode="wait">
+          {/* STEP 0: ESTABLISHMENT */}
+          {step === "establishment" && (
+            <motion.div key="establishment" variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="glass-card p-10 bg-white shadow-xl shadow-slate-200/50">
+              <div className="flex items-center gap-3 mb-3">
+                <Store className="text-[#06C167] w-8 h-8" />
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Votre site de production</h2>
+              </div>
+              <p className="text-slate-500 font-medium mb-10 text-base">Sélectionnez votre établissement pour pré-remplir automatiquement vos stocks et matériel. Vous pouvez aussi continuer sans.</p>
+
+              {establishments.length > 0 ? (
+                <div className="space-y-4 mb-10">
+                  {establishments.map((est) => (
+                    <div
+                      key={est.id}
+                      onClick={() => handleEstablishmentSelect(est.id)}
+                      className={`p-6 border-2 rounded-3xl cursor-pointer transition-all duration-300 flex items-center justify-between gap-4 ${
+                        selectedEstablishmentId === est.id
+                          ? 'bg-[#06C167]/5 border-[#06C167] shadow-lg shadow-[#06C167]/10'
+                          : 'bg-white border-slate-100 hover:border-slate-200 shadow-sm'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                          selectedEstablishmentId === est.id ? 'bg-[#06C167]' : 'bg-indigo-50'
+                        }`}>
+                          <Store className={`w-6 h-6 ${selectedEstablishmentId === est.id ? 'text-white' : 'text-indigo-600'}`} />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-slate-900 text-lg">{est.name}</h3>
+                          <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
+                            <MapPin className="w-3 h-3" /> {est.address}, {est.city}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{(est.default_ingredients?.length || 0)} ingr. • {(est.default_equipment?.length || 0)} mat.</p>
+                        {selectedEstablishmentId === est.id && (
+                          <span className="text-[10px] font-black text-[#06C167] uppercase tracking-widest">Sélectionné ✓</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mb-10 p-8 bg-indigo-50/50 rounded-3xl border border-indigo-100 flex flex-col md:flex-row items-center gap-6">
+                  <div className="p-4 bg-indigo-100 rounded-2xl">
+                    <Store className="w-8 h-8 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-black text-indigo-900 text-lg mb-1">Aucun site enregistré</h4>
+                    <p className="text-sm text-indigo-600 font-medium">Créez un site pour sauvegarder vos stocks et les réutiliser à chaque audit. Vous pouvez aussi continuer manuellement.</p>
+                  </div>
+                  <Link href="/onboarding" className="shrink-0 px-5 py-3 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2">
+                    <Plus className="w-4 h-4" /> Créer un site
+                  </Link>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => setStep("concept")}
+                  className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
+                >
+                  Passer cette étape →
+                </button>
+                <button
+                  onClick={() => setStep("concept")}
+                  disabled={establishments.length > 0 && !selectedEstablishmentId}
+                  className="btn-primary flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {selectedEstablishmentId ? 'Continuer avec ce site' : 'Continuer sans site'} <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
           {/* STEP 1: CONCEPT & BRANDING */}
           {step === "concept" && (
             <motion.div key="concept" variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="glass-card p-10 bg-white shadow-xl shadow-slate-200/50">
@@ -481,22 +562,6 @@ export default function AuditPage() {
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">Concept & Vision</h2>
               </div>
               
-              {establishments.length > 0 && (
-                <div className="mb-10 p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                  <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">Utiliser un établissement existant</label>
-                  <select 
-                    className="input-premium w-full bg-white"
-                    value={selectedEstablishmentId}
-                    onChange={(e) => handleEstablishmentSelect(e.target.value)}
-                  >
-                    <option value="">-- Choisir un établissement --</option>
-                    {establishments.map(est => (
-                      <option key={est.id} value={est.id}>{est.name} ({est.city})</option>
-                    ))}
-                  </select>
-                  <p className="mt-2 text-[10px] text-slate-400 font-medium">Ceci chargera automatiquement vos ingrédients et votre matériel sauvegardés.</p>
-                </div>
-              )}
 
               <div className="space-y-8 mb-10">
                 <div>
