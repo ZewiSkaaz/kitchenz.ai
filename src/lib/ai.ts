@@ -7,8 +7,7 @@ let openaiInstance: OpenAI | null = null;
 function getOpenAI() {
   if (!openaiInstance) {
     openaiInstance = new OpenAI({
-      apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || "",
-      dangerouslyAllowBrowser: true,
+      apiKey: process.env.OPENAI_API_KEY || "",
     });
   }
   return openaiInstance;
@@ -307,10 +306,6 @@ const CoreItemsZod = z.object({
 const MenuAssemblyZod = z.object({
   combos: z.array(MenuItemZod.extend({ modifier_groups: z.array(z.any()) }))
 });
-
-// ---------------------------------------------------------------------------
-// FUNCTIONS
-// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // FUNCTIONS

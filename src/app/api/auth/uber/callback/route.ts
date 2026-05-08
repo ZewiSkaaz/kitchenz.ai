@@ -8,7 +8,10 @@ export async function GET(request: Request) {
   const errorParam = searchParams.get("error");
   const errorDesc = searchParams.get("error_description");
   
-  const baseUrl = "https://kitchenz-ai.onrender.com";
+  // 1. Détermination dynamique de l'URL de base pour redirections
+  const host = request.headers.get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const baseUrl = `${protocol}://${host}`;
 
   if (errorParam) {
     return NextResponse.redirect(new URL(`/dashboard?error=${errorParam}&desc=${encodeURIComponent(errorDesc || '')}`, baseUrl));
@@ -45,14 +48,18 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL("/login?error=no_session", baseUrl));
     }
 
-    // Exchange code for tokens
+    // 2. Échange du code contre les tokens (Redirect URI doit MATCH l'initiation)
+    const redirectURI = `${baseUrl}/api/auth/uber/callback`;
+
     const params = new URLSearchParams({
       client_id: process.env.UBER_CLIENT_ID!,
       client_secret: process.env.UBER_CLIENT_SECRET!,
       grant_type: 'authorization_code',
-      redirect_uri: process.env.UBER_REDIRECT_URI || 'https://kitchenz-ai.onrender.com/api/auth/uber/callback',
+      redirect_uri: redirectURI,
       code,
     });
+
+    console.log("🔄 Exchanging code for tokens with Redirect URI:", redirectURI);
 
     const tokenRes = await fetch('https://login.uber.com/oauth/v2/token', {
       method: 'POST',

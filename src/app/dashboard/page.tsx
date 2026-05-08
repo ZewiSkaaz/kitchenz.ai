@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChefHat, Calendar, LayoutGrid, ListFilter, Trash2, ExternalLink, Utensils, BookOpen, Plus, Download, TrendingUp, Zap, LogOut, Store, MapPin, User, Loader2 } from "lucide-react";
+import { ChefHat, LayoutGrid, Zap, LogOut, Store, MapPin, User, Loader2, TrendingUp, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BrandEditor from "@/components/BrandEditor";
+import BrandCard from "@/components/BrandCard";
+import StatCard from "@/components/StatCard";
+import EditProfileModal from "@/components/EditProfileModal";
+import EditEstablishmentModal from "@/components/EditEstablishmentModal";
 
 export default function DashboardPage() {
   const [brands, setBrands] = useState<any[]>([]);
@@ -353,163 +357,5 @@ export default function DashboardPage() {
         onRefresh={() => fetchEstablishments(profile?.id)} 
       />
     </div>
-  );
-}
-
-function EditProfileModal({ isOpen, profile, onClose, onRefresh }: { isOpen: boolean, profile: any, onClose: () => void, onRefresh: () => void }) {
-  const [formData, setFormData] = useState(profile || {});
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => { if (profile) setFormData(profile); }, [profile]);
-
-  const handleSave = async () => {
-    setLoading(true);
-    const { error } = await supabase.from("profiles").upsert(formData);
-    if (!error) {
-      onRefresh();
-      onClose();
-    }
-    setLoading(false);
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-          <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-xl rounded-[40px] p-12 shadow-2xl overflow-hidden">
-            <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Modifier mon Profil Pro</h2>
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Prénom</label><input type="text" className="input-premium w-full" value={formData.first_name || ""} onChange={e => setFormData({...formData, first_name: e.target.value})} /></div>
-              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nom</label><input type="text" className="input-premium w-full" value={formData.last_name || ""} onChange={e => setFormData({...formData, last_name: e.target.value})} /></div>
-              <div className="space-y-2 col-span-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Téléphone</label><input type="text" className="input-premium w-full" value={formData.phone || ""} onChange={e => setFormData({...formData, phone: e.target.value})} /></div>
-              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Siret</label><input type="text" className="input-premium w-full" value={formData.siret || ""} onChange={e => setFormData({...formData, siret: e.target.value})} /></div>
-              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">TVA</label><input type="text" className="input-premium w-full" value={formData.tva_number || ""} onChange={e => setFormData({...formData, tva_number: e.target.value})} /></div>
-            </div>
-            <div className="flex gap-4">
-              <button onClick={onClose} className="flex-1 py-4 bg-slate-50 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl">Annuler</button>
-              <button onClick={handleSave} disabled={loading} className="flex-2 py-4 bg-[#06C167] text-white font-black uppercase text-xs tracking-widest rounded-2xl shadow-lg shadow-[#06C167]/20 flex items-center justify-center gap-2">
-                {loading && <Loader2 className="w-4 h-4 animate-spin" />} Enregistrer les modifications
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function EditEstablishmentModal({ isOpen, establishment, onClose, onRefresh }: { isOpen: boolean, establishment: any, onClose: () => void, onRefresh: () => void }) {
-  const [formData, setFormData] = useState(establishment || {});
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => { if (establishment) setFormData(establishment); }, [establishment]);
-
-  const handleSave = async () => {
-    setLoading(true);
-    const { error } = await supabase.from("establishments").update({
-      name: formData.name,
-      address: formData.address,
-      city: formData.city
-    }).eq("id", establishment.id);
-    if (!error) {
-      onRefresh();
-      onClose();
-    }
-    setLoading(false);
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-          <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-xl rounded-[40px] p-12 shadow-2xl overflow-hidden">
-            <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Modifier l'Établissement</h2>
-            <div className="space-y-6 mb-8">
-              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nom du restaurant</label><input type="text" className="input-premium w-full" value={formData.name || ""} onChange={e => setFormData({...formData, name: e.target.value})} /></div>
-              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Adresse</label><input type="text" className="input-premium w-full" value={formData.address || ""} onChange={e => setFormData({...formData, address: e.target.value})} /></div>
-              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Ville</label><input type="text" className="input-premium w-full" value={formData.city || ""} onChange={e => setFormData({...formData, city: e.target.value})} /></div>
-            </div>
-            <div className="flex gap-4">
-              <button onClick={onClose} className="flex-1 py-4 bg-slate-50 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl">Annuler</button>
-              <button onClick={handleSave} disabled={loading} className="flex-2 py-4 bg-indigo-600 text-white font-black uppercase text-xs tracking-widest rounded-2xl shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
-                {loading && <Loader2 className="w-4 h-4 animate-spin" />} Enregistrer les changements
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function StatCard({ title, value, trend, icon }: { title: string, value: string, trend: string, icon: React.ReactNode }) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
-    >
-      <div className="flex justify-between items-center mb-4">
-        <p className="text-gray-500 text-[11px] font-bold uppercase tracking-wider">{title}</p>
-        <div className="p-1.5 bg-gray-50 rounded-md border border-gray-100">{icon}</div>
-      </div>
-      <div className="flex items-baseline gap-2">
-        <h3 className="text-2xl font-bold text-black tracking-tight">{value}</h3>
-        <span className="text-[10px] font-bold text-[#06C167]">{trend}</span>
-      </div>
-    </motion.div>
-  );
-}
-
-function BrandCard({ brand, onDelete, onClick }: { brand: any, onDelete: () => void, onClick: () => void }) {
-  return (
-    <motion.div 
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -4 }}
-      className="bg-white group cursor-pointer border border-gray-200 rounded-lg overflow-hidden hover:border-[#06C167] transition-all"
-      onClick={onClick}
-    >
-      <div className="h-40 relative bg-gray-100 overflow-hidden">
-        <Image 
-          src={brand.background_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop"} 
-          alt={brand.name}
-          fill
-          className="object-cover" 
-        />
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all" />
-        <button 
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="absolute top-3 right-3 p-2 bg-white/90 text-gray-400 rounded-md hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
-      </div>
-      <div className="p-5">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-md border border-gray-100 bg-white relative overflow-hidden">
-            <Image 
-              src={brand.logo_url || "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=200&auto=format&fit=crop"} 
-              alt="Logo"
-              width={40}
-              height={40}
-              className="object-cover" 
-            />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-black group-hover:text-[#06C167] transition-colors">{brand.name}</h3>
-            <p className="text-[10px] text-gray-500 font-medium uppercase tracking-tight">{brand.culinary_style}</p>
-          </div>
-        </div>
-        <p className="text-gray-500 text-xs line-clamp-1 mb-4">"{brand.tagline}"</p>
-        <div className="flex justify-between items-center pt-4 border-t border-gray-50">
-           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><Utensils className="w-3 h-3" /> {brand.menu_items?.length || 0} Articles</span>
-           <span className="text-[10px] font-bold text-[#06C167] uppercase tracking-widest">Gérer</span>
-        </div>
-      </div>
-    </motion.div>
   );
 }
