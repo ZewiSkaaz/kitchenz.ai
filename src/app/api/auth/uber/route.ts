@@ -1,16 +1,42 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  const clientID = process.env.UBER_CLIENT_ID;
-  const redirectURI = process.env.UBER_REDIRECT_URI || 'https://kitchenz-ai.onrender.com/api/auth/uber/callback';
+export async function GET(req: NextRequest) {
+  // 1. Récupération et nettoyage des credentials
+  const clientID = process.env.UBER_CLIENT_ID?.trim();
   
-  // Scopes nécessaires pour gérer le restaurant et les commandes
-  const scopes = encodeURIComponent("eats.store eats.store.status.write eats.order eats.report");
-  
-  const uberAuthUrl = `https://login.uber.com/oauth/v2/authorize?client_id=${clientID}&response_type=code&redirect_uri=${encodeURIComponent(redirectURI)}&scope=${scopes}`;
+  // 2. Construction dynamique du Redirect URI (évite les mismatches entre dev et prod)
+  const host = req.headers.get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const redirectURI = `${protocol}://${host}/api/auth/uber/callback`;
 
-  console.log("🚀 Redirecting user to Uber OAuth...");
-  return NextResponse.redirect(uberAuthUrl);
+  console.log("🛠️ Uber Auth Config Check:", {
+    hasID: !!clientID,
+    redirectURI,
+    env: process.env.NODE_ENV
+  });
+
+  if (!clientID) {
+    console.error("❌ ERREUR : UBER_CLIENT_ID est manquant ou vide.");
+    return NextResponse.redirect(new URL('/dashboard?error=missing_uber_config', req.url));
+  }
+
+  // 3. Scopes - Assurez-vous qu'ils sont activés dans votre Dashboard Uber > Settings
+  const scopes = [
+    "eats.store",
+    "eats.store.status.write",
+    "eats.order",
+    "eats.report"
+  ].join(" ");
+
+  // 4. Construction de l'URL finale
+  const uberAuthUrl = new URL("https://login.uber.com/oauth/v2/authorize");
+  uberAuthUrl.searchParams.append("client_id", clientID);
+  uberAuthUrl.searchParams.append("response_type", "code");
+  uberAuthUrl.searchParams.append("redirect_uri", redirectURI);
+  uberAuthUrl.searchParams.append("scope", scopes);
+
+  console.log("🚀 Redirection vers Uber...");
+  return NextResponse.redirect(uberAuthUrl.toString());
 }
