@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChefHat, Calendar, LayoutGrid, ListFilter, Trash2, ExternalLink, Utensils, BookOpen, Plus, Download, TrendingUp, Zap, LogOut, Store, MapPin } from "lucide-react";
+import { ChefHat, Calendar, LayoutGrid, ListFilter, Trash2, ExternalLink, Utensils, BookOpen, Plus, Download, TrendingUp, Zap, LogOut, Store, MapPin, User, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BrandEditor from "@/components/BrandEditor";
@@ -16,6 +16,8 @@ export default function DashboardPage() {
   const [uberConnected, setUberConnected] = useState(false);
   const [establishments, setEstablishments] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editingEstablishment, setEditingEstablishment] = useState<any | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -116,6 +118,12 @@ export default function DashboardPage() {
           <Link href="/audit" className="bg-[#06C167] text-white text-sm font-bold px-6 py-3 rounded-md hover:bg-[#05a357] transition-all flex items-center gap-2">
             Nouvel Audit <Plus className="w-4 h-4" />
           </Link>
+          <button 
+            onClick={() => setIsEditingProfile(true)}
+            className="px-6 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 text-sm font-black uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm"
+          >
+            <User className="w-4 h-4" /> Mon Profil Pro
+          </button>
         </div>
 
         {/* Stats Grid */}
@@ -134,7 +142,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <h4 className="text-sm font-black text-slate-900 uppercase tracking-tighter">Uber Eats</h4>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Marketplace Manager</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Marketplace Manager</p>
                 </div>
               </div>
               <div className={`w-2 h-2 rounded-full ${uberConnected ? 'bg-[#06C167] animate-pulse' : 'bg-slate-200'}`} />
@@ -198,7 +206,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-2xl font-black text-slate-900 tracking-tight">Vos Établissements</h2>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gérez vos stocks et matériel par site</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Gérez vos stocks et matériel par site</p>
             </div>
             <Link href="/onboarding" className="p-3 bg-white border border-slate-100 rounded-xl hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2 text-xs font-black uppercase tracking-widest">
               <Plus className="w-4 h-4 text-[#06C167]" /> Ajouter un site
@@ -216,7 +224,15 @@ export default function DashboardPage() {
                   <div className="p-3 bg-indigo-50 rounded-2xl">
                     <Store className="w-6 h-6 text-indigo-600" />
                   </div>
-                  <span className="bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">ID: {est.id.slice(0,8)}</span>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setEditingEstablishment(est)}
+                      className="p-2 bg-slate-50 text-slate-400 hover:text-[#06C167] rounded-lg transition-all"
+                    >
+                      <LayoutGrid className="w-4 h-4" />
+                    </button>
+                    <span className="bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">ID: {est.id.slice(0,8)}</span>
+                  </div>
                 </div>
                 <h3 className="text-xl font-black text-slate-900 mb-1">{est.name}</h3>
                 <div className="flex items-center gap-2 text-slate-400 text-xs font-medium mb-6">
@@ -225,11 +241,11 @@ export default function DashboardPage() {
                 
                 <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-50">
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Ingrédients</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Ingrédients</p>
                     <p className="text-sm font-bold text-slate-900">{est.default_ingredients?.length || 0} sauv.</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Matériel</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Matériel</p>
                     <p className="text-sm font-bold text-slate-900">{est.default_equipment?.length || 0} sauv.</p>
                   </div>
                 </div>
@@ -256,7 +272,109 @@ export default function DashboardPage() {
           />
         )}
       </AnimatePresence>
+
+      <EditProfileModal 
+        isOpen={isEditingProfile} 
+        profile={profile} 
+        onClose={() => setIsEditingProfile(false)} 
+        onRefresh={() => fetchProfile(profile.id)} 
+      />
+
+      <EditEstablishmentModal 
+        isOpen={!!editingEstablishment} 
+        establishment={editingEstablishment} 
+        onClose={() => setEditingEstablishment(null)} 
+        onRefresh={() => fetchEstablishments(profile?.id)} 
+      />
     </div>
+  );
+}
+
+function EditProfileModal({ isOpen, profile, onClose, onRefresh }: { isOpen: boolean, profile: any, onClose: () => void, onRefresh: () => void }) {
+  const [formData, setFormData] = useState(profile || {});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => { if (profile) setFormData(profile); }, [profile]);
+
+  const handleSave = async () => {
+    setLoading(true);
+    const { error } = await supabase.from("profiles").upsert(formData);
+    if (!error) {
+      onRefresh();
+      onClose();
+    }
+    setLoading(false);
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+          <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-xl rounded-[40px] p-12 shadow-2xl overflow-hidden">
+            <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Modifier mon Profil Pro</h2>
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Prénom</label><input type="text" className="input-premium w-full" value={formData.first_name || ""} onChange={e => setFormData({...formData, first_name: e.target.value})} /></div>
+              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nom</label><input type="text" className="input-premium w-full" value={formData.last_name || ""} onChange={e => setFormData({...formData, last_name: e.target.value})} /></div>
+              <div className="space-y-2 col-span-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Téléphone</label><input type="text" className="input-premium w-full" value={formData.phone || ""} onChange={e => setFormData({...formData, phone: e.target.value})} /></div>
+              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Siret</label><input type="text" className="input-premium w-full" value={formData.siret || ""} onChange={e => setFormData({...formData, siret: e.target.value})} /></div>
+              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">TVA</label><input type="text" className="input-premium w-full" value={formData.tva_number || ""} onChange={e => setFormData({...formData, tva_number: e.target.value})} /></div>
+            </div>
+            <div className="flex gap-4">
+              <button onClick={onClose} className="flex-1 py-4 bg-slate-50 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl">Annuler</button>
+              <button onClick={handleSave} disabled={loading} className="flex-2 py-4 bg-[#06C167] text-white font-black uppercase text-xs tracking-widest rounded-2xl shadow-lg shadow-[#06C167]/20 flex items-center justify-center gap-2">
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />} Enregistrer les modifications
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function EditEstablishmentModal({ isOpen, establishment, onClose, onRefresh }: { isOpen: boolean, establishment: any, onClose: () => void, onRefresh: () => void }) {
+  const [formData, setFormData] = useState(establishment || {});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => { if (establishment) setFormData(establishment); }, [establishment]);
+
+  const handleSave = async () => {
+    setLoading(true);
+    const { error } = await supabase.from("establishments").update({
+      name: formData.name,
+      address: formData.address,
+      city: formData.city
+    }).eq("id", establishment.id);
+    if (!error) {
+      onRefresh();
+      onClose();
+    }
+    setLoading(false);
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+          <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-xl rounded-[40px] p-12 shadow-2xl overflow-hidden">
+            <h2 className="text-3xl font-black text-slate-900 mb-8 tracking-tight">Modifier l'Établissement</h2>
+            <div className="space-y-6 mb-8">
+              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nom du restaurant</label><input type="text" className="input-premium w-full" value={formData.name || ""} onChange={e => setFormData({...formData, name: e.target.value})} /></div>
+              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Adresse</label><input type="text" className="input-premium w-full" value={formData.address || ""} onChange={e => setFormData({...formData, address: e.target.value})} /></div>
+              <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Ville</label><input type="text" className="input-premium w-full" value={formData.city || ""} onChange={e => setFormData({...formData, city: e.target.value})} /></div>
+            </div>
+            <div className="flex gap-4">
+              <button onClick={onClose} className="flex-1 py-4 bg-slate-50 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl">Annuler</button>
+              <button onClick={handleSave} disabled={loading} className="flex-2 py-4 bg-indigo-600 text-white font-black uppercase text-xs tracking-widest rounded-2xl shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />} Enregistrer les changements
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }
 

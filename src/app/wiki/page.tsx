@@ -54,19 +54,31 @@ export default function WikiPage() {
               icon={<Sparkles className="w-8 h-8 text-[#06C167]" />}
               title="Audit de Marque"
               desc="Apprenez à utiliser l'IA pour analyser vos stocks et générer des concepts culinaires uniques."
-              links={["Comment lancer un audit", "Optimiser les entrées", "Style visuel"]}
+              links={[
+                { label: "Comment lancer un audit", href: "/wiki/lancer-un-audit" },
+                { label: "Optimiser les entrées", href: "/wiki/optimiser-entrees" },
+                { label: "Style visuel", href: "/wiki/style-visuel" }
+              ]}
             />
             <DocCard 
               icon={<Zap className="w-8 h-8 text-yellow-500" />}
               title="Intégration Uber Eats"
               desc="Guide complet sur l'export JSON et la publication de votre menu sur les plateformes."
-              links={["Export JSON Uber Eats", "Gestion des catégories", "Mapping des prix"]}
+              links={[
+                { label: "Export JSON Uber Eats", href: "/wiki/export-json-uber" },
+                { label: "Gestion des catégories", href: "/wiki/gestion-categories" },
+                { label: "Mapping des prix", href: "/wiki/mapping-prix" }
+              ]}
             />
             <DocCard 
               icon={<DollarSign className="w-8 h-8 text-emerald-500" />}
               title="Tarification & Marges"
               desc="Comprendre comment Kitchenz.ai calcule vos prix de vente pour garantir votre rentabilité."
-              links={["Structure des coûts", "TVA & Commissions", "Cibles de marge"]}
+              links={[
+                { label: "Structure des coûts", href: "/wiki/structure-couts" },
+                { label: "TVA & Commissions", href: "/wiki/tva-commissions" },
+                { label: "Cibles de marge", href: "/wiki/cibles-marge" }
+              ]}
             />
           </div>
         </div>
@@ -105,7 +117,7 @@ export default function WikiPage() {
   );
 }
 
-function DocCard({ icon, title, desc, links }: { icon: React.ReactNode, title: string, desc: string, links: string[] }) {
+function DocCard({ icon, title, desc, links }: { icon: React.ReactNode, title: string, desc: string, links: { label: string, href: string }[] }) {
   return (
     <div className="p-10 bg-white border border-slate-100 rounded-[45px] hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500 group">
       <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mb-8 border border-slate-100 group-hover:scale-110 transition-transform">{icon}</div>
@@ -114,8 +126,8 @@ function DocCard({ icon, title, desc, links }: { icon: React.ReactNode, title: s
       <ul className="space-y-3">
         {links.map((link, i) => (
           <li key={i}>
-            <Link href="#" className="text-slate-400 hover:text-[#06C167] font-bold text-sm flex items-center gap-2 transition-colors">
-              <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" /> {link}
+            <Link href={link.href} className="text-slate-400 hover:text-[#06C167] font-bold text-sm flex items-center gap-2 transition-colors">
+              <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" /> {link.label}
             </Link>
           </li>
         ))}

@@ -36,10 +36,18 @@ export default function OnboardingPage() {
         router.push("/login");
       } else {
         setUserId(session.user.id);
-        // Check if onboarding already done
+        // Check if profile exists
         const { data: prof } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
-        if (prof && prof.siret) {
-          router.push("/dashboard");
+        if (prof) {
+          setProfile({
+            first_name: prof.first_name || "",
+            last_name: prof.last_name || "",
+            phone: prof.phone || "",
+            siret: prof.siret || "",
+            tva_number: prof.tva_number || ""
+          });
+          // If we have a profile, we can skip to step 2
+          setStep(2);
         }
       }
     };
@@ -112,7 +120,7 @@ export default function OnboardingPage() {
 
               <div className="grid md:grid-cols-2 gap-8 mb-10">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Prénom</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Prénom</label>
                   <input 
                     type="text" 
                     placeholder="Jean"
@@ -122,7 +130,7 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nom</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nom</label>
                   <input 
                     type="text" 
                     placeholder="Dupont"
@@ -132,7 +140,7 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Téléphone</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Téléphone</label>
                   <div className="relative">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input 
@@ -145,7 +153,7 @@ export default function OnboardingPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">N° SIRET</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">N° SIRET</label>
                   <div className="relative">
                     <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input 
@@ -158,7 +166,7 @@ export default function OnboardingPage() {
                   </div>
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">N° TVA Intracommunautaire</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">N° TVA Intracommunautaire</label>
                   <input 
                     type="text" 
                     placeholder="FR 12 345678901"
@@ -199,7 +207,7 @@ export default function OnboardingPage() {
 
               <div className="space-y-8 mb-10">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nom du restaurant</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nom du restaurant</label>
                   <input 
                     type="text" 
                     placeholder="Ex: Le Petit Bistro, Pizza Napoli..."
@@ -209,7 +217,7 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Adresse complète</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Adresse complète</label>
                   <div className="relative">
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input 
@@ -222,7 +230,7 @@ export default function OnboardingPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ville</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Ville</label>
                   <input 
                     type="text" 
                     placeholder="Paris"

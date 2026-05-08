@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Zap, ShieldCheck, TrendingUp, ChevronRight, Play, Check, Star, Globe, Users, ChefHat } from "lucide-react";
@@ -36,7 +37,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-gray-500 font-medium max-w-2xl mx-auto mb-12 leading-relaxed"
+            className="text-lg md:text-xl text-slate-600 font-medium max-w-2xl mx-auto mb-12 leading-relaxed"
           >
             Kitchenz.ai transforme vos stocks en marques virtuelles optimisées. 
             Gagnez en visibilité et en rentabilité grâce à notre technologie de vision par ordinateur.
@@ -63,10 +64,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-center text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-12">Ils nous font confiance</p>
           <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" className="h-8 md:h-10" alt="Uber Eats" />
-             <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Deliveroo_logo.svg/1200px-Deliveroo_logo.svg.png" className="h-8 md:h-12" alt="Deliveroo" />
-             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Burger_King_logo.svg/1200px-Burger_King_logo.svg.png" className="h-10 md:h-14" alt="Burger King" />
-             <img src="https://upload.wikimedia.org/wikipedia/fr/b/bf/Logo_Mc_Donald%27s.png" className="h-10 md:h-14" alt="McDonalds" />
+             <Image src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" width={120} height={40} className="h-8 md:h-10 w-auto" alt="Uber Eats" />
+             <Image src="https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Deliveroo_logo.svg/1200px-Deliveroo_logo.svg.png" width={140} height={48} className="h-8 md:h-12 w-auto" alt="Deliveroo" />
+             <Image src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Burger_King_logo.svg/1200px-Burger_King_logo.svg.png" width={56} height={56} className="h-10 md:h-14 w-auto" alt="Burger King" />
+             <Image src="https://upload.wikimedia.org/wikipedia/fr/b/bf/Logo_Mc_Donald%27s.png" width={56} height={56} className="h-10 md:h-14 w-auto" alt="McDonalds" />
           </div>
         </div>
       </section>
@@ -76,7 +77,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-24">
             <h2 className="text-3xl md:text-5xl font-bold text-black tracking-tight mb-6">Multipliez vos marques, <br/> pas votre travail.</h2>
-            <p className="text-gray-500 text-lg font-medium max-w-xl mx-auto">Exploitez tout le potentiel de votre cuisine existante pour dominer les plateformes de livraison.</p>
+            <p className="text-slate-600 text-lg font-medium max-w-xl mx-auto">Exploitez tout le potentiel de votre cuisine existante pour dominer les plateformes de livraison.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -104,7 +105,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-24">
              <h2 className="text-3xl md:text-5xl font-bold text-black tracking-tight mb-4">Une solution rentabilisée <br/> <span className="text-[#06C167]">immédiatement</span>.</h2>
-             <p className="text-gray-500 text-lg font-medium">Choisissez le plan qui correspond à votre ambition.</p>
+             <p className="text-slate-600 text-lg font-medium">Choisissez le plan qui correspond à votre ambition.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -133,7 +134,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-bold text-black tracking-tight mb-4">Une solution sans frontières</h2>
-            <p className="text-gray-500 text-lg font-medium max-w-2xl mx-auto">
+            <p className="text-slate-600 text-lg font-medium max-w-2xl mx-auto">
               Kitchenz.ai accompagne les restaurateurs partout où Uber Eats opère. Optimisez votre rentabilité, de Paris à Tokyo.
             </p>
           </div>
@@ -153,7 +154,7 @@ export default function Home() {
           </div>
           
           <div className="mt-20 p-8 text-center">
-            <p className="text-gray-400 text-xs font-bold uppercase tracking-[0.2em]">Et 20+ autres pays à travers le monde</p>
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em]">Et 20+ autres pays à travers le monde</p>
           </div>
         </div>
       </section>
@@ -163,10 +164,10 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="bg-black rounded-2xl p-12 md:p-24 text-center relative overflow-hidden">
              <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 relative z-10">Optimisez votre cuisine <br/> dès aujourd'hui.</h2>
-             <p className="text-gray-400 text-lg font-medium mb-12 max-w-xl mx-auto relative z-10">Rejoignez les restaurateurs qui utilisent Kitchenz.ai pour automatiser leur croissance.</p>
+             <p className="text-gray-300 text-lg font-medium mb-12 max-w-xl mx-auto relative z-10">Rejoignez les restaurateurs qui utilisent Kitchenz.ai pour automatiser leur croissance.</p>
              <Link href="/audit" className="btn-primary px-10 py-4 mx-auto relative z-10 w-full md:w-auto">
                 Commencer l'Audit Gratuit
-             </Link>
+              </Link>
           </div>
         </div>
       </section>
@@ -181,7 +182,7 @@ function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: stri
         {icon}
       </div>
       <h3 className="text-xl font-bold text-black mb-4">{title}</h3>
-      <p className="text-gray-500 text-sm leading-relaxed font-medium">{desc}</p>
+      <p className="text-slate-600 text-sm leading-relaxed font-medium">{desc}</p>
     </div>
   );
 }
@@ -190,14 +191,14 @@ function PricingCard({ plan, price, features, popular }: { plan: string, price: 
   return (
     <div className={`p-10 rounded-xl flex flex-col border transition-all duration-500 ${popular ? 'bg-white border-[#06C167] shadow-xl scale-105 z-10' : 'bg-white border-gray-100 hover:border-gray-200'}`}>
       {popular && <span className="bg-[#06C167] text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded w-fit mb-6">Recommandé</span>}
-      <h3 className="text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">{plan}</h3>
+      <h3 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">{plan}</h3>
       <div className="flex items-baseline gap-1 mb-8">
         <span className="text-4xl font-bold text-black tracking-tight">{price}€</span>
-        <span className="text-gray-400 font-medium text-xs">/ mois</span>
+        <span className="text-slate-500 font-medium text-xs">/ mois</span>
       </div>
       <ul className="space-y-3 mb-10 flex-1">
         {features.map((f, i) => (
-          <li key={i} className="flex items-center gap-3 text-gray-600 text-sm font-medium">
+          <li key={i} className="flex items-center gap-3 text-slate-700 text-sm font-medium">
             <Check className="w-4 h-4 text-[#06C167]" /> {f}
           </li>
         ))}

@@ -104,6 +104,10 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
     
     if (error) setToast({ message: "Erreur lors de la sauvegarde", type: 'error' });
     else {
+      // UX Tracking: Identity Saved
+      if (typeof window !== 'undefined' && (window as any).clarity) {
+        (window as any).clarity("event", "identity_saved", { brandId: brand.id });
+      }
       onRefresh();
       setToast({ message: "Identité sauvegardée avec succès !", type: 'success' });
     }
@@ -128,6 +132,10 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
       console.error(error);
       setToast({ message: "Erreur Supabase: " + (error.message || error.details || "Erreur de synchronisation"), type: 'error' });
     } else {
+      // UX Tracking: Menu Saved
+      if (typeof window !== 'undefined' && (window as any).clarity) {
+        (window as any).clarity("event", "menu_saved", { itemCount: menuToSave.length });
+      }
       onRefresh();
       setToast({ message: "Menu sauvegardé !", type: 'success' });
     }
@@ -225,9 +233,9 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
             </div>
             <div className="h-6 w-px bg-gray-200 hidden md:block" />
             <div className="flex gap-1 overflow-x-auto no-scrollbar max-w-[200px] md:max-w-none">
-               <button onClick={() => setActiveTab('identity')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'identity' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Identité</button>
-               <button onClick={() => setActiveTab('menu')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'menu' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Articles</button>
-               <button onClick={() => setActiveTab('ops')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'ops' ? 'bg-gray-100 text-black' : 'text-gray-400 hover:text-gray-600'}`}>Paramètres</button>
+               <button onClick={() => setActiveTab('identity')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'identity' ? 'bg-slate-100 text-black' : 'text-slate-500 hover:text-slate-700'}`}>Identité</button>
+               <button onClick={() => setActiveTab('menu')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'menu' ? 'bg-slate-100 text-black' : 'text-slate-500 hover:text-slate-700'}`}>Articles</button>
+               <button onClick={() => setActiveTab('ops')} className={`px-3 md:px-4 py-2 rounded text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'ops' ? 'bg-slate-100 text-black' : 'text-slate-500 hover:text-slate-700'}`}>Paramètres</button>
             </div>
           </div>
 
@@ -291,22 +299,22 @@ export default function BrandEditor({ brand: initialBrand, onClose, onRefresh, u
                 <div className="pt-8 grid md:grid-cols-2 gap-8">
                   <div className="space-y-5">
                     <div className="space-y-1.5">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Nom de l&apos;établissement</label>
-                      <input value={brand.name} onChange={e => setBrand({...brand, name: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-base font-bold outline-none focus:border-[#06C167] focus:bg-white transition-all" />
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Nom de l&apos;établissement</label>
+                      <input value={brand.name} onChange={e => setBrand({...brand, name: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 text-base font-bold outline-none focus:border-[#06C167] focus:bg-white transition-all" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Slogan marketing</label>
-                      <input value={brand.tagline} onChange={e => setBrand({...brand, tagline: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-700 text-sm font-medium outline-none focus:border-[#06C167] focus:bg-white transition-all" />
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Slogan marketing</label>
+                      <input value={brand.tagline} onChange={e => setBrand({...brand, tagline: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-700 text-sm font-medium outline-none focus:border-[#06C167] focus:bg-white transition-all" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Catégorie de cuisine</label>
-                      <input value={brand.culinary_style} onChange={e => setBrand({...brand, culinary_style: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-[#06C167] text-sm font-bold outline-none focus:border-[#06C167] focus:bg-white transition-all" />
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Catégorie de cuisine</label>
+                      <input value={brand.culinary_style} onChange={e => setBrand({...brand, culinary_style: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-[#06C167] text-sm font-bold outline-none focus:border-[#06C167] focus:bg-white transition-all" />
                     </div>
                   </div>
                   <div className="space-y-5">
                     <div className="space-y-1.5">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Présentation (Storytelling)</label>
-                      <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-700 text-sm leading-relaxed outline-none focus:border-[#06C167] focus:bg-white transition-all min-h-[160px] resize-none" />
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Présentation (Storytelling)</label>
+                      <textarea value={brand.storytelling} onChange={e => setBrand({...brand, storytelling: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-700 text-sm leading-relaxed outline-none focus:border-[#06C167] focus:bg-white transition-all min-h-[160px] resize-none" />
                     </div>
                   </div>
                 </div>

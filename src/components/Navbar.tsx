@@ -59,11 +59,11 @@ export default function Navbar() {
           <NavLink href="/examples" label="Exemples" scrolled={scrolled} />
           
           {/* Language Selector (Master Audit #8) */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-md border border-gray-100">
+          <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-md border border-slate-100">
             {['FR', 'EN', 'ES'].map((lang) => (
               <button 
                 key={lang}
-                className="text-[10px] font-bold text-gray-400 hover:text-black transition-colors"
+                className="text-[10px] font-black text-slate-500 hover:text-[#06C167] transition-colors"
                 onClick={() => alert(`Changement vers ${lang} (Configuration en cours...)`)}
               >
                 {lang}
@@ -88,7 +88,7 @@ export default function Navbar() {
             </div>
           ) : (
             <>
-              <Link href="/login" className={`font-black text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-all ${scrolled ? "text-slate-600 hover:text-[#06C167]" : "text-slate-600 hover:text-[#06C167]"}`}>
+              <Link href="/login" className={`font-black text-sm uppercase tracking-widest px-6 py-3 rounded-xl transition-all ${scrolled ? "text-slate-700 hover:text-[#06C167]" : "text-slate-700 hover:text-[#06C167]"}`}>
                 Connexion
               </Link>
               <Link href="/audit" className="btn-primary !py-2 !text-xs uppercase tracking-widest">
@@ -142,7 +142,7 @@ export default function Navbar() {
 
 function NavLink({ href, label, scrolled }: { href: string; label: string; scrolled: boolean }) {
   return (
-    <Link href={href} className={`text-sm font-black uppercase tracking-widest transition-all hover:text-[#06C167] ${scrolled ? "text-slate-600" : "text-slate-600"}`}>
+    <Link href={href} className={`text-sm font-black uppercase tracking-widest transition-all hover:text-[#06C167] ${scrolled ? "text-slate-700" : "text-slate-700"}`}>
       {label}
     </Link>
   );

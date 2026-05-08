@@ -49,7 +49,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Email de contact</label>
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">Email de contact</label>
             <div className="relative">
               <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
               <input
@@ -64,7 +64,7 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Mot de passe</label>
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-4">Mot de passe</label>
             <div className="relative">
               <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
               <input
@@ -92,7 +92,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-12 text-center pt-8 border-t border-slate-100">
-          <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
             Nouveau sur Kitchenz ? <Link href="/register" className="text-[#06C167] hover:underline ml-2">Créer un compte</Link>
           </p>
         </div>

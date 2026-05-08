@@ -6,6 +6,7 @@ import { ArrowRight, Calendar, User, Clock, ChevronRight } from "lucide-react";
 
 const POSTS = [
   {
+    slug: "uber-eats-strategie-2024",
     title: "Comment Uber Eats a changé la donne pour les restaurateurs en 2024",
     excerpt: "Découvrez les nouvelles tendances de la livraison et comment adapter votre menu pour maximiser vos marges.",
     date: "24 Mars 2024",
@@ -14,6 +15,7 @@ const POSTS = [
     image: "https://images.unsplash.com/photo-1512152272829-e3139592d56f?auto=format&fit=crop&q=80&w=800"
   },
   {
+    slug: "optimiser-couts-ia",
     title: "5 astuces pour réduire vos coûts matières avec l'IA",
     excerpt: "L'intelligence artificielle peut vous aider à optimiser vos stocks et à créer des recettes plus rentables.",
     date: "12 Mars 2024",
@@ -22,6 +24,7 @@ const POSTS = [
     image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=800"
   },
   {
+    slug: "storytelling-dark-kitchen",
     title: "Le guide ultime du storytelling culinaire pour Dark Kitchen",
     excerpt: "Pourquoi l'histoire de votre marque est aussi importante que le goût de vos plats sur les plateformes.",
     date: "05 Mars 2024",
@@ -87,7 +90,7 @@ export default function BlogPage() {
                 <p className="text-slate-500 font-medium mb-10 line-clamp-3">
                   {post.excerpt}
                 </p>
-                <Link href="#" className="mt-auto inline-flex items-center gap-2 text-slate-900 font-black uppercase text-xs tracking-widest group-hover:gap-4 transition-all">
+                <Link href={`/blog/${post.slug}`} className="mt-auto inline-flex items-center gap-2 text-slate-900 font-black uppercase text-xs tracking-widest group-hover:gap-4 transition-all">
                   Lire l'article <ChevronRight className="w-4 h-4 text-[#06C167]" />
                 </Link>
               </div>

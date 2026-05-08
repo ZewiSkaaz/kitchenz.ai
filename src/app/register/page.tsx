@@ -96,7 +96,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSignUp} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">E-mail Professionnel</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">E-mail Professionnel</label>
               <div className="relative">
                 <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
                 <input
@@ -111,7 +111,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Mot de passe</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">Mot de passe</label>
               <div className="relative">
                 <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
                 <input
@@ -141,7 +141,7 @@ export default function RegisterPage() {
             </button>
 
             <div className="pt-8 border-t border-slate-100 text-center">
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+              <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
                 Déjà inscrit ? <Link href="/login" className="text-[#06C167] hover:underline ml-2">Connectez-vous</Link>
               </p>
             </div>

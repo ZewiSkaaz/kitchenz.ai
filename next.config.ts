@@ -12,8 +12,6 @@ const nextConfig: any = {
       { protocol: 'https', hostname: '**.supabase.in' },
     ],
   },
-  // On garde l'ignorance temporairement pour ne pas bloquer le déploiement actuel
-  eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true }
 };
 
