@@ -18,3 +18,5 @@ services:
         sync: false
       - key: UBER_EATS_CLIENT_SECRET
         sync: false
+      - key: NEXT_PUBLIC_CLARITY_ID
+        value: woc8b5ukqn

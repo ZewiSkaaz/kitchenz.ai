@@ -64,10 +64,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-center text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-12">Ils nous font confiance</p>
           <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-             <Image src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" width={120} height={40} className="h-8 md:h-10 w-auto" alt="Uber Eats" />
-             <Image src="https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Deliveroo_logo.svg/1200px-Deliveroo_logo.svg.png" width={140} height={48} className="h-8 md:h-12 w-auto" alt="Deliveroo" />
-             <Image src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Burger_King_logo.svg/1200px-Burger_King_logo.svg.png" width={56} height={56} className="h-10 md:h-14 w-auto" alt="Burger King" />
-             <Image src="https://upload.wikimedia.org/wikipedia/fr/b/bf/Logo_Mc_Donald%27s.png" width={56} height={56} className="h-10 md:h-14 w-auto" alt="McDonalds" />
+             <Image priority={true} src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg" width={120} height={40} className="h-8 md:h-10 w-auto" alt="Uber Eats" />
+             <Image priority={true} src="https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Deliveroo_logo.svg/1200px-Deliveroo_logo.svg.png" width={140} height={48} className="h-8 md:h-12 w-auto" alt="Deliveroo" />
+             <Image priority={true} src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Burger_King_logo.svg/1200px-Burger_King_logo.svg.png" width={56} height={56} className="h-10 md:h-14 w-auto" alt="Burger King" />
+             <Image priority={true} src="https://upload.wikimedia.org/wikipedia/fr/b/bf/Logo_Mc_Donald%27s.png" width={56} height={56} className="h-10 md:h-14 w-auto" alt="McDonalds" />
           </div>
         </div>
       </section>
@@ -164,7 +164,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="bg-black rounded-2xl p-12 md:p-24 text-center relative overflow-hidden">
              <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 relative z-10">Optimisez votre cuisine <br/> dès aujourd'hui.</h2>
-             <p className="text-gray-300 text-lg font-medium mb-12 max-w-xl mx-auto relative z-10">Rejoignez les restaurateurs qui utilisent Kitchenz.ai pour automatiser leur croissance.</p>
+             <p className="text-gray-100 text-lg font-medium mb-12 max-w-xl mx-auto relative z-10">Rejoignez les restaurateurs qui utilisent Kitchenz.ai pour automatiser leur croissance.</p>
              <Link href="/audit" className="btn-primary px-10 py-4 mx-auto relative z-10 w-full md:w-auto">
                 Commencer l'Audit Gratuit
               </Link>
