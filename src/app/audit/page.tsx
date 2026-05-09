@@ -478,8 +478,9 @@ export default function AuditPage() {
         </div>
 
         <AnimatePresence mode="wait">
-          {/* STEP 0: ESTABLISHMENT */}
-          {step === "establishment" && (
+          {/* FORM STEPS ON SINGLE PAGE */}
+          {step !== "generating" && step !== "result" && (
+            <div className="space-y-12">
             <motion.div key="establishment" variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="glass-card p-10 bg-white shadow-xl shadow-slate-200/50">
               <div className="flex items-center gap-3 mb-3">
                 <Store className="text-[#06C167] w-8 h-8" />
@@ -536,26 +537,10 @@ export default function AuditPage() {
                 </div>
               )}
 
-              <div className="flex justify-between items-center">
-                <button
-                  onClick={() => setStep("concept")}
-                  className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
-                >
-                  Passer cette étape →
-                </button>
-                <button
-                  onClick={() => setStep("concept")}
-                  disabled={establishments.length > 0 && !selectedEstablishmentId}
-                  className="btn-primary flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {selectedEstablishmentId ? 'Continuer avec ce site' : 'Continuer sans site'} <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
+              
             </motion.div>
-          )}
 
           {/* STEP 1: CONCEPT & BRANDING */}
-          {step === "concept" && (
             <motion.div key="concept" variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="glass-card p-10 bg-white shadow-xl shadow-slate-200/50">
               <div className="flex items-center gap-3 mb-8">
                 <ChefHat className="text-[#06C167] w-8 h-8" />
@@ -605,16 +590,10 @@ export default function AuditPage() {
                   />
                 </div>
               </div>
-              <div className="flex justify-end">
-                <button onClick={() => setStep("ingredients")} className="btn-primary flex items-center gap-2">
-                  Suivant <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
+              
             </motion.div>
-          )}
 
           {/* STEP 2: INGREDIENTS */}
-          {step === "ingredients" && (
             <motion.div key="ingredients" variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="glass-card p-10 bg-white shadow-xl shadow-slate-200/50">
               <div className="flex items-center gap-3 mb-8">
                 <Utensils className="text-[#06C167] w-8 h-8" />
@@ -676,17 +655,10 @@ export default function AuditPage() {
                   )}
                 </div>
 
-                <div className="flex justify-between">
-                  <button onClick={() => setStep("concept")} className="btn-secondary">Retour</button>
-                  <button disabled={ingredients.length === 0} onClick={() => setStep("extras")} className="btn-primary flex items-center gap-2">
-                    Suivant <ArrowRight className="w-5 h-5" />
-                  </button>
-                </div>
+                
             </motion.div>
-          )}
 
           {/* STEP 3: EXTRAS (Drinks & Desserts) */}
-          {step === "extras" && (
             <motion.div key="extras" variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="glass-card p-10 bg-white shadow-xl shadow-slate-200/50">
               <div className="flex items-center gap-3 mb-8">
                 <Coffee className="text-[#06C167] w-8 h-8" />
@@ -756,17 +728,10 @@ export default function AuditPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-between">
-                <button onClick={() => setStep("ingredients")} className="btn-secondary">Retour</button>
-                <button onClick={() => setStep("equipment")} className="btn-primary flex items-center gap-2">
-                  Suivant <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
+              
             </motion.div>
-          )}
 
           {/* STEP 4: EQUIPMENT */}
-          {step === "equipment" && (
             <motion.div key="equipment" variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="glass-card p-10 bg-white shadow-xl shadow-slate-200/50">
               <div className="flex items-center gap-3 mb-8">
                 <Zap className="text-[#06C167] w-8 h-8" />
@@ -807,17 +772,10 @@ export default function AuditPage() {
                   </motion.span>
                 ))}
               </div>
-              <div className="flex justify-between">
-                <button onClick={() => setStep("extras")} className="btn-secondary">Retour</button>
-                <button disabled={equipment.length === 0} onClick={() => setStep("flexibility")} className="btn-primary flex items-center gap-2">
-                  Suivant <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
+              
             </motion.div>
-          )}
 
           {/* STEP 5: FLEXIBILITY */}
-          {step === "flexibility" && (
             <motion.div key="flexibility" variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="glass-card p-10 bg-white">
               <div className="flex items-center gap-3 mb-8">
                 <Zap className="text-[#06C167]" />
@@ -853,16 +811,16 @@ export default function AuditPage() {
                   </div>
                 </div>
 
-              <div className="flex justify-between">
-                <button className="btn-secondary" onClick={() => setStep("equipment")}>Retour</button>
+              <div className="flex justify-center mt-12">
                 <button 
-                  className="btn-primary" 
+                  className="btn-primary text-xl px-12 py-6 shadow-2xl shadow-[#06C167]/30 hover:scale-105 transition-transform" 
                   onClick={handleGenerate}
                 >
                   Lancer l'Audit Global IA <Sparkles className="w-6 h-6" />
                 </button>
               </div>
             </motion.div>
+            </div>
           )}
 
           {/* STEP: GENERATING */}
