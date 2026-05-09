@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChefHat, LayoutGrid, Zap, LogOut, Store, MapPin, User, Loader2, TrendingUp, Plus } from "lucide-react";
+import { ChefHat, LayoutGrid, Zap, LogOut, Store, MapPin, User, Loader2, TrendingUp, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BrandEditor from "@/components/BrandEditor";
