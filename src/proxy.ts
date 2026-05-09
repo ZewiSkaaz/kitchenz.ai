@@ -43,14 +43,15 @@ export async function proxy(req: NextRequest) {
   res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   
-  // CSP: Allowing self, Supabase, Google Fonts, and Microsoft Clarity
+  // CSP: Allowing self, Supabase, Google Fonts, Stripe, and Microsoft Clarity
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.clarity.ms https://c.bing.com;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.clarity.ms https://c.bing.com https://js.stripe.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' data: https: blob:;
     font-src 'self' data: https://fonts.gstatic.com;
-    connect-src 'self' https://*.supabase.co https://*.clarity.ms https://c.bing.com;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.clarity.ms https://c.bing.com https://api.stripe.com;
+    frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
     frame-ancestors 'none';
   `.replace(/\s{2,}/g, ' ').trim();
   
