@@ -119,7 +119,16 @@ export default function EstablishmentDetailPage() {
                 placeholder="Ajouter un ingrédient..." 
                 className="input-premium flex-1" 
                 value={currentIngredient}
-                onChange={(e) => setCurrentIngredient(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.includes(',')) {
+                    const newItems = val.split(',').map(i => i.trim()).filter(i => i !== "");
+                    setIngredients([...ingredients, ...newItems]);
+                    setCurrentIngredient("");
+                  } else {
+                    setCurrentIngredient(val);
+                  }
+                }}
                 onKeyPress={(e) => e.key === "Enter" && addItem("ingredient")}
               />
               <button onClick={() => addItem("ingredient")} className="p-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all">
@@ -152,7 +161,16 @@ export default function EstablishmentDetailPage() {
                 placeholder="Ajouter un matériel..." 
                 className="input-premium flex-1" 
                 value={currentEquipment}
-                onChange={(e) => setCurrentEquipment(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.includes(',')) {
+                    const newItems = val.split(',').map(i => i.trim()).filter(i => i !== "");
+                    setEquipment([...equipment, ...newItems]);
+                    setCurrentEquipment("");
+                  } else {
+                    setCurrentEquipment(val);
+                  }
+                }}
                 onKeyPress={(e) => e.key === "Enter" && addItem("equipment")}
               />
               <button onClick={() => addItem("equipment")} className="p-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all">
