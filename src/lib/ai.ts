@@ -70,7 +70,8 @@ async function askAI(prompt: string, systemPrompt: string = "You are a professio
       lastError = e;
     }
   }
-  throw lastError || new Error("All AI models failed");
+  console.error("❌ All AI models failed, using fallback.");
+  return {};
 }
 function healItem(item: any) {
   return {
