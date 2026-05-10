@@ -223,23 +223,19 @@ export default function AuditPage() {
         console.error("Erreur images marque:", e);
       }
 
-      // Étape 4 : Photos produits — Construction instantanée des URLs
+      // Étape 4 : Photos produits — Construction instantanée des URLs sur le CLIENT
+      // Plus besoin de Server Action pour Pollinations car c'est une URL publique
       setLoadingStep("Génération des Photos de TOUS les produits...");
       const allItems = [...coreItems.main_dishes, ...coreItems.generated_sides];
       
-      const allDishesWithPhotos = await Promise.all(
-        allItems.map(async (item: any) => {
-          const imageUrl = await generateMenuItemImageAction(
-            item.title,
-            item.description_seo,
-            brandCore.culinary_style,
-            visualStyle,
-            brandCore.background_prompt,
-            brandImages.sceneSeed
-          );
-          return { ...item, imageUrl: imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" };
-        })
-      );
+      const allDishesWithPhotos = allItems.map((item: any) => {
+        const seed = brandImages.sceneSeed;
+        const bgContext = brandCore.background_prompt ? ` Consistent setting: ${brandCore.background_prompt}.` : "";
+        const prompt = `Professional food photography, overhead shot of ${item.title}. ${item.description_seo}.${bgContext} Same background and table surface as all other dishes in this menu. Shot on a high-end camera, natural side lighting, realistic textures, styled plating. Style: "${visualStyle}" and "${brandCore.culinary_style}". Strict rule: NO TEXT, NO LOGO, NO WATERMARK.`;
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true&seed=${seed}&model=flux`;
+        
+        return { ...item, imageUrl };
+      });
 
       const allMainDishes = allDishesWithPhotos.filter((i: any) => i.category === "Plat Principal" || i.category === "Plats");
       const allSides = allDishesWithPhotos.filter((i: any) => i.category === "Accompagnement" || i.category === "Sides");
