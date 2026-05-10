@@ -1,0 +1,332 @@
+{
+  "timestamp": "2026-05-08T11:14:17.345Z",
+  "success": true,
+  "data_integrity": {
+    "item_count": 7,
+    "combo_count": 3,
+    "ingredient_compliance": false
+  },
+  "audit_result": {
+    "brand": {
+      "name": "L'Épopée du Levant",
+      "tagline": "Fusion de saveurs, art du partage",
+      "storytelling": "Immergez-vous dans une aventure gastronomique où chaque plat est un chapitre, combinant la richesse de la cuisine libanaise traditionnelle avec le flair moderne. Partagez des moments précieux autour de nos créations culinaires, où le luxe devient accessible. Vivez le voyage des saveurs, inspiré par l'héritage du Levant, niché dans le cœur vibrant de Paris.",
+      "culinary_style": "Cuisine libanaise contemporaine avec une touche moderniste, axée sur le partage et des ingrédients frais et authentiques.",
+      "logo_prompt": "A minimalist abstract representation of a crescent moon and a wheat stalk, flat design, vector.",
+      "background_prompt": "An elegant restaurant interior that embodies a modern 'Arabian Nights' ambiance with dark velvet, gold accents, and ambient lighting, creating a luxurious yet inviting atmosphere.",
+      "suggested_new_equipment": []
+    },
+    "items": {
+      "main_dishes": [
+        {
+          "title": "Agneau au Cumin avec Semoule",
+          "description_seo": "Savourez un agneau tendre aux épices, accompagné d'une semoule légère et parfumée, symbole des saveurs libanaises modernes.",
+          "ingredients": [
+            "Agneau",
+            "Cumin",
+            "Semoule",
+            "Huile d'olive",
+            "Oignons",
+            "Persil",
+            "Citron"
+          ],
+          "financials": {
+            "material_cost": 6.5,
+            "net_margin_target": 4,
+            "selling_price": 23.9
+          },
+          "category": "main",
+          "dietary_tags": [
+            "sans gluten"
+          ],
+          "allergens": [],
+          "prep_instructions": "1. Faire revenir les oignons dans l'huile d'olive jusqu'à ce qu'ils soient dorés. 2. Ajouter l'agneau et le cumin, faire cuire jusqu'à ce qu'il soit bien doré. 3. Cuire la semoule selon les instructions, ajouter de l'eau et du sel. 4. Dresser le plat avec l'agneau sur la semoule, garnir de persil et de citron."
+        },
+        {
+          "title": "Poulet au Paprika et Tahini",
+          "description_seo": "Ce poulet mariné au paprika et servi avec une sauce tahini veloutée offre une expérience culinaire libanaise authentique et moderne.",
+          "ingredients": [
+            "Poulet",
+            "Paprika",
+            "Tahini",
+            "Ail",
+            "Citron",
+            "Huile d'olive"
+          ],
+          "financials": {
+            "material_cost": 5.5,
+            "net_margin_target": 3,
+            "selling_price": 18.9
+          },
+          "category": "main",
+          "dietary_tags": [
+            "sans gluten"
+          ],
+          "allergens": [
+            "sésame"
+          ],
+          "prep_instructions": "1. Mariner le poulet dans un mélange de paprika, tahini, ail et citron pendant 1 heure. 2. Griller ou cuire le poulet jusqu'à ce qu'il soit bien cuit. 3. Servir avec un filet d'huile d'olive."
+        },
+        {
+          "title": "Boeuf aux Épices Libanaises",
+          "description_seo": "Découvrez le bœuf tendre mijoté avec des épices libanaises, servant une harmonie de goûts et de senteurs dans chaque bouchée.",
+          "ingredients": [
+            "Bœuf",
+            "Coriandre",
+            "Cumin",
+            "Paprika",
+            "Oignons",
+            "Citrons",
+            "Huile d'olive"
+          ],
+          "financials": {
+            "material_cost": 7,
+            "net_margin_target": 4.5,
+            "selling_price": 25.9
+          },
+          "category": "main",
+          "dietary_tags": [
+            "sans gluten"
+          ],
+          "allergens": [],
+          "prep_instructions": "1. Faire revenir les oignons dans l'huile d'olive. 2. Ajouter le bœuf, la coriandre, le cumin et le paprika, cuire jusqu'à ce que le bœuf soit bien doré. 3. Ajouter de l'eau et laisser mijoter jusqu'à tendreté. 4. Servir avec un filet de jus de citron."
+        },
+        {
+          "title": "Tartinade de Pois Chiches et Aubergines",
+          "description_seo": "Une tartinade crémeuse à base de pois chiches et d'aubergines, offrant une explosion de saveurs libanaises traditionnelles revisitées en moderne.",
+          "ingredients": [
+            "Pois chiches",
+            "Aubergines",
+            "Tahini",
+            "Citron",
+            "Ail",
+            "Olive",
+            "Persil"
+          ],
+          "financials": {
+            "material_cost": 4,
+            "net_margin_target": 3.5,
+            "selling_price": 16.9
+          },
+          "category": "main",
+          "dietary_tags": [
+            "végétalien",
+            "sans gluten"
+          ],
+          "allergens": [
+            "sésame"
+          ],
+          "prep_instructions": "1. Rôtir les aubergines au four jusqu'à tendreté. 2. Mixer les pois chiches, aubergines, tahini, ail et citron jusqu'à obtenir une consistance lisse. 3. Ajuster l'assaisonnement et garnir de persil avant de servir."
+        }
+      ],
+      "generated_sides": [
+        {
+          "title": "Fattoush Libanais",
+          "description_seo": "Une salade fraîche et croquante de légumes et pain libanais, rehaussée d'une vinaigrette citronnée, parfaite pour accompagner vos plats.",
+          "ingredients": [
+            "Concombres",
+            "Tomates",
+            "Oignons",
+            "Pain Libanais",
+            "Menthe",
+            "Coriandre",
+            "Citron",
+            "Huile d'olive"
+          ],
+          "financials": {
+            "material_cost": 2.5,
+            "net_margin_target": 2,
+            "selling_price": 11
+          },
+          "category": "side",
+          "dietary_tags": [
+            "végétalien",
+            "sans gluten"
+          ],
+          "allergens": [],
+          "prep_instructions": "1. Couper les légumes et le pain libanais en morceaux. 2. Mélanger avec la menthe, la coriandre et une vinaigrette à base de citron et d'huile d'olive. 3. Servir frais."
+        },
+        {
+          "title": "Lentilles Épicées",
+          "description_seo": "Des lentilles cuites avec des épices fines, offrant une texture riche et savoureuse, idéales pour accompagner vos plats principaux.",
+          "ingredients": [
+            "Lentilles",
+            "Cumin",
+            "Paprika",
+            "Oignons",
+            "Ail",
+            "Huile d'olive"
+          ],
+          "financials": {
+            "material_cost": 2,
+            "net_margin_target": 1.5,
+            "selling_price": 9
+          },
+          "category": "side",
+          "dietary_tags": [
+            "végétalien",
+            "sans gluten"
+          ],
+          "allergens": [],
+          "prep_instructions": "1. Faire revenir les oignons et l'ail dans l'huile d'olive. 2. Ajouter les lentilles avec de l'eau et les épices. 3. Cuire jusqu'à ce que les lentilles soient tendres. 4. Servir chaud."
+        },
+        {
+          "title": "Yaourt au Menthe et Citron",
+          "description_seo": "Un yaourt crémeux parfumé à la menthe et au citron, apportant une fraîcheur délicate, parfait pour accompagner les plats épicés.",
+          "ingredients": [
+            "Yaourt",
+            "Menthe",
+            "Citron",
+            "Huile d'olive"
+          ],
+          "financials": {
+            "material_cost": 1.5,
+            "net_margin_target": 1,
+            "selling_price": 6.9
+          },
+          "category": "side",
+          "dietary_tags": [
+            "végétalien"
+          ],
+          "allergens": [
+            "produit laitier"
+          ],
+          "prep_instructions": "1. Dans un bol, mélanger le yaourt avec des feuilles de menthe finement hachées. 2. Ajouter un filet de jus de citron et un peu d'huile d'olive. 3. Mélanger et servir frais."
+        }
+      ],
+      "suggested_new_ingredients": []
+    },
+    "menu": {
+      "combos": [
+        {
+          "title": "Le Festin Oriental",
+          "description_seo": "Un festin de saveurs avec des plats emblématiques du Levant.",
+          "ingredients": [
+            "Agneau au Cumin avec Semoule",
+            "Fattoush Libanais",
+            "Baklava",
+            "Limonade maison"
+          ],
+          "financials": {
+            "material_cost": 6,
+            "net_margin_target": 10,
+            "selling_price": 35
+          },
+          "category": "Menu Combo",
+          "dietary_tags": [],
+          "allergens": [
+            "Noix"
+          ],
+          "prep_instructions": "Servir frais avec un assortiment de saveurs.",
+          "modifier_groups": [
+            {
+              "name": "Choisissez votre boisson",
+              "min_selection": 1,
+              "max_selection": 1,
+              "options": [
+                {
+                  "name": "Thé menthe",
+                  "price_override": 0
+                },
+                {
+                  "name": "Limonade maison",
+                  "price_override": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Le Dîner du Levant",
+          "description_seo": "Un mélange parfait pour une soirée agréable, alliant viande et fraîcheur.",
+          "ingredients": [
+            "Poulet au Paprika et Tahini",
+            "Tartinade de Pois Chiches et Aubergines",
+            "Lentilles Épicées",
+            "Yaourt au Menthe et Citron"
+          ],
+          "financials": {
+            "material_cost": 5.5,
+            "net_margin_target": 9,
+            "selling_price": 31.9
+          },
+          "category": "Menu Combo",
+          "dietary_tags": [
+            "Végétarien"
+          ],
+          "allergens": [
+            "Sésame"
+          ],
+          "prep_instructions": "Mélanger les tartinades fraîches avec les viandes chaudes.",
+          "modifier_groups": [
+            {
+              "name": "Votre accompagnement",
+              "min_selection": 1,
+              "max_selection": 1,
+              "options": [
+                {
+                  "name": "Fattoush Libanais",
+                  "price_override": 0
+                },
+                {
+                  "name": "Lentilles Épicées",
+                  "price_override": 0
+                }
+              ]
+            },
+            {
+              "name": "Choisissez votre dessert",
+              "min_selection": 1,
+              "max_selection": 1,
+              "options": [
+                {
+                  "name": "Baklava",
+                  "price_override": 0
+                },
+                {
+                  "name": "Loukoum",
+                  "price_override": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Le Morceau du Levant",
+          "description_seo": "Une combinaison légère mais savoureuse, idéale pour un petit repas.",
+          "ingredients": [
+            "Boeuf aux Épices Libanaises",
+            "Fattoush Libanais",
+            "Thé menthe"
+          ],
+          "financials": {
+            "material_cost": 4.5,
+            "net_margin_target": 8,
+            "selling_price": 27.9
+          },
+          "category": "Menu Combo",
+          "dietary_tags": [],
+          "allergens": [],
+          "prep_instructions": "Servir avec un soupçon de thé à la menthe.",
+          "modifier_groups": [
+            {
+              "name": "Choisissez votre boisson",
+              "min_selection": 1,
+              "max_selection": 1,
+              "options": [
+                {
+                  "name": "Thé menthe",
+                  "price_override": 0
+                },
+                {
+                  "name": "Limonade maison",
+                  "price_override": 0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

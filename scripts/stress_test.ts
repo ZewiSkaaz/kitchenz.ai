@@ -36,10 +36,13 @@ async function stressTest() {
       audit_result: { brand, items, menu }
     };
 
+    const allItems = [...items.main_dishes, ...items.generated_sides];
+    const avgPrice = allItems.reduce((acc, i) => acc + i.financials.selling_price, 0) / allItems.length;
+
     fs.writeFileSync("STRESS_TEST_REPORT.json", JSON.stringify(report, null, 2));
     console.log("\n✅ STRESS TEST TERMINE !");
     console.log("Vérification de l'intégrité des ingrédients :", report.data_integrity.ingredient_compliance ? "PARFAITE" : "ATTENTION (Hallucinations détectées)");
-    console.log("Prix de vente moyen généré :", 0);
+    console.log("Prix de vente moyen généré :", avgPrice.toFixed(2), "€");
   } catch (e) {
     console.error("❌ ECHEC DU STRESS TEST :", e);
   }

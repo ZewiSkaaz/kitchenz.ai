@@ -17,3 +17,11 @@ export async function generateMenuAssemblyAction(...args: Parameters<typeof gene
 export async function analyzeInventoryImageAction(...args: Parameters<typeof analyzeInventoryImageLib>) {
   return await analyzeInventoryImageLib(...args);
 }
+
+export async function generateMenuItemImageAction(...args: Parameters<typeof generateMenuItemImageLib>) {
+  return await generateMenuItemImageLib(...args);
+}
+
+export async function generateBrandImagesAction(...args: Parameters<typeof generateBrandImagesLib>) {
+  return await generateBrandImagesLib(...args);
+}

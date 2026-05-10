@@ -1,0 +1,261 @@
+{
+  "brand": {
+    "name": "Le Gone du Tacos",
+    "tagline": "Tacos Lyonnais, réinventés.",
+    "storytelling": "Au cœur de Lyon, nous célébrons la fusion parfaite entre tradition et modernité. Nos tacos, garnis de viande juteuse et de notre sauce fromagère maison, capturent l'essence des bouchons lyonnais avec une touche urbaine. Chaque bouchée est une invitation à redécouvrir le goût authentique de notre belle région.",
+    "culinary_style": "Cuisine de rue moderne avec des influences lyonnaises.",
+    "logo_prompt": "A minimalist taco shape with a stylized cheese wave, flat design, vector",
+    "background_prompt": "An upscale restaurant interior with modern urban decor featuring rustic touches, warm lighting, and elegant table settings.",
+    "suggested_new_equipment": []
+  },
+  "items": {
+    "main_dishes": [
+      {
+        "title": "Taco Lyonnais",
+        "description_seo": "Experience the fusion of modern street food and Lyonnaise flavors with our Taco Lyonnais, featuring savory minced meat and creamy cheese sauce.",
+        "ingredients": [
+          "tortilla",
+          "viande hachée",
+          "sauce fromagère maison",
+          "oignons frits"
+        ],
+        "financials": {
+          "material_cost": 2.5,
+          "net_margin_target": 4.5,
+          "selling_price": 15.9
+        },
+        "category": "main",
+        "dietary_tags": [],
+        "allergens": [
+          "lait"
+        ],
+        "prep_instructions": "1. Cook the minced meat in a skillet until browned. 2. Warm the tortillas. 3. Spread a layer of cheese sauce on each tortilla. 4. Add the cooked meat and top with fried onions. 5. Roll and serve."
+      },
+      {
+        "title": "Chicken Crunch Tacos",
+        "description_seo": "Delight in our Chicken Crunch Tacos, featuring tender chicken, a smooth cheese sauce, and crispy fried onions for that perfect bite!",
+        "ingredients": [
+          "tortilla",
+          "filet de poulet",
+          "sauce fromagère maison",
+          "oignons frits"
+        ],
+        "financials": {
+          "material_cost": 3,
+          "net_margin_target": 4,
+          "selling_price": 15.9
+        },
+        "category": "main",
+        "dietary_tags": [],
+        "allergens": [
+          "lait"
+        ],
+        "prep_instructions": "1. Grill the chicken filet until cooked through. 2. Warm the tortillas. 3. Pour cheese sauce over the chicken. 4. Assemble with crispy onions on top. 5. Roll and serve."
+      },
+      {
+        "title": "Cheesy Beef Wrap",
+        "description_seo": "Savor the bold flavors of our Cheesy Beef Wrap, loaded with rich minced meat, house cheese sauce, and crunchy fried onions.",
+        "ingredients": [
+          "tortilla",
+          "viande hachée",
+          "sauce fromagère maison",
+          "oignons frits"
+        ],
+        "financials": {
+          "material_cost": 2.75,
+          "net_margin_target": 4.25,
+          "selling_price": 15.9
+        },
+        "category": "main",
+        "dietary_tags": [],
+        "allergens": [
+          "lait"
+        ],
+        "prep_instructions": "1. Brown the minced meat in a skillet. 2. Heat tortillas. 3. Spread cheese sauce on the tortilla. 4. Add the meat and fried onions on top. 5. Roll tightly and serve."
+      },
+      {
+        "title": "Lyonnaise Chicken Tortilla Stack",
+        "description_seo": "Indulge in our Lyonnaise Chicken Tortilla Stack with stacked tortillas, creamy sauce, and juicy grilled chicken for a taste of street food heaven!",
+        "ingredients": [
+          "tortilla",
+          "filet de poulet",
+          "sauce fromagère maison",
+          "oignons frits"
+        ],
+        "financials": {
+          "material_cost": 3.5,
+          "net_margin_target": 4,
+          "selling_price": 16.9
+        },
+        "category": "main",
+        "dietary_tags": [],
+        "allergens": [
+          "lait"
+        ],
+        "prep_instructions": "1. Cook chicken filet and slice it. 2. Layer tortillas with cheese sauce, chicken, and fried onions. 3. Repeat layers and finish with a final layer of sauce. 4. Serve cut into wedges."
+      }
+    ],
+    "generated_sides": [
+      {
+        "title": "Crispy Fries",
+        "description_seo": "Enjoy our Crispy Fries, perfectly fried to golden perfection, ideal for any taco meal or for indulging on their own.",
+        "ingredients": [
+          "frites"
+        ],
+        "financials": {
+          "material_cost": 1.5,
+          "net_margin_target": 3,
+          "selling_price": 11
+        },
+        "category": "side",
+        "dietary_tags": [],
+        "allergens": [],
+        "prep_instructions": "1. Deep fry the fries until golden and crispy. 2. Drain and season with salt. 3. Serve hot alongside main dishes."
+      },
+      {
+        "title": "Cheesy Dip",
+        "description_seo": "Our Cheesy Dip serves as the perfect complement for your tacos, offering a rich and creamy taste that will have you coming back for more.",
+        "ingredients": [
+          "sauce fromagère maison"
+        ],
+        "financials": {
+          "material_cost": 1,
+          "net_margin_target": 2.5,
+          "selling_price": 9
+        },
+        "category": "side",
+        "dietary_tags": [],
+        "allergens": [
+          "lait"
+        ],
+        "prep_instructions": "1. Warm the cheese sauce in a pot. 2. Pour into a serving bowl. 3. Serve with fries or as a dip for tacos."
+      },
+      {
+        "title": "Crispy Onion Topping",
+        "description_seo": "Enhance your meal with our Crispy Onion Topping, a flavorful addition that adds an irresistible crunch and savory depth to every bite.",
+        "ingredients": [
+          "oignons frits"
+        ],
+        "financials": {
+          "material_cost": 0.75,
+          "net_margin_target": 2,
+          "selling_price": 7.9
+        },
+        "category": "side",
+        "dietary_tags": [],
+        "allergens": [],
+        "prep_instructions": "1. Prepare the fried onions as needed. 2. Serve in a small bowl for topping main dishes or fries."
+      }
+    ],
+    "suggested_new_ingredients": []
+  },
+  "menu": {
+    "combos": [
+      {
+        "title": "Le Menu Lyonnais Delight",
+        "description_seo": "Savourez un mélange gourmand avec notre Taco Lyonnais, accompagné de frites croustillantes et de votre boisson préférée.",
+        "ingredients": [
+          "Taco Lyonnais",
+          "Crispy Fries",
+          "Coca-Cola"
+        ],
+        "financials": {
+          "material_cost": 4.5,
+          "net_margin_target": 10,
+          "selling_price": 31.9
+        },
+        "category": "Menu Combo",
+        "dietary_tags": [],
+        "allergens": [],
+        "prep_instructions": "Servir chaud avec des frites croustillantes.",
+        "modifier_groups": [
+          {
+            "name": "Choix de la boisson",
+            "min_selection": 1,
+            "max_selection": 1,
+            "options": [
+              {
+                "name": "Coca-Cola",
+                "price_override": 0
+              },
+              {
+                "name": "Oasis",
+                "price_override": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Le Pack Crunch & Sweet",
+        "description_seo": "Un mélange parfait de saveurs avec le Chicken Crunch Tacos, une Mousse chocolat et des frites pour un repas gargantuesque.",
+        "ingredients": [
+          "Chicken Crunch Tacos",
+          "Crispy Fries",
+          "Mousse chocolat"
+        ],
+        "financials": {
+          "material_cost": 5,
+          "net_margin_target": 11,
+          "selling_price": 35
+        },
+        "category": "Menu Combo",
+        "dietary_tags": [],
+        "allergens": [],
+        "prep_instructions": "Servir avec des frites croustillantes.",
+        "modifier_groups": [
+          {
+            "name": "Choix de la boisson",
+            "min_selection": 1,
+            "max_selection": 1,
+            "options": [
+              {
+                "name": "Coca-Cola",
+                "price_override": 0
+              },
+              {
+                "name": "Oasis",
+                "price_override": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Le Festin Lyonnais",
+        "description_seo": "Une combinaison irrésistible de saveurs avec la Lyonnaise Chicken Tortilla Stack, frites croustillantes et une délicieuse Tarte aux pralines.",
+        "ingredients": [
+          "Lyonnaise Chicken Tortilla Stack",
+          "Crispy Fries",
+          "Tarte aux pralines"
+        ],
+        "financials": {
+          "material_cost": 6,
+          "net_margin_target": 9,
+          "selling_price": 32.9
+        },
+        "category": "Menu Combo",
+        "dietary_tags": [],
+        "allergens": [],
+        "prep_instructions": "Réchauffer et servir avec des frites croustillantes.",
+        "modifier_groups": [
+          {
+            "name": "Choix de la boisson",
+            "min_selection": 1,
+            "max_selection": 1,
+            "options": [
+              {
+                "name": "Coca-Cola",
+                "price_override": 0
+              },
+              {
+                "name": "Oasis",
+                "price_override": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

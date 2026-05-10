@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, ChefHat, Utensils, Zap, Sparkles, ArrowRight, Loader2, ShieldCheck, Image as ImageIcon, Coffee, CakeSlice, Bot, ZapOff, Download, Check, Store, MapPin } from "lucide-react";
-import { PRICING, calculateSellingPrice, generateMenuItemImage, generateBrandImages } from "@/lib/ai";
-import { generateBrandCoreAction, generateCoreItemsAction, generateMenuAssemblyAction, analyzeInventoryImageAction } from "@/app/actions/aiActions";
+import { PRICING, calculateSellingPrice } from "@/lib/ai";
+import { generateBrandCoreAction, generateCoreItemsAction, generateMenuAssemblyAction, analyzeInventoryImageAction, generateMenuItemImageAction, generateBrandImagesAction } from "@/app/actions/aiActions";
 import { useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -214,7 +214,7 @@ export default function AuditPage() {
       };
       try {
         const dishesContext = coreItems.main_dishes.slice(0, 3).map((d: any) => d.title).join(", ");
-        brandImages = await generateBrandImages(brandCore.name, brandCore.logo_prompt, brandCore.background_prompt, dishesContext);
+        brandImages = await generateBrandImagesAction(brandCore.name, brandCore.logo_prompt, brandCore.background_prompt, dishesContext);
       } catch (e) {
         console.error("Erreur images marque:", e);
       }
@@ -224,7 +224,7 @@ export default function AuditPage() {
       const allDishesWithPhotos = await Promise.all(
         [...coreItems.main_dishes, ...coreItems.generated_sides].map(async (item: any) => {
           try {
-            const imageUrl = await generateMenuItemImage(
+            const imageUrl = await generateMenuItemImageAction(
               item.title,
               item.description_seo,
               brandCore.culinary_style,
