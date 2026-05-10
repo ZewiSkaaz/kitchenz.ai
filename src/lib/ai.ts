@@ -58,8 +58,13 @@ async function askAI(prompt: string, systemPrompt: string = "You are a professio
       if (!response.ok) throw new Error(`HTTP ${response.status} from ${model}`);
       
       const text = await response.text();
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+      try {
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+      } catch (e) {
+        console.warn(`⚠️ JSON Parse failed for ${model}, retrying next...`);
+        lastError = e;
+      }
     } catch (e) {
       console.warn(`⚠️ Pollinations ${model} failed...`, (e as any).message);
       lastError = e;
@@ -120,9 +125,11 @@ function roundToPsychologicalPrice(price: number): number {
 }
 
 export function calculateSellingPrice(materialCost: number, netMargin: number, tvaRate: number = PRICING.TVA_FOOD): number {
+  const cost = typeof materialCost === 'number' ? materialCost : parseFloat(materialCost as any) || 3;
+  const margin = typeof netMargin === 'number' ? netMargin : parseFloat(netMargin as any) || 10;
   const totalFees = PRICING.UBER_COMMISSION + PRICING.UBER_MARKETING_ADS + PRICING.STRIPE_FEE;
   const safetyMargin = Math.max(0.1, 1 - totalFees);
-  const rawPrice = ((materialCost + netMargin + PRICING.PACKAGING_COST) * (1 + tvaRate) / safetyMargin);
+  const rawPrice = ((cost + margin + PRICING.PACKAGING_COST) * (1 + tvaRate) / safetyMargin);
   return roundToPsychologicalPrice(rawPrice);
 }
 
@@ -353,7 +360,22 @@ export async function generateBrandCore(
   }`;
 
   const data = await askAI(prompt, systemPrompt, brandCoreSchema, "gpt-4o-mini");
-  return BrandCoreZod.parse(data);
+  
+  // Validation Robuste
+  const result = BrandCoreZod.safeParse(data);
+  if (!result.success) {
+    console.warn("⚠️ BrandCore schema validation failed, using fallback values.", result.error);
+    return {
+      name: data.name || brandName || "Nouvelle Marque",
+      tagline: data.tagline || "Une expérience culinaire unique",
+      storytelling: data.storytelling || "Découvrez notre concept innovant.",
+      culinary_style: data.culinary_style || "Street Food",
+      logo_prompt: data.logo_prompt || "minimalist restaurant logo icon",
+      background_prompt: data.background_prompt || "modern restaurant interior",
+      suggested_new_equipment: Array.isArray(data.suggested_new_equipment) ? data.suggested_new_equipment : []
+    };
+  }
+  return result.data;
 }
 
 export async function generateCoreItems(
@@ -388,8 +410,8 @@ export async function generateCoreItems(
 
   const data = await askAI(prompt, systemPrompt, coreItemsSchema, "gpt-4o-mini");
   
-  // Post-processing: Calculate final selling prices based on the consultant logic
-  data.main_dishes = (data.main_dishes || []).map(healItem).map((i: any) => ({
+  // Heal and validate
+  const mainDishes = (data.main_dishes || []).map(healItem).map((i: any) => ({
     ...i, 
     financials: {
       ...i.financials, 
@@ -397,7 +419,7 @@ export async function generateCoreItems(
     }
   }));
   
-  data.generated_sides = (data.generated_sides || []).map(healItem).map((i: any) => ({
+  const generatedSides = (data.generated_sides || []).map(healItem).map((i: any) => ({
     ...i, 
     financials: {
       ...i.financials, 
@@ -405,7 +427,23 @@ export async function generateCoreItems(
     }
   }));
 
-  return CoreItemsZod.parse(data);
+  const result = CoreItemsZod.safeParse({
+    main_dishes: mainDishes,
+    generated_sides: generatedSides,
+    suggested_new_ingredients: Array.isArray(data.suggested_new_ingredients) ? data.suggested_new_ingredients : []
+  });
+
+  if (!result.success) {
+    console.error("❌ CoreItems schema validation failed:", result.error);
+    // Return partially healed data anyway to avoid total crash
+    return {
+      main_dishes: mainDishes,
+      generated_sides: generatedSides,
+      suggested_new_ingredients: Array.isArray(data.suggested_new_ingredients) ? data.suggested_new_ingredients : []
+    };
+  }
+
+  return result.data;
 }
 
 export async function generateMenuAssembly(coreItems: any, drinks: string[], desserts: string[], brandCore: any) {
@@ -450,7 +488,21 @@ export async function generateMenuAssembly(coreItems: any, drinks: string[], des
     }
   }));
 
-  return MenuAssemblyZod.parse(data);
+  const result = MenuAssemblyZod.safeParse(data);
+  if (!result.success) {
+    console.error("❌ MenuAssembly schema validation failed:", result.error);
+    return {
+      combos: (data.combos || []).map(healItem).map((i: any) => ({
+        ...i,
+        financials: {
+          ...i.financials,
+          selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)
+        }
+      }))
+    };
+  }
+
+  return result.data;
 }
 
 /**

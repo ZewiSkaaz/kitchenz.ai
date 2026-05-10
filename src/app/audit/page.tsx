@@ -192,14 +192,18 @@ export default function AuditPage() {
     setStep("generating");
 
     try {
+      // Étape 0 : Sanitize inputs (just in case they come as single strings from dashboard)
+      const sanitizedIngredients = ingredients.flatMap(i => typeof i === 'string' && i.includes(',') ? i.split(',').map(s => s.trim()) : i).filter(Boolean);
+      const sanitizedEquipment = equipment.flatMap(e => typeof e === 'string' && e.includes(',') ? e.split(',').map(s => s.trim()) : e).filter(Boolean);
+
       // Étape 1 : Brand Core
       setLoadingStep("Génération de l'Identité de Marque (Brand Core)...");
       const flexibilityOptions = { allowNewIngredients, allowNewEquipment };
-      const brandCore = await generateBrandCoreAction(ingredients, equipment, brandName, concept, visualStyle, flexibilityOptions, location);
+      const brandCore = await generateBrandCoreAction(sanitizedIngredients, sanitizedEquipment, brandName, concept, visualStyle, flexibilityOptions, location);
 
       // Étape 2 : Core Items
       setLoadingStep("Création du Menu & Recettes...");
-      const coreItems = await generateCoreItemsAction(ingredients, brandCore, flexibilityOptions);
+      const coreItems = await generateCoreItemsAction(sanitizedIngredients, brandCore, flexibilityOptions);
 
       // Étape 3 : Logo & Background EN PREMIER → récupère le sceneSeed partagé
       setLoadingStep("Création du Logo & de la Bannière...");
@@ -1054,7 +1058,7 @@ export default function AuditPage() {
                           <input 
                             type="text"
                             className="bg-gray-100 text-black px-2 py-1 rounded-md text-[10px] font-bold border border-gray-200 w-full"
-                            value={fullMenu.inventory_analysis.detected_ingredients.join(", ")}
+                            value={(fullMenu?.inventory_analysis?.detected_ingredients || []).join(", ")}
                             onChange={(e) => {
                               const newData = {...fullMenu};
                               newData.inventory_analysis.detected_ingredients = e.target.value.split(",").map(s => s.trim());
@@ -1062,7 +1066,7 @@ export default function AuditPage() {
                             }}
                           />
                         ) : (
-                          fullMenu.inventory_analysis.detected_ingredients.map((ing: string, i: number) => (
+                          (fullMenu?.inventory_analysis?.detected_ingredients || []).map((ing: string, i: number) => (
                             <span key={i} className="bg-gray-100 text-black px-2 py-1 rounded-md text-[10px] font-bold border border-gray-200">{ing}</span>
                           ))
                         )}
@@ -1075,7 +1079,7 @@ export default function AuditPage() {
                           <input 
                             type="text"
                             className="bg-gray-100 text-black px-2 py-1 rounded-md text-[10px] font-bold border border-gray-200 w-full"
-                            value={fullMenu.inventory_analysis.required_equipment.join(", ")}
+                            value={(fullMenu?.inventory_analysis?.required_equipment || []).join(", ")}
                             onChange={(e) => {
                               const newData = {...fullMenu};
                               newData.inventory_analysis.required_equipment = e.target.value.split(",").map(s => s.trim());
@@ -1083,7 +1087,7 @@ export default function AuditPage() {
                             }}
                           />
                         ) : (
-                          fullMenu.inventory_analysis.required_equipment.map((eq: string, i: number) => (
+                          (fullMenu?.inventory_analysis?.required_equipment || []).map((eq: string, i: number) => (
                             <span key={i} className="bg-gray-100 text-black px-2 py-1 rounded-md text-[10px] font-bold border border-gray-200">{eq}</span>
                           ))
                         )}
@@ -1113,8 +1117,8 @@ export default function AuditPage() {
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {fullMenu.menu_items
-                  .filter((item: any) => selectedCategory === "Tous" || item.category === selectedCategory)
+                {(fullMenu?.menu_items || [])
+                  .filter((item: any) => selectedCategory === "Tous" || item?.category === selectedCategory)
                   .map((item: any, i: number) => (
                   <motion.div 
                     key={i} 
