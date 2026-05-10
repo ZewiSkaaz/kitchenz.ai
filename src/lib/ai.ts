@@ -547,25 +547,15 @@ export async function generateMenuItemImage(
   backgroundPrompt: string = "",
   sceneSeed?: number
 ): Promise<string | null> {
-  try {
-    const seed = sceneSeed ?? Math.floor(Math.random() * 1000000);
-    const bgContext = backgroundPrompt
-      ? ` Consistent setting: ${backgroundPrompt}.`
-      : "";
-    const prompt = `Professional food photography, overhead shot of ${itemTitle}. ${itemDescription}.${bgContext} Same background and table surface as all other dishes in this menu. Shot on a high-end camera, natural side lighting, shallow depth of field, realistic textures, styled plating. Style: "${visualStyle}" and "${culinaryStyle}". Strict rule: NO TEXT, NO LOGO, NO WATERMARK.`;
-    const encodedPrompt = encodeURIComponent(prompt);
-    
-    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}&model=flux`;
-    
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Pollinations HTTP ${response.status}`);
-    
-    const buffer = await response.arrayBuffer();
-    return `data:image/png;base64,${Buffer.from(buffer).toString("base64")}`;
-  } catch (error) {
-    console.warn(`⚠️ Pollinations failed for ${itemTitle}:`, (error as any).message);
-    return null;
-  }
+  const seed = sceneSeed ?? Math.floor(Math.random() * 1000000);
+  const bgContext = backgroundPrompt
+    ? ` Consistent setting: ${backgroundPrompt}.`
+    : "";
+  const prompt = `Professional food photography, overhead shot of ${itemTitle}. ${itemDescription}.${bgContext} Same background and table surface as all other dishes in this menu. Shot on a high-end camera, natural side lighting, realistic textures, styled plating. Style: "${visualStyle}" and "${culinaryStyle}". Strict rule: NO TEXT, NO LOGO, NO WATERMARK.`;
+  const encodedPrompt = encodeURIComponent(prompt);
+  
+  // Return the URL directly to avoid large base64 payloads and server-side timeouts
+  return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}&model=flux`;
 }
 
 /**
@@ -604,12 +594,8 @@ export async function generateBrandImages(
       if (fbRes.ok) logoUrl = `data:image/png;base64,${Buffer.from(await fbRes.arrayBuffer()).toString("base64")}`;
     }
 
-    // 🏠 Background → FLUX via Pollinations (gratuit, cohérent)
-    const bgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(`Cinematic wide restaurant background photo. ${backgroundPrompt}. Featuring: ${mainDishesContext || ""}. High resolution, natural light, warm atmosphere. NO people, NO text.`)}?width=1024&height=768&nologo=true&seed=${sceneSeed}&model=flux`;
-    const bgRes = await fetch(bgUrl);
-    const backgroundUrl = bgRes.ok
-      ? `data:image/png;base64,${Buffer.from(await bgRes.arrayBuffer()).toString("base64")}`
-      : null;
+    // 🏠 Background → FLUX via Pollinations (URL directe)
+    const backgroundUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(`Cinematic wide restaurant background photo. ${backgroundPrompt}. Featuring: ${mainDishesContext || ""}. High resolution, natural light, warm atmosphere. NO people, NO text.`)}?width=1024&height=768&nologo=true&seed=${sceneSeed}&model=flux`;
 
     return { logoUrl, backgroundUrl, sceneSeed };
   } catch (error) {
