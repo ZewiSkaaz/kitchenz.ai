@@ -1,605 +1,90 @@
-import OpenAI from "openai";
-import { HfInference } from "@huggingface/inference";
 import { z } from "zod";
 
-let openaiInstance: OpenAI | null = null;
+/**
+ * 🚀 KITCHENZ AI ENGINE - 100% FREE & SIMPLE
+ * Utilise Pollinations.ai pour le texte et les images.
+ */
 
-function getOpenAI() {
-  if (!openaiInstance) {
-    openaiInstance = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || "",
-    });
-  }
-  return openaiInstance;
-}
+// 1. Schéma de réponse unique pour l'IA
+export const AuditResultSchema = z.object({
+  brand: z.object({
+    name: z.string(),
+    tagline: z.string(),
+    storytelling: z.string(),
+    logo_prompt: z.string(),
+    background_prompt: z.string(),
+    culinary_style: z.string(),
+  }),
+  menu_items: z.array(z.object({
+    title: z.string(),
+    description_seo: z.string(),
+    ingredients: z.array(z.string()),
+    category: z.string(),
+    financials: z.object({
+      material_cost: z.number(),
+      net_margin_target: z.number(),
+    })
+  })),
+  combos: z.array(z.object({
+    title: z.string(),
+    description_seo: z.string(),
+    items: z.array(z.string()),
+    financials: z.object({
+      material_cost: z.number(),
+      net_margin_target: z.number(),
+    })
+  }))
+});
 
-function getHF() {
-  return new HfInference(process.env.HUGGINGFACE_TOKEN);
-}
+export type AuditResult = z.infer<typeof AuditResultSchema>;
 
-async function askAI(prompt: string, systemPrompt: string = "You are a professional culinary branding expert.", schema?: any, model: string = "gpt-4o-mini") {
-  // 1. Essai avec OpenAI (Priorité car rechargé + Qualité JSON supérieure)
+/**
+ * 📝 APPEL IA TEXTE (POLLINATIONS)
+ */
+export async function askAI(prompt: string, systemPrompt: string = "Tu es un expert en dark kitchen."): Promise<any> {
   try {
-    const openai = getOpenAI();
-    if (process.env.OPENAI_API_KEY) {
-      const response = await openai.chat.completions.create({
-        model: model,
+    const response = await fetch("https://text.pollinations.ai/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + " Réponds EXCLUSIVEMENT en JSON valide." },
           { role: "user", content: prompt }
         ],
-        response_format: schema ? { type: "json_schema", json_schema: schema } : { type: "json_object" }
-      });
-      return JSON.parse(response.choices[0].message.content || "{}");
-    }
-  } catch (e) {
-    console.warn("⚠️ OpenAI failed, falling back to Pollinations...", (e as any).message);
-  }
-
-  // 2. Fallback Pollinations (Gratuit)
-  const models = ["openai", "mistral", "llama"];
-  let lastError = null;
-
-  for (const model of models) {
-    try {
-      const response = await fetch("https://text.pollinations.ai/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: prompt }
-          ],
-          model: model,
-          jsonMode: true
-        })
-      });
-
-      if (!response.ok) throw new Error(`HTTP ${response.status} from ${model}`);
-      
-      const text = await response.text();
-      try {
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        return JSON.parse(jsonMatch ? jsonMatch[0] : text);
-      } catch (e) {
-        console.warn(`⚠️ JSON Parse failed for ${model}, retrying next...`);
-        lastError = e;
-      }
-    } catch (e) {
-      console.warn(`⚠️ Pollinations ${model} failed...`, (e as any).message);
-      lastError = e;
-    }
-  }
-  console.error("❌ All AI models failed, using fallback.");
-  return {};
-}
-function healItem(item: any) {
-  return {
-    title: item.title || "Sans nom",
-    description_seo: item.description_seo || item.description || "Délicieux plat préparé avec soin.",
-    ingredients: Array.isArray(item.ingredients) ? item.ingredients : [],
-    financials: {
-      material_cost: item.financials?.material_cost || 3,
-      net_margin_target: item.financials?.net_margin_target || 10,
-      selling_price: item.financials?.selling_price || 15
-    },
-    category: item.category || "Plats",
-    dietary_tags: Array.isArray(item.dietary_tags) ? item.dietary_tags : [],
-    allergens: Array.isArray(item.allergens) ? item.allergens : [],
-    prep_instructions: item.prep_instructions || "Assembler les ingrédients avec soin.",
-    modifier_groups: Array.isArray(item.modifier_groups) ? item.modifier_groups : []
-  };
-}
-
-/**
- * Retries for resilience
- */
-async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    if (retries <= 0) throw error;
-    console.warn(`⚠️ API Error, retrying... (${retries} attempts left)`);
-    await new Promise(resolve => setTimeout(resolve, delay));
-    return withRetry(fn, retries - 1, delay * 2);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// PRICING & LOGIC
-// ---------------------------------------------------------------------------
-export const PRICING = {
-  UBER_COMMISSION: 0.30,
-  UBER_MARKETING_ADS: 0.15,
-  STRIPE_FEE: 0.02,
-  TVA_FOOD: 0.10,
-  TVA_ALCOHOL: 0.20,
-  PACKAGING_COST: 0.75,
-};
-
-function roundToPsychologicalPrice(price: number): number {
-  const floor = Math.floor(price);
-  const decimals = price - floor;
-  if (decimals < 0.25) return floor - 0.10;
-  if (decimals < 0.75) return floor + 0.90;
-  return floor + 1.0;
-}
-
-export function calculateSellingPrice(materialCost: number, netMargin: number, tvaRate: number = PRICING.TVA_FOOD): number {
-  const cost = typeof materialCost === 'number' ? materialCost : parseFloat(materialCost as any) || 3;
-  const margin = typeof netMargin === 'number' ? netMargin : parseFloat(netMargin as any) || 10;
-  const totalFees = PRICING.UBER_COMMISSION + PRICING.UBER_MARKETING_ADS + PRICING.STRIPE_FEE;
-  const safetyMargin = Math.max(0.1, 1 - totalFees);
-  const rawPrice = ((cost + margin + PRICING.PACKAGING_COST) * (1 + tvaRate) / safetyMargin);
-  return roundToPsychologicalPrice(rawPrice);
-}
-
-// ---------------------------------------------------------------------------
-// SCHEMAS (GPT-4o)
-// ---------------------------------------------------------------------------
-const brandCoreSchema = {
-  name: "brand_core_generation",
-  strict: true,
-  schema: {
-    type: "object",
-    properties: {
-      name: { type: "string" },
-      tagline: { type: "string" },
-      storytelling: { type: "string" },
-      culinary_style: { type: "string" },
-      logo_prompt: { type: "string" },
-      background_prompt: { type: "string" },
-      suggested_new_equipment: { type: "array", items: { type: "string" } },
-    },
-    required: ["name", "tagline", "storytelling", "culinary_style", "logo_prompt", "background_prompt", "suggested_new_equipment"],
-    additionalProperties: false,
-  },
-};
-
-const coreItemsSchema = {
-  name: "core_items_generation",
-  strict: true,
-  schema: {
-    type: "object",
-    properties: {
-      main_dishes: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            description_seo: { type: "string" },
-            ingredients: { type: "array", items: { type: "string" } },
-            financials: {
-              type: "object",
-              properties: {
-                material_cost: { type: "number" },
-                net_margin_target: { type: "number" },
-              },
-              required: ["material_cost", "net_margin_target"],
-              additionalProperties: false,
-            },
-            category: { type: "string" },
-            dietary_tags: { type: "array", items: { type: "string" } },
-            allergens: { type: "array", items: { type: "string" } },
-            prep_instructions: { type: "string" },
-          },
-          required: ["title", "description_seo", "ingredients", "financials", "category", "dietary_tags", "allergens", "prep_instructions"],
-          additionalProperties: false,
-        },
-      },
-      generated_sides: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            description_seo: { type: "string" },
-            ingredients: { type: "array", items: { type: "string" } },
-            financials: {
-              type: "object",
-              properties: {
-                material_cost: { type: "number" },
-                net_margin_target: { type: "number" },
-              },
-              required: ["material_cost", "net_margin_target"],
-              additionalProperties: false,
-            },
-            category: { type: "string" },
-            dietary_tags: { type: "array", items: { type: "string" } },
-            allergens: { type: "array", items: { type: "string" } },
-            prep_instructions: { type: "string" },
-          },
-          required: ["title", "description_seo", "ingredients", "financials", "category", "dietary_tags", "allergens", "prep_instructions"],
-          additionalProperties: false,
-        },
-      },
-      suggested_new_ingredients: { type: "array", items: { type: "string" } },
-    },
-    required: ["main_dishes", "generated_sides", "suggested_new_ingredients"],
-    additionalProperties: false,
-  },
-};
-
-const menuAssemblySchema = {
-  name: "menu_assembly_generation",
-  strict: true,
-  schema: {
-    type: "object",
-    properties: {
-      combos: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            description_seo: { type: "string" },
-            ingredients: { type: "array", items: { type: "string" } },
-            financials: {
-              type: "object",
-              properties: {
-                material_cost: { type: "number" },
-                net_margin_target: { type: "number" },
-              },
-              required: ["material_cost", "net_margin_target"],
-              additionalProperties: false,
-            },
-            category: { type: "string" },
-            dietary_tags: { type: "array", items: { type: "string" } },
-            allergens: { type: "array", items: { type: "string" } },
-            prep_instructions: { type: "string" },
-            modifier_groups: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  min_selection: { type: "number" },
-                  max_selection: { type: "number" },
-                  options: { 
-                    type: "array", 
-                    items: { 
-                      type: "object",
-                      properties: {
-                        name: { type: "string" },
-                        price_override: { type: "number" }
-                      },
-                      required: ["name", "price_override"],
-                      additionalProperties: false
-                    } 
-                  }
-                },
-                required: ["name", "min_selection", "max_selection", "options"],
-                additionalProperties: false
-              }
-            }
-          },
-          required: ["title", "description_seo", "ingredients", "financials", "category", "dietary_tags", "allergens", "prep_instructions", "modifier_groups"],
-          additionalProperties: false,
-        },
-      },
-    },
-    required: ["combos"],
-    additionalProperties: false,
-  },
-};
-
-const BrandCoreZod = z.object({
-  name: z.string(),
-  tagline: z.string(),
-  storytelling: z.string(),
-  culinary_style: z.string(),
-  logo_prompt: z.string(),
-  background_prompt: z.string(),
-  suggested_new_equipment: z.array(z.string())
-});
-
-const MenuItemZod = z.object({
-  title: z.string(),
-  description_seo: z.string(),
-  ingredients: z.array(z.string()),
-  financials: z.object({ material_cost: z.number(), net_margin_target: z.number(), selling_price: z.number().optional() }),
-  category: z.string(),
-  dietary_tags: z.array(z.string()),
-  allergens: z.array(z.string()),
-  prep_instructions: z.string()
-});
-
-const CoreItemsZod = z.object({
-  main_dishes: z.array(MenuItemZod),
-  generated_sides: z.array(MenuItemZod),
-  suggested_new_ingredients: z.array(z.string())
-});
-
-const MenuAssemblyZod = z.object({
-  combos: z.array(MenuItemZod.extend({ modifier_groups: z.array(z.any()) }))
-});
-
-// ---------------------------------------------------------------------------
-// FUNCTIONS
-// ---------------------------------------------------------------------------
-
-export async function generateBrandCore(
-  ingredients: string[],
-  equipment: string[],
-  brandName: string,
-  concept: string,
-  visualStyle: string,
-  flexibilityOptions?: { allowNewIngredients?: boolean; allowNewEquipment?: boolean },
-  location?: string
-) {
-  const systemPrompt = `You are a high-end restaurant consultant and branding expert for delivery platforms like Uber Eats. 
-  Your goal is to create a viral, high-converting virtual brand. 
-  Respond ONLY with valid JSON following the provided schema.`;
-
-  const locationHint = location ? ` The restaurant is located in ${location}, adapt the tone if necessary.` : "";
-  const flexHint = flexibilityOptions?.allowNewIngredients 
-    ? " You are allowed to suggest up to 3 strategic new ingredients to unlock high-margin dishes." 
-    : " STRICT RULE: Do not suggest or use any ingredients outside of the provided list.";
-
-  const prompt = `Create a complete brand identity for: "${brandName || "a new concept"}". 
-  User Concept: ${concept || "Surprise me with a trendy delivery-first concept"}. 
-  Visual Style: ${visualStyle || "Modern and appetizing"}.
-  Available Ingredients: ${ingredients.join(", ")}.
-  Available Equipment: ${equipment.join(", ")}.
-  ${locationHint}
-  ${flexHint}
-
-  The "storytelling" should be short, punchy, and emotional (3-4 sentences max).
-  The "logo_prompt" must be a description of a MINIMALIST VECTOR LOGO only (ex: "A stylized fork and leaf, flat design, vector"). STRICT RULE: NO realistic details, NO backgrounds, NO photos.
-  The "background_prompt" must be a high-end restaurant interior or a close-up food shot prompt.
-  
-  Return structure:
-  {
-    "name": "...",
-    "tagline": "...",
-    "storytelling": "...",
-    "culinary_style": "...",
-    "logo_prompt": "simple minimalist graphic icon description in english, flat design",
-    "background_prompt": "...",
-    "suggested_new_equipment": []
-  }`;
-
-  const data = await askAI(prompt, systemPrompt, brandCoreSchema, "gpt-4o-mini");
-  
-  // Validation Robuste
-  const result = BrandCoreZod.safeParse(data);
-  if (!result.success) {
-    console.warn("⚠️ BrandCore schema validation failed, using fallback values.", result.error);
-    return {
-      name: data.name || brandName || "Nouvelle Marque",
-      tagline: data.tagline || "Une expérience culinaire unique",
-      storytelling: data.storytelling || "Découvrez notre concept innovant.",
-      culinary_style: data.culinary_style || "Street Food",
-      logo_prompt: data.logo_prompt || "minimalist restaurant logo icon",
-      background_prompt: data.background_prompt || "modern restaurant interior",
-      suggested_new_equipment: Array.isArray(data.suggested_new_equipment) ? data.suggested_new_equipment : []
-    };
-  }
-  return result.data;
-}
-
-export async function generateCoreItems(
-  ingredients: string[],
-  brandCore: any,
-  flexibilityOptions?: { allowNewIngredients?: boolean; allowNewEquipment?: boolean }
-) {
-  const systemPrompt = `You are an Executive Chef specializing in high-margin delivery menus. 
-  You must create recipes that are easy to prep, travel well, and maximize the use of the shared inventory.
-  Respond ONLY with valid JSON.`;
-
-  const flexHint = flexibilityOptions?.allowNewIngredients 
-    ? " You can include the suggested new ingredients: " + (brandCore.suggested_new_ingredients?.join(", ") || "none")
-    : " STRICT RULE: Use ONLY the provided ingredients list. No exceptions.";
-
-  const prompt = `Create 4 signature main dishes and 3 smart sides for the brand "${brandCore.name}".
-  Brand Style: ${brandCore.culinary_style}.
-  Available Inventory: ${ingredients.join(", ")}.
-  ${flexHint}
-
-  For each item:
-  - "description_seo": Write a mouth-watering description (150-200 chars) optimized for search.
-  - "financials": "material_cost" is the cost of ingredients per portion, "net_margin_target" is the desired profit after all delivery fees.
-  - "prep_instructions": Precise steps for a kitchen operator.
-
-  Return structure:
-  {
-    "main_dishes": [...],
-    "generated_sides": [...],
-    "suggested_new_ingredients": []
-  }`;
-
-  const data = await askAI(prompt, systemPrompt, coreItemsSchema, "gpt-4o-mini");
-  
-  // Heal and validate
-  const mainDishes = (data.main_dishes || []).map(healItem).map((i: any) => ({
-    ...i, 
-    financials: {
-      ...i.financials, 
-      selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)
-    }
-  }));
-  
-  const generatedSides = (data.generated_sides || []).map(healItem).map((i: any) => ({
-    ...i, 
-    financials: {
-      ...i.financials, 
-      selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)
-    }
-  }));
-
-  const result = CoreItemsZod.safeParse({
-    main_dishes: mainDishes,
-    generated_sides: generatedSides,
-    suggested_new_ingredients: Array.isArray(data.suggested_new_ingredients) ? data.suggested_new_ingredients : []
-  });
-
-  if (!result.success) {
-    console.error("❌ CoreItems schema validation failed:", result.error);
-    // Return partially healed data anyway to avoid total crash
-    return {
-      main_dishes: mainDishes,
-      generated_sides: generatedSides,
-      suggested_new_ingredients: Array.isArray(data.suggested_new_ingredients) ? data.suggested_new_ingredients : []
-    };
-  }
-
-  return result.data;
-}
-
-export async function generateMenuAssembly(coreItems: any, drinks: string[], desserts: string[], brandCore: any) {
-  const systemPrompt = `You are a Delivery Marketing Specialist. Your job is to create high-value "Combos" to increase the average basket size on Uber Eats.
-  Respond ONLY with valid JSON.`;
-
-  const availableItems = [...coreItems.main_dishes, ...coreItems.generated_sides].map(d => d.title).join(", ");
-
-  const prompt = `Create 3 optimized Menu Combos for "${brandCore.name}".
-  Use ONLY the following products as base: ${availableItems}.
-  Incorporate these drinks: ${drinks.join(", ") || "Standard soft drinks"}.
-  Incorporate these desserts: ${desserts.join(", ") || "Standard desserts"}.
-
-  Rules for Combos:
-  1. "title": Catchy names (ex: "Le Menu Best-Seller", "Le Sultan Pack").
-  2. "modifier_groups": Essential for Uber Eats. Add groups like "Choisissez votre boisson" or "Votre accompagnement".
-  3. "financials": Ensure the combo price is slightly cheaper than buying items separately, but still highly profitable.
-
-  Return structure:
-  {
-    "combos": [
-      { 
-        "title": "...", 
-        "description_seo": "...", 
-        "ingredients": [], 
-        "financials": { "material_cost": 5, "net_margin_target": 12 },
-        "category": "Menu Combo",
-        "modifier_groups": [
-          { "name": "Choix de la boisson", "min_selection": 1, "max_selection": 1, "options": [{ "name": "Coca-Cola", "price_override": 0 }] }
-        ]
-      }
-    ]
-  }`;
-
-  const data = await askAI(prompt, systemPrompt, menuAssemblySchema, "gpt-4o-mini");
-  
-  data.combos = (data.combos || []).map(healItem).map((i: any) => ({
-    ...i, 
-    financials: {
-      ...i.financials, 
-      selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)
-    }
-  }));
-
-  const result = MenuAssemblyZod.safeParse(data);
-  if (!result.success) {
-    console.error("❌ MenuAssembly schema validation failed:", result.error);
-    return {
-      combos: (data.combos || []).map(healItem).map((i: any) => ({
-        ...i,
-        financials: {
-          ...i.financials,
-          selling_price: calculateSellingPrice(i.financials.material_cost, i.financials.net_margin_target)
-        }
-      }))
-    };
-  }
-
-  return result.data;
-}
-
-/**
- * 📸 ANALYSE D'IMAGE D'INVENTAIRE (GPT-4o Vision)
- */
-export async function analyzeInventoryImage(base64Image: string): Promise<{ name: string; qty: string }[]> {
-  try {
-    const openai = getOpenAI();
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: 'Analyze this kitchen inventory photo. List all visible food ingredients with their estimated quantities. Respond ONLY with valid JSON: { "items": [{ "name": "string", "qty": "string" }] }' },
-            { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
-          ]
-        }
-      ],
-      response_format: { type: "json_object" }
+        model: "openai" // Pollinations redirige vers un modèle performant
+      })
     });
-    const data = JSON.parse(response.choices[0].message.content || "{}");
-    return data.items || [];
+    
+    const text = await response.text();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    return JSON.parse(jsonMatch ? jsonMatch[0] : text);
   } catch (error) {
-    console.warn("⚠️ analyzeInventoryImage failed:", (error as any).message);
-    return [];
+    console.error("❌ AI Error:", error);
+    return null;
   }
 }
 
 /**
- * 📸 GÉNÉRATION PHOTO (FLUX via Pollinations)
- *
- * @param sceneSeed     Seed commun à toute la session → même décor pour tous les produits
- * @param backgroundPrompt  Contexte visuel de la marque injecté dans chaque photo
+ * 🖼️ GENERATEUR D'URL D'IMAGE
  */
-export async function generateMenuItemImage(
-  itemTitle: string,
-  itemDescription: string,
-  culinaryStyle: string,
-  visualStyle: string,
-  backgroundPrompt: string = "",
-  sceneSeed?: number
-): Promise<string | null> {
-  const seed = sceneSeed ?? Math.floor(Math.random() * 1000000);
-  const bgContext = backgroundPrompt
-    ? ` Consistent setting: ${backgroundPrompt}.`
-    : "";
-  const prompt = `Professional food photography, overhead shot of ${itemTitle}. ${itemDescription}.${bgContext} Same background and table surface as all other dishes in this menu. Shot on a high-end camera, natural side lighting, realistic textures, styled plating. Style: "${visualStyle}" and "${culinaryStyle}". Strict rule: NO TEXT, NO LOGO, NO WATERMARK.`;
-  const encodedPrompt = encodeURIComponent(prompt);
+export function getImageUrl(title: string, context: string, type: "logo" | "dish" | "bg", seed?: number): string {
+  const s = seed || Math.floor(Math.random() * 1000000);
+  let prompt = "";
   
-  // Return the URL directly to avoid large base64 payloads and server-side timeouts
-  return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}&model=flux`;
+  if (type === "logo") prompt = `Minimalist restaurant logo for "${title}". ${context}. Flat vector, solid background.`;
+  else if (type === "bg") prompt = `Cinematic restaurant background for "${title}". ${context}. High res, food photography.`;
+  else prompt = `Professional food photography, ${title}. ${context}. Styled plate, natural light.`;
+
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true&seed=${s}&model=flux`;
 }
 
 /**
- * Génère le logo (DALL-E 3 via OpenAI) + le background de marque (FLUX via Pollinations)
- * Retourne aussi le sceneSeed pour l'utiliser dans toutes les photos produits
+ * 💰 CALCUL PRIX DE VENTE
  */
-export async function generateBrandImages(
-  brandName: string,
-  logoPrompt: string,
-  backgroundPrompt: string,
-  mainDishesContext?: string
-): Promise<{ logoUrl: string | null; backgroundUrl: string | null; sceneSeed: number }> {
-  const sceneSeed = Math.floor(Math.random() * 1000000);
-
-  try {
-    // 🎨 Logo → DALL-E 3 (meilleur pour le texte et les instructions précises)
-    let logoUrl: string | null = null;
-    try {
-      const openai = getOpenAI();
-      const logoResp = await openai.images.generate({
-        model: "dall-e-3",
-        prompt: `Professional MINIMALIST FLAT VECTOR LOGO for "${brandName}". ${logoPrompt}. Solid white background, high contrast, simple geometric shapes. NO 3D, NO shadows, NO realistic textures, NO photos, NO gradients.`,
-        n: 1,
-        size: "1024x1024",
-        quality: "hd",
-        style: "natural",
-        response_format: "b64_json",
-      });
-      const b64 = (logoResp.data?.[0] as any)?.b64_json;
-      if (b64) logoUrl = `data:image/png;base64,${b64}`;
-    } catch (logoErr) {
-      console.warn("⚠️ DALL-E logo failed, fallback Pollinations:", (logoErr as any).message);
-      // Fallback Pollinations si OpenAI échoue
-      const fbUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(`Professional minimalist restaurant logo for "${brandName}". ${logoPrompt}. Clean typography, flat design, solid background. NO taglines.`)}?width=1024&height=1024&nologo=true&seed=${sceneSeed}&model=flux`;
-      const fbRes = await fetch(fbUrl);
-      if (fbRes.ok) logoUrl = `data:image/png;base64,${Buffer.from(await fbRes.arrayBuffer()).toString("base64")}`;
-    }
-
-    // 🏠 Background → FLUX via Pollinations (URL directe)
-    const backgroundUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(`Cinematic wide restaurant background photo. ${backgroundPrompt}. Featuring: ${mainDishesContext || ""}. High resolution, natural light, warm atmosphere. NO people, NO text.`)}?width=1024&height=768&nologo=true&seed=${sceneSeed}&model=flux`;
-
-    return { logoUrl, backgroundUrl, sceneSeed };
-  } catch (error) {
-    console.error("❌ generateBrandImages error:", (error as any).message);
-    return { logoUrl: null, backgroundUrl: null, sceneSeed };
-  }
+export function calculatePrice(materialCost: number, margin: number): number {
+  // Simple formula: Cost + Margin + Fees (Uber 30% + Stripe 2%) + TVA 10%
+  const fees = 0.32;
+  const tva = 1.10;
+  const raw = (materialCost + margin) * tva / (1 - fees);
+  return Math.ceil(raw / 1.1) * 1.1 - 0.1; // Prix psychologique (ex: 12.90)
 }
